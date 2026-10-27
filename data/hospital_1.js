@@ -1,0 +1,1 @@
+var json_hospital_1 = {"type":"FeatureCollection","name":"hospital_1","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"nome":"VIA VERNIERI","id":null},"geometry":{"type":"Point","coordinates":[14.76577,40.68193]}}]}
