@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per l'allineamento verticale centrato delle voci e uniformità pulsanti (44x44px)
+// Iniezione di stili CSS per allineamento, uniformità pulsanti (44x44px) e rientro sinistro azzerato
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -26,6 +26,15 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-tree {
         text-align: left !important;
         direction: ltr !important;
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+    /* Azzeramento completo dell'indentazione ad albero (spazio a sinistra) */
+    .leaflet-control-layers-tree ul,
+    .leaflet-control-layers-tree li,
+    .leaflet-control-layers-tree div {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
     }
     /* Centratura verticale perfetta per le singole voci (checkbox + testo + pallino) */
     .leaflet-control-layers-tree label {
@@ -409,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. GESTIONE EVENTI GEOLOCALIZZAZIONE (Opzionale: feedback visivo sulla posizione trovata) ---
+    // --- 5. GESTIONE EVENTI GEOLOCALIZZAZIONE ---
     map.on('locationfound', function(e) {
         var radius = e.accuracy / 2;
         L.marker(e.latlng).addTo(map)
@@ -421,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("Impossibile determinare la posizione: " + e.message);
     });
 
-    // --- 6. PULSANTI IN ALTO A DESTRA (44x44px con margini regolabili) ---
+    // --- 6. PULSANTI IN ALTO A DESTRA (45x45px con margini regolabili) ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -470,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
-        // 2. Geolocalizzazione (Usa map.locate nativo)
+        // 2. Geolocalizzazione (Geolocalizzazione nativa Leaflet)
         createBtn('📍', "Posizione", () => {
             map.locate({setView: true, maxZoom: 16});
         }, 'btn-tutorial-locate');
