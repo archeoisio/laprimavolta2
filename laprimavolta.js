@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per uniformare il toggle dei layer e i pulsanti a 44x44px
+// Iniezione di stili CSS corretti per il pannello dei layer e uniformità pulsanti (44x44px)
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -22,13 +22,9 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-list, 
     .leaflet-control-layers-base, 
     .leaflet-control-layers-overlays,
-    .leaflet-control-layers-tree,
-    .leaflet-control-layers-expanded span,
-    .leaflet-control-layers-expanded label,
-    .leaflet-control-layers-group label {
+    .leaflet-control-layers-tree {
         text-align: left !important;
         direction: ltr !important;
-        width: 100% !important;
     }
     .leaflet-control-layers-expanded label,
     .leaflet-control-layers-group label {
@@ -40,6 +36,13 @@ customStyleTag.innerHTML = `
         line-height: 1.4 !important;
         cursor: pointer;
         margin: 4px 0 !important;
+        text-align: left !important;
+        width: 100% !important;
+    }
+    /* Evita che gli span delle icone colore vengano stirati al 100% */
+    .leaflet-control-layers-expanded label span {
+        width: auto !important;
+        flex-shrink: 0 !important;
     }
     .leaflet-control-layers-selector {
         margin: 0 !important;
@@ -413,10 +416,12 @@ document.addEventListener('DOMContentLoaded', () => {
         strings: { title: "Posizione" }
     });
 
-    // --- 6. PULSANTI IN ALTO A DESTRA (Fissati rigorosamente a 44x44px) ---
+    // --- 6. PULSANTI IN ALTO A DESTRA (44x44px con margini regolabili dal bordo schermo) ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
+        
+        // PUOI REGOLARE QUI I MARGINI DAL BORDO SCHERMO:
         container.style.marginTop = '4px';
         container.style.marginRight = '10px';
         container.style.display = 'flex';
@@ -460,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
-        // 2. Geolocalizzazione (Dimensioni 44x44px)
+        // 2. Geolocalizzazione
         createBtn('📍', "Posizione", () => {
             locateControl.start();
         }, 'btn-tutorial-locate');
