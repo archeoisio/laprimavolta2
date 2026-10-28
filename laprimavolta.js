@@ -33,8 +33,8 @@ customStyleTag.innerHTML = `
     /* Colonna 3: Destra (Contenuto Cluster Selezionato con scorrimento proprio) */
     .col-right { display: flex; flex-direction: column; overflow: hidden; }
     
-    .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 4px 6px; font-size: 10px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; }
+    .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 4px 6px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; }
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 10px; color: #666; margin-bottom: 4px; }
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
             items.forEach((item, itemIdx) => {
                 html += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 5px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
-                        <span style="font-size:10px; color:#333; flex-grow:1; margin-right:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
+                        <span style="font-size:12px; color:#333; flex-grow:1; margin-right:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
                         <button class="vola-btn" data-tavolo="${tavolo}" data-index="${itemIdx}" style="font-weight:bold; font-size:8px; padding:2px 4px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
                     </div>
                 `;
