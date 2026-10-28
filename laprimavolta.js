@@ -129,6 +129,19 @@ function resetFeatureStyle(e) {
     }
 }
 
+// Funzioni di sicurezza globali per evitare errori se richiamate da index2.html
+window.closeModal = function() {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.nextTutorialStep = function() {
+    // Svuota eventuali popup rimasti aperti
+    if (typeof map !== 'undefined') {
+        map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. INIZIALIZZAZIONE MAPPA E VIEWPORT ---
     map = L.map('map', {
