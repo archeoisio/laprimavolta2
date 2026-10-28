@@ -595,22 +595,33 @@ document.addEventListener('DOMContentLoaded', () => {
     sideInfoControl.addTo(map);
 });
 
-// --- TUTORIAL ---
+// --- TUTORIAL (ispirato allo stile Atlas ma adattato a La Prima Volta) ---
 const tutorialSteps = [
+    { 
+        id: ".leaflet-control-layers", 
+        titolo: "Layer Tematici e Base", 
+        testo: "Scegli la mappa base (OSM o Satellite) e attiva/disattiva i layer tematici, le aree e il contesto urbano." 
+    },
     { 
         id: ".btn-tutorial-home", 
         titolo: "Tasto Home", 
-        testo: "Resetta la mappa alla vista zoom iniziale" 
+        testo: "Resetta la mappa alla vista zoom iniziale su Salerno." 
     },
     { 
         id: ".btn-tutorial-locate", 
         titolo: "Geolocalizzazione", 
-        testo: "Trova la tua posizione attuale sulla mappa." 
+        testo: "Trova la tua posizione attuale sulla mappa (richiede permessi di localizzazione)." 
     },
     { 
         id: ".btn-tutorial-hearts", 
-        titolo: "Cluster tematici", 
-        testo: "Apri il pannello dei cluster tematici per esplorare le proposte e volare direttamente su di esse." 
+        titolo: "Cluster Tematici", 
+        testo: "Clicca qui per aprire il pannello di riepilogo dei tavoli tematici." 
+    },
+    { 
+        id: "#hearts-list-box", 
+        titolo: "Esplora Proposte", 
+        testo: "Elenco delle proposte divise per tavolo. Clicca su 'VOLA' per raggiungere direttamente la destinazione sulla mappa.",
+        action: "openHearts" 
     }
 ];
 
@@ -641,11 +652,21 @@ function showStep() {
     const step = tutorialSteps[currentStep];
     const target = document.querySelector(step.id);
     const isLast = currentStep === tutorialSteps.length - 1;
+    const isHeartBox = step.id === "#hearts-list-box";
+
+    if (step.action === "openHearts") {
+        const hb = document.getElementById('hearts-list-box');
+        if (hb) hb.style.display = 'block';
+    }
 
     let popupPoint;
     if (target) {
         const rect = target.getBoundingClientRect();
-        popupPoint = map.containerPointToLayerPoint([rect.left - 130, rect.top + (rect.height / 2)]);
+        if (isHeartBox) {
+            popupPoint = map.containerPointToLayerPoint([rect.left + 120, rect.top - 10]);
+        } else {
+            popupPoint = map.containerPointToLayerPoint([rect.left - 130, rect.top + (rect.height / 2)]);
+        }
     } else {
         popupPoint = map.containerPointToLayerPoint([100, 100]);
     }
@@ -657,8 +678,8 @@ function showStep() {
         closeButton: false, 
         closeOnClick: false,
         autoPan: false,
-        className: 'tutorial-pointer',
-        offset: L.point(0, 0) 
+        className: 'tutorial-pointer' + (isHeartBox ? ' heart-box-popup' : ''),
+        offset: isHeartBox ? L.point(0, -15) : L.point(0, 0) 
     })
     .setLatLng(popupLatLng)
     .setContent(
@@ -689,5 +710,7 @@ window.nextTutorialStep = function() {
         map.doubleClickZoom.enable();
         map.scrollWheelZoom.enable();
         map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
+        const hb = document.getElementById('hearts-list-box');
+        if (hb) hb.style.display = 'none';
     }
 }
