@@ -39,7 +39,15 @@ customStyleTag.innerHTML = `
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
     .panel-scrollable-grid { flex-grow: 1; overflow-y: auto; padding-right: 2px; }
-    .features-grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    
+    /* Griglia a 3 colonne con flusso verticale (riempie prima la colonna 1 in alto-basso) */
+    .features-grid-3col { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        grid-auto-flow: column; 
+        gap: 5px; 
+    }
+    
     @media (max-width: 650px) { .features-grid-3col { grid-template-columns: repeat(2, 1fr); } }
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
 `;
