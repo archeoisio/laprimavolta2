@@ -428,8 +428,8 @@ document.addEventListener('DOMContentLoaded', () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
-        // Atlas Layers ❤️
-        createBtn('❤️', "Atlas Layers", () => {
+        // Cluster tematici ❤️
+        createBtn('❤️', "Cluster tematici", () => {
             const hb = document.getElementById('hearts-list-box');
             if(hb) hb.style.display = (hb.style.display === 'none') ? 'block' : 'none';
         }, 'btn-tutorial-hearts');
@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
         locContainer.style.height = '36px';
     }
 
-    // --- 6. PANNELLO ATLAS LAYERS (BASSO SINISTRA) ---
+    // --- 6. PANNELLO CLUSTER TEMATICI (BASSO SINISTRA) ---
     const sideInfoControl = L.control({ position: 'bottomleft' });
     sideInfoControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'info-container-bottom');
@@ -559,8 +559,8 @@ const tutorialSteps = [
     },
     { 
         id: ".btn-tutorial-hearts", 
-        titolo: "Atlas Layers ❤️", 
-        testo: "Apri il pannello dei tavoli per esplorare le proposte e volare direttamente su di esse." 
+        titolo: "Cluster tematici ", 
+        testo: "Apri il pannello dei cluster tematici per esplorare le proposte e volare direttamente su di esse." 
     }
 ];
 
