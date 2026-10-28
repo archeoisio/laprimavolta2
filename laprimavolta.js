@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. PULSANTI IN ALTO A DESTRA (36x36px) ---
+    // --- 5. PULSANTI IN ALTO A DESTRA (Fissati rigorosamente a 36x36px) ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -457,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     btnControl.addTo(map);
 
-    // Locate control
+    // Locate control (forzato anch'esso a 36x36px per coerenza perfetta)
     const locateControl = L.control.locate({
         position: 'topright',
         flyTo: { duration: 6 },
@@ -469,6 +469,10 @@ document.addEventListener('DOMContentLoaded', () => {
         locContainer.classList.add('btn-tutorial-locate');
         locContainer.style.width = '36px';
         locContainer.style.height = '36px';
+        locContainer.style.lineHeight = '36px';
+        locContainer.style.display = 'flex';
+        locContainer.style.alignItems = 'center';
+        locContainer.style.justifyContent = 'center';
     }
 
     // --- 6. PANNELLO CLUSTER TEMATICI (BASSO SINISTRA) ---
@@ -564,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sideInfoControl.addTo(map);
 });
 
-// --- TUTORIAL ---
+// --- TUTORIAL (Con posizionamento popup calibrato sui pulsanti) ---
 const tutorialSteps = [
     { 
         id: ".btn-tutorial-home", 
@@ -578,7 +582,7 @@ const tutorialSteps = [
     },
     { 
         id: ".btn-tutorial-hearts", 
-        titolo: "Cluster tematici ", 
+        titolo: "Cluster tematici", 
         testo: "Apri il pannello dei cluster tematici per esplorare le proposte e volare direttamente su di esse." 
     }
 ];
@@ -614,7 +618,8 @@ function showStep() {
     let popupPoint;
     if (target) {
         const rect = target.getBoundingClientRect();
-        popupPoint = map.containerPointToLayerPoint([rect.left - 120, rect.top + 110]);
+        // Calcolo preciso basato sul bounding rect del pulsante target sulla destra dello schermo
+        popupPoint = map.containerPointToLayerPoint([rect.left - 130, rect.top + (rect.height / 2)]);
     } else {
         popupPoint = map.containerPointToLayerPoint([100, 100]);
     }
@@ -627,7 +632,7 @@ function showStep() {
         closeOnClick: false,
         autoPan: false,
         className: 'tutorial-pointer',
-        offset: L.point(-10, 0) 
+        offset: L.point(0, 0) 
     })
     .setLatLng(popupLatLng)
     .setContent(
