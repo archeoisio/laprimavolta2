@@ -43,7 +43,7 @@ customStyleTag.innerHTML = `
     .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
     
     /* Singola colonna verticale (max 4 elementi) */
-    .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 180px; flex-shrink: 0; }
+    .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
 `;
@@ -259,12 +259,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 colItems.forEach((item) => {
                     // Troviamo l'indice globale originale dell'item per il tasto VOLA
                     const globalIdx = items.indexOf(item);
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 5px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
-                            <span style="font-size:12px; color:#333; flex-grow:1; margin-right:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
-                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-weight:bold; font-size:8px; padding:2px 4px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">🔍</button>
-                        </div>
-                    `;
+                   html += `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
+        <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
+        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:11px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
+    </div>
+`;
                 });
                 html += `</div>`;
             });
