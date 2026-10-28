@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // COLONNA 2: CLUSTER TEMATICI (PULSANTI CON SCORRIMENTO VERTICALE INDIPENDENTE)
         html += `
             <div class="col-middle">
-                <div class="sub-section-title">Tavoli</div>
+                <div class="sub-section-title">Tematiche</div>
                 <div class="sidebar-tabs-vertical">
         `;
         let firstTab = true;
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const catColor = getTavoloColor(tavolo);
             html += `
                 <div id="tab-${cleanKey}" class="sidebar-tab-content ${firstTab ? 'active' : ''}">
-                    <div class="cluster-counter-fixed">Proposte: <b>${items.length}</b></div>
+                    <div class="cluster-counter-fixed">Elementi mappati: <b>${items.length}</b></div>
                     <div class="panel-scrollable-grid">
                         <div class="features-grid-3col">
             `;
