@@ -67,7 +67,7 @@ customStyleTag.innerHTML = `
     /* Layout principale SEMPRE a 2 Colonne (anche su mobile) */
     .panel-two-columns {
         display: grid;
-        grid-template-columns: 210px 1fr; /* Colonna sinistra più compatta per mobile */
+        grid-template-columns: 150px 1fr; /* Colonna sinistra più compatta per mobile */
         gap: 10px;
         flex-grow: 1;
         overflow: hidden;
