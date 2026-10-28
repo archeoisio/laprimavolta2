@@ -42,7 +42,7 @@ customStyleTag.innerHTML = `
     /* Contenitore con scorrimento orizzontale per le colonne verticali */
     .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
     
-    /* Singola colonna verticale */
+    /* Singola colonna verticale (5 elementi fissi) */
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
@@ -197,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
-                    <button class="panel-close-btn" onclick="event.stopPropagation(); document.getElementById('custom-bottom-panel').classList.remove('open'); renderPanelContent();">&times;</button>
                 </div>
             </div>
             <div class="panel-three-columns">
@@ -240,16 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div></div>`;
 
-        // COLONNA 3: ELENCO PROPOSTE (DINAMICO: 5 DESKTOP, 6 MOBILE)
+        // COLONNA 3: ELENCO PROPOSTE (FISSO A 5 ELEMENTI PER COLONNA)
         html += `<div class="col-right">`;
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
             
-            const isMobile = window.innerWidth <= 650;
-            const itemsPerColumn = isMobile ? 6 : 5;
-            
+            const itemsPerColumn = 5;
             const columns = [];
             for (let i = 0; i < items.length; i += itemsPerColumn) {
                 columns.push(items.slice(i, i + itemsPerColumn));
@@ -267,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const globalIdx = items.indexOf(item);
                     html += `
                         <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
-                            <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
+                            <span style="font-size:12px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
                             <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:11px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
                         </div>
                     `;
@@ -320,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Render iniziale del pannello (chiuso con freccia verso l'alto)
     renderPanelContent();
 
     map.on('locationfound', function(e) {
