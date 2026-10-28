@@ -1,71 +1,232 @@
 let map; 
+let highlightLayer;
+
+function highlightFeature(e) {
+    highlightLayer = e.target;
+    if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
+      highlightLayer.setStyle({ color: 'rgba(255, 255, 0, 1.00)' });
+    } else {
+      highlightLayer.setStyle({ fillColor: 'rgba(255, 255, 0, 1.00)', fillOpacity: 1 });
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. CONFIGURAZIONI VIEWPORT & MAPPA ---
-    const MOBILE_MAX_WIDTH = 1024;
-    
-    const isMobile = window.innerWidth <= MOBILE_MAX_WIDTH;
-    const isLandscape = window.innerWidth > window.innerHeight;
-    let initialView;
-    
-    if (isMobile) {
-        if (isLandscape) {
-            initialView = { center: [40.6766, 14.7923], zoom: 13 }; 
-        } else {
-            initialView = { center: [40.6766, 14.7923], zoom: 12 };
-        }
-    } else {
-        initialView = { center: [40.6766, 14.7923], zoom: 13 };
+    // --- 1. INIZIALIZZAZIONE MAPPA E VIEWPORT ---
+    map = L.map('map', {
+        zoomControl: false,
+        maxZoom: 28,
+        minZoom: 1
+    }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
+
+    var hash = new L.Hash(map);
+    map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+    var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+
+    function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
     }
 
-    map = L.map('map', {
-        center: initialView.center,
-        zoom: initialView.zoom,
-        zoomSnap: 0.1,           
-        zoomDelta: 1,           
-        wheelPxPerZoomLevel: 150, 
-        zoomControl: true,
-        minZoom: 2.5,
-        worldCopyJump: true,
-        bounceAtZoomLimits: false,
-        attributionControl: false
+    // --- 2. CARICAMENTO LAYER QGIS ---
+    // iconaquartieri_0
+    function pop_iconaquartieri_0(feature, layer) {
+        layer.on({
+            mouseout: function(e) { layer.closePopup(); },
+            mouseover: highlightFeature,
+        });
+        var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
+        var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+        layer.bindPopup(content, { maxHeight: 400 });
+    }
+    function style_iconaquartieri_0_0() {
+        return { pane: 'pane_iconaquartieri_0', radius: 4.0, stroke: false, fill: true, fillOpacity: 1, fillColor: 'rgba(190,178,151,0.0)', interactive: false };
+    }
+    map.createPane('pane_iconaquartieri_0');
+    map.getPane('pane_iconaquartieri_0').style.zIndex = 400;
+    var layer_iconaquartieri_0 = new L.geoJson(json_iconaquartieri_0, {
+        interactive: false, pane: 'pane_iconaquartieri_0', onEachFeature: pop_iconaquartieri_0,
+        pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, style_iconaquartieri_0_0(feature)); },
     });
+    map.addLayer(layer_iconaquartieri_0);
 
-    map.on('zoomstart', function() {
-        map.getContainer().style.background = '#1a1a1a';
+    // hospital_1
+    function pop_hospital_1(feature, layer) {
+        layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
+        var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
+        var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+        layer.bindPopup(content, { maxHeight: 400 });
+    }
+    function style_hospital_1_0() {
+        return { pane: 'pane_hospital_1', icon: L.icon({ iconUrl: 'markers/hospital_1.svg', iconSize: [16.72, 16.72] }), interactive: false };
+    }
+    map.createPane('pane_hospital_1');
+    map.getPane('pane_hospital_1').style.zIndex = 401;
+    var layer_hospital_1 = new L.geoJson(json_hospital_1, {
+        interactive: false, pane: 'pane_hospital_1', onEachFeature: pop_hospital_1,
+        pointToLayer: function (feature, latlng) { return L.marker(latlng, style_hospital_1_0(feature)); },
     });
+    map.addLayer(layer_hospital_1);
 
-    const satellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-        attribution: 'Google',
-        maxZoom: 20,
-        updateWhenIdle: false, 
-        updateWhenZooming: true,
-        keepBuffer: 15
+    // iconestazioni_2
+    function pop_iconestazioni_2(feature, layer) {
+        layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
+        var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
+        var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+        layer.bindPopup(content, { maxHeight: 400 });
+    }
+    function style_iconestazioni_2_0() {
+        return { pane: 'pane_iconestazioni_2', radius: 12.0, opacity: 1, color: 'rgba(35,35,35,1.0)', fill: true, fillOpacity: 1, fillColor: 'rgba(255,255,255,1.0)', interactive: false };
+    }
+    function style_iconestazioni_2_1() {
+        return { pane: 'pane_iconestazioni_2', icon: L.icon({ iconUrl: 'markers/iconestazioni_2.svg', iconSize: [19.0, 19.0] }), interactive: false };
+    }
+    map.createPane('pane_iconestazioni_2');
+    map.getPane('pane_iconestazioni_2').style.zIndex = 402;
+    var layer_iconestazioni_2 = new L.geoJson.multiStyle(json_iconestazioni_2, {
+        interactive: false, pane: 'pane_iconestazioni_2', onEachFeature: pop_iconestazioni_2,
+        pointToLayers: [
+            function (feature, latlng) { return L.marker(latlng, style_iconestazioni_2_0(feature)); },
+            function (feature, latlng) { return L.marker(latlng, style_iconestazioni_2_1(feature)); }
+        ]
+    });
+    map.addLayer(layer_iconestazioni_2);
+
+    // Basemaps
+    map.createPane('pane_GoogleSatellite_3');
+    map.getPane('pane_GoogleSatellite_3').style.zIndex = 403;
+    var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28 });
+
+    map.createPane('pane_OpenStreetMap_4');
+    map.getPane('pane_OpenStreetMap_4').style.zIndex = 404;
+    var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28 });
+    map.addLayer(layer_OpenStreetMap_4);
+
+    // puntiprimavolta_5 (I tuoi punti dell'assemblea)
+    function pop_puntiprimavolta_5(feature, layer) {
+        layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
+        var popupContent = '<table>\
+                <tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                <tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                <tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                <tr><th scope="row">Stato</th><td>' + (feature.properties['Stato'] !== null ? autolinker.link(String(feature.properties['Stato']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                <tr><th scope="row">Tavolo</th><td>' + (feature.properties['Tavolo'] !== null ? autolinker.link(String(feature.properties['Tavolo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+            </table>';
+        var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+        layer.bindPopup(content, { maxHeight: 400 });
+    }
+    function style_puntiprimavolta_5_0(feature) {
+        return { pane: 'pane_puntiprimavolta_5', radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: 'rgba(59,113,230,1.0)', interactive: true };
+    }
+    map.createPane('pane_puntiprimavolta_5');
+    map.getPane('pane_puntiprimavolta_5').style.zIndex = 405;
+    var layer_puntiprimavolta_5 = new L.geoJson(json_puntiprimavolta_5, {
+        interactive: true, pane: 'pane_puntiprimavolta_5', onEachFeature: pop_puntiprimavolta_5,
+        pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, style_puntiprimavolta_5_0(feature)); },
+    });
+    map.addLayer(layer_puntiprimavolta_5);
+
+    // poligoniprimavolta_6 (I tuoi poligoni dell'assemblea)
+    function pop_poligoniprimavolta_6(feature, layer) {
+        layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
+        var popupContent = '<table>\
+                <tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                <tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                <tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+            </table>';
+        var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+        layer.bindPopup(content, { maxHeight: 400 });
+    }
+    function style_poligoniprimavolta_6_0(feature) {
+        return { pane: 'pane_poligoniprimavolta_6', opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: 'rgba(140,83,231,1.0)', interactive: true };
+    }
+    map.createPane('pane_poligoniprimavolta_6');
+    map.getPane('pane_poligoniprimavolta_6').style.zIndex = 406;
+    var layer_poligoniprimavolta_6 = new L.geoJson(json_poligoniprimavolta_6, {
+        interactive: true, pane: 'pane_poligoniprimavolta_6', onEachFeature: pop_poligoniprimavolta_6, style: style_poligoniprimavolta_6_0,
+    });
+    map.addLayer(layer_poligoniprimavolta_6);
+
+    // Layer Tree Control
+    var overlaysTree = [
+        {label: 'poligoniprimavolta', layer: layer_poligoniprimavolta_6},
+        {label: 'puntiprimavolta', layer: layer_puntiprimavolta_5},
+        {label: "OpenStreetMap", layer: layer_OpenStreetMap_4, radioGroup: 'bm' },
+        {label: "Google Satellite", layer: layer_GoogleSatellite_3, radioGroup: 'bm' },
+        {label: 'iconestazioni', layer: layer_iconestazioni_2},
+        {label: 'hospital', layer: layer_hospital_1},
+        {label: 'iconaquartieri', layer: layer_iconaquartieri_0}
+    ];
+    var lay = L.control.layers.tree(null, overlaysTree, { collapsed: true });
+    lay.addTo(map);
+
+    // Photon Search Control
+    const photonUrl = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&"};
+    var photonControl = L.control.photon({
+        url: photonUrl["Nominatim OSM"],
+        feedbackLabel: '',
+        position: 'topleft',
+        includePosition: true,
+        initial: true,
     }).addTo(map);
+    photonControl._container.childNodes[0].style.borderRadius="10px";
 
-    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        updateWhenIdle: false,
-        keepBuffer: 10,
-        updateInterval: 100
+    var searchMarker = null;
+    var searchGeoJson = null;
+    photonControl.on('selected', function(e) {
+        if (searchGeoJson != null) {
+            map.removeLayer(searchMarker);
+            map.removeLayer(searchGeoJson);
+        }
+        var gcd = e.choice;
+        searchGeoJson = L.geoJSON(gcd).addTo(map);
+        var label = typeof gcd.properties.label === 'undefined' ? gcd.properties.display_name : gcd.properties.label;
+        searchMarker = L.marker(searchGeoJson.getLayers()[0].getLatLng()).bindPopup(label).addTo(map);
+        map.setView(searchGeoJson.getLayers()[0].getLatLng(), 17);
+        var z = typeof e.choice.properties.label === 'undefined'? e.choice.properties.display_name : e.choice.properties.label;
+        e.target.input.value = z;
     });
-   
-    let control = null; 
+    var searchEl = document.getElementsByClassName("leaflet-photon leaflet-control")[0];
+    if (searchEl) {
+        searchEl.classList.add("leaflet-control-search");
+        searchEl.style.display = "flex";
+        searchEl.style.backgroundColor="rgba(255,255,255,0.5)";
 
-    // --- 2. GESTIONE ROUTING (CALCOLO PERCORSI) ---
+        var button = document.createElement("div");
+        button.id = "gcd-button-control";
+        button.className = "gcd-gl-btn fa fa-search search-button";
+        searchEl.insertBefore(button, searchEl.firstChild);
+        var last = searchEl.lastChild;
+        last.style.display = "none";
+        button.addEventListener("click", function () {
+            if (last.style.display === "none") {
+                last.style.display = "block";
+            } else {
+                last.style.display = "none";
+            }
+        });
+    }
+
+    // --- 3. CONTROLLI INTERFACCIA E ROUTING ---
+    let control = null; 
     async function startRouting() {
         const startInput = document.getElementById('start');
         const endInput = document.getElementById('end');
-        
         if (!startInput || !endInput) return;
-        
         const startVal = startInput.value;
         const endVal = endInput.value;
-
         if (!startVal || !endVal) {
             alert("Inserisci sia partenza che destinazione");
             return;
         }
-
         try {
             const geocode = async (query) => {
                 const r = await fetch("https://nominatim.openstreetmap.org/search?format=json&q=" + encodeURIComponent(query));
@@ -73,14 +234,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (d.length === 0) throw new Error("Località non trovata: " + query);
                 return L.latLng(d[0].lat, d[0].lon);
             };
-
             const startCoords = await geocode(startVal);
             const endCoords = await geocode(endVal);
-
             if (typeof control !== 'undefined' && control) {
                 map.removeControl(control);
             }
-
             control = L.Routing.control({
                 waypoints: [startCoords, endCoords],
                 language: 'it',
@@ -93,16 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const container = document.querySelector('.leaflet-routing-container');
                 const toggleBtn = document.querySelector('.leaflet-routing-toggle');
-
                 if (container && toggleBtn) {
                     container.classList.add('leaflet-routing-container-hide');
                     const newToggle = toggleBtn.cloneNode(true);
                     toggleBtn.parentNode.replaceChild(newToggle, toggleBtn);
-
                     newToggle.addEventListener('click', (e) => {
                         L.DomEvent.stopPropagation(e);
                         L.DomEvent.preventDefault(e);
-                        
                         const isHidden = container.classList.contains('leaflet-routing-container-hide');
                         if (isHidden) {
                             container.classList.remove('leaflet-routing-container-hide');
@@ -112,18 +267,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             }, 600);
-
         } catch (e) {
             console.error("Errore Routing:", e);
             alert(e.message || "Errore nel calcolo del percorso.");
         }
     }
-    
-    // --- 3. CONTROLLI INTERFACCIA (BOTTONI E PANNELLI) ---
+
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
-        
         container.style.marginTop = '4px';
         container.style.marginRight = '4px';
         container.style.display = 'flex';
@@ -150,12 +302,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        // Pulsante Home 🌍
         createBtn('🌍', "Torna alla vista iniziale", () => {
-            map.flyTo(initialView.center, initialView.zoom, { animate: true, duration: 4, easeLinearity: 0.1 });
+            map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
-        
-        // Pulsante Routing 🗺️
+
         createBtn('🗺️', "Mostra/Nascondi indicazioni", () => {
             const rb = document.getElementById('route-box');
             if(rb) rb.style.display = (rb.style.display === 'none') ? 'flex' : 'none';
@@ -165,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     btnControl.addTo(map);
 
-    // Pulsante Locate 📍 (Controllo indipendente in topright)
+    // Locate control
     const locateControl = L.control.locate({
         position: 'topright',
         flyTo: { duration: 6 },
@@ -177,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
         locContainer.classList.add('btn-tutorial-locate');
     }
 
-    // --- 4. PANNELLI INFORMATIVI (BASSO SINISTRA) ---
+    // Side info control (Routing box)
     const sideInfoControl = L.control({ position: 'bottomleft' });
     sideInfoControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'info-container-bottom');
@@ -188,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
         container.style.marginLeft = '10px';   
         container.style.pointerEvents = 'auto';
         
-        // Box Routing
         const routeBox = L.DomUtil.create('div', '', container);
         routeBox.id = 'route-box';
         L.DomEvent.disableClickPropagation(routeBox);
@@ -235,27 +384,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return container;
     };
     sideInfoControl.addTo(map);
-
-    function setVh() {
-        const mapEl = document.getElementById('map');
-        if (!mapEl || !map) return;
-        const runResize = () => {
-            mapEl.style.left = "0px";
-            mapEl.style.top = "0px";
-            mapEl.style.width = window.innerWidth + 'px';
-            mapEl.style.height = window.innerHeight + 'px';
-            map.invalidateSize({ animate: false });
-        };
-        runResize();
-        setTimeout(runResize, 100);
-        setTimeout(runResize, 500);
-    }
-
-    setVh();
-    window.addEventListener('resize', setVh);
 });
 
-// --- SEZIONE TUTORIAL ---
+// --- TUTORIAL ---
 const tutorialSteps = [
     { 
         id: ".btn-tutorial-home", 
@@ -284,7 +415,6 @@ function closeModal() {
 function startTutorial() {
     closeModal();
     currentStep = 0;
-    
     if (typeof map === 'undefined') return;
 
     try {
@@ -307,6 +437,8 @@ function showStep() {
     if (target) {
         const rect = target.getBoundingClientRect();
         popupPoint = map.containerPointToLayerPoint([rect.left - 100, rect.top + 110]);
+    } else {
+        popupPoint = map.containerPointToLayerPoint([100, 100]);
     }
 
     const popupLatLng = map.layerPointToLatLng(popupPoint);
@@ -340,7 +472,6 @@ function showStep() {
 
 function nextTutorialStep() {
     currentStep++;
-    
     if (currentStep < tutorialSteps.length) {
         showStep(); 
     } else {
@@ -348,7 +479,6 @@ function nextTutorialStep() {
         map.touchZoom.enable();
         map.doubleClickZoom.enable();
         map.scrollWheelZoom.enable();
-        
         map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
     }
 }
