@@ -21,38 +21,26 @@ customStyleTag.innerHTML = `
         font-size: 12px !important;
     }
     
-    /* AZZERAMENTO RADICALE DI OGNI SPAZIO, MARGINE E RIENTRO DEL TREE */
+    /* AZZERAMENTO DELLE LISTE DEL TREE SENZA TOCCARE LE ICONE */
     .leaflet-control-layers-list, 
     .leaflet-control-layers-base, 
     .leaflet-control-layers-overlays,
     .leaflet-control-layers-tree,
     .leaflet-control-layers-tree ul,
-    .leaflet-control-layers-tree li,
-    .leaflet-control-layers-tree div,
-    .leaflet-control-layers-group,
-    .leaflet-control-layers-subgroup {
+    .leaflet-control-layers-tree li {
         margin-left: 0 !important;
         padding-left: 0 !important;
         text-align: left !important;
-        direction: ltr !important;
-        text-indent: 0 !important;
-    }
-
-    /* Rimuove i pallini/indicatori di lista e azzera il padding dei nodi */
-    .leaflet-control-layers-tree li {
         list-style: none !important;
-        margin-left: 0 !important;
-        padding-left: 0 !important;
-        text-indent: 0 !important;
     }
 
-    /* ELIMINA IL MARGINE FORZATO DEI RAMI FIGLI NEL PLUGIN TREE */
+    /* Rimuove l'indentazione forzata dei rami figli generata dal plugin */
     .leaflet-control-layers-tree ul {
         padding-left: 0 !important;
         margin-left: 0 !important;
     }
 
-    /* Allineamento rigoroso a sinistra per ogni singola etichetta */
+    /* Allineamento rigido a sinistra delle singole righe */
     .leaflet-control-layers-tree label {
         display: flex !important;
         align-items: center !important;
@@ -72,8 +60,10 @@ customStyleTag.innerHTML = `
         flex-shrink: 0 !important;
     }
 
+    /* ISOLAMENTO DELLE ICONE: Impedisce a qualsiasi span di stirarsi o allargarsi */
     .leaflet-control-layers-tree label span {
         width: auto !important;
+        max-width: none !important;
         flex-shrink: 0 !important;
         display: inline-flex !important;
         align-items: center !important;
