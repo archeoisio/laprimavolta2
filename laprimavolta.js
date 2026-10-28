@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per allineamento, uniformità pulsanti (44x44px) e rientro sinistro azzerato
+// Iniezione di stili CSS per eliminare lo spazio a sinistra nel pannello layer, allineamento e pulsanti a 44x44px
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -9,9 +9,9 @@ customStyleTag.innerHTML = `
         height: 44px !important;
     }
     .leaflet-control-layers-expanded {
-        min-width: 250px !important;
-        max-width: 280px !important;
-        padding: 12px 14px !important;
+        min-width: 240px !important;
+        max-width: 270px !important;
+        padding: 10px 10px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
@@ -26,15 +26,17 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-tree {
         text-align: left !important;
         direction: ltr !important;
+        margin-left: 0 !important;
         padding-left: 0 !important;
+    }
+    /* Riduzione drastica dello spazio sinistro nelle liste ad albero del plugin */
+    .leaflet-control-layers-tree ul {
+        padding-left: 8px !important;
         margin-left: 0 !important;
     }
-    /* Azzeramento completo dell'indentazione ad albero (spazio a sinistra) */
-    .leaflet-control-layers-tree ul,
-    .leaflet-control-layers-tree li,
-    .leaflet-control-layers-tree div {
-        padding-left: 0 !important;
+    .leaflet-control-layers-tree li {
         margin-left: 0 !important;
+        padding-left: 0 !important;
     }
     /* Centratura verticale perfetta per le singole voci (checkbox + testo + pallino) */
     .leaflet-control-layers-tree label {
@@ -44,6 +46,7 @@ customStyleTag.innerHTML = `
         cursor: pointer;
         font-size: 12px !important;
         line-height: 1.4 !important;
+        margin-left: 0 !important;
     }
     .leaflet-control-layers-selector {
         margin: 0 !important;
@@ -430,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("Impossibile determinare la posizione: " + e.message);
     });
 
-    // --- 6. PULSANTI IN ALTO A DESTRA (45x45px con margini regolabili) ---
+    // --- 6. PULSANTI IN ALTO A DESTRA (44x44px con margini regolabili) ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -453,9 +456,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = html;
             btn.title = title;
             btn.href = '#';
-            btn.style.width = '45px';
-            btn.style.height = '45px';
-            btn.style.lineHeight = '45px';
+            btn.style.width = '44px';
+            btn.style.height = '44px';
+            btn.style.lineHeight = '44px';
             btn.style.textAlign = 'center';
             btn.style.display = 'flex';
             btn.style.alignItems = 'center';
@@ -479,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
-        // 2. Geolocalizzazione (Geolocalizzazione nativa Leaflet)
+        // 2. Geolocalizzazione
         createBtn('📍', "Posizione", () => {
             map.locate({setView: true, maxZoom: 16});
         }, 'btn-tutorial-locate');
