@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per la barra laterale a scomparsa (destra)
+// Iniezione di stili CSS per il pannello a scomparsa dal basso
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -9,33 +9,37 @@ customStyleTag.innerHTML = `
         height: 44px !important;
     }
     
-    /* Barra/Pannello laterale con altezza massima a 300px e scroll interno */
-    #custom-sidebar-layers {
+    /* Pannello inferiore a scomparsa (Bottom Sheet) */
+    #custom-bottom-panel {
         position: fixed;
-        top: 60px; /* Posizionato subito sotto i pulsanti in alto a destra */
-        right: -280px; /* Nascosto fuori dallo schermo */
-        width: 260px;
+        bottom: -320px; /* Nascosto sotto lo schermo */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 450px;
         max-height: 300px; /* Altezza massima bloccata a 300px */
         overflow-y: auto; /* Attiva la barra di scorrimento verticale */
-        background: rgba(255, 255, 255, 0.97);
+        background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
-        box-shadow: -5px 0 25px rgba(0,0,0,0.3);
-        transition: right 0.3s ease-in-out;
+        box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+        transition: bottom 0.3s ease-in-out;
         z-index: 2000;
-        padding: 12px;
+        padding: 15px;
         box-sizing: border-box;
         text-align: left;
         font-family: sans-serif;
         font-size: 12px;
         color: #333;
-        border-radius: 10px;
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
+        border: 1px solid rgba(0,0,0,0.1);
     }
 
-    #custom-sidebar-layers.open {
-        right: 0; /* Mostra la barra */
+    #custom-bottom-panel.open {
+        bottom: 0; /* Sale dal basso ed emerge */
     }
 
-    .sidebar-close-btn {
+    .panel-close-btn {
         background: none;
         border: none;
         font-size: 16px;
@@ -44,47 +48,8 @@ customStyleTag.innerHTML = `
         color: #666;
     }
 
-    .sidebar-close-btn:hover {
+    .panel-close-btn:hover {
         color: #000;
-    }
-
-    /* Stile per le schede (Tabs) superiori */
-    .sidebar-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 8px;
-        margin-bottom: 8px;
-    }
-
-    .sidebar-tab-btn {
-        background: #f1f2f6;
-        border: 1px solid #dcdde1;
-        border-radius: 4px;
-        padding: 4px 8px;
-        font-size: 11px;
-        cursor: pointer;
-        font-weight: 600;
-        color: #57606f;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        transition: all 0.2s;
-    }
-
-    .sidebar-tab-btn.active {
-        background: #2f3542;
-        color: white;
-        border-color: #2f3542;
-    }
-
-    .sidebar-tab-content {
-        display: none;
-    }
-
-    .sidebar-tab-content.active {
-        display: block;
     }
 
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
@@ -362,108 +327,89 @@ document.addEventListener('DOMContentLoaded', () => {
         map.addLayer(layerPoligoniTavolo);
     }
 
-    // --- 4. CREAZIONE BARRA LATERALE A SCHEDE (TABS) ---
-    const sidebar = document.createElement('div');
-    sidebar.id = 'custom-sidebar-layers';
-    document.body.appendChild(sidebar);
+    // --- 4. CREAZIONE PANNELLO INFERIORE A SCOMPARSA (BOTTOM SHEET) ---
+    const bottomPanel = document.createElement('div');
+    bottomPanel.id = 'custom-bottom-panel';
+    document.body.appendChild(bottomPanel);
 
-    function renderSidebarContent() {
+    function renderPanelContent() {
         let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:6px; margin-bottom:8px;">
-                <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
-                <button class="sidebar-close-btn">&times;</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:6px; margin-bottom:10px;">
+                <b style="font-size:14px; color:#2c3e50;">🗂️ Centro di Controllo</b>
+                <button class="panel-close-btn">&times;</button>
             </div>
-            <div class="sidebar-tabs">
-                <button class="sidebar-tab-btn active" data-tab="tab-mappe">🗺️ Mappe</button>
         `;
 
-        // Pulsanti delle schede per ogni Tavolo
-        for (const tavolo of Object.keys(atlasCategories)) {
-            html += `<button class="sidebar-tab-btn" data-tab="tab-${tavolo.replace(/\s+/g, '')}">${tavolo.charAt(0).toUpperCase() + tavolo.slice(1)}</button>`;
-        }
-        html += `<button class="sidebar-tab-btn" data-tab="tab-contesto">🏙️ Contesto</button>`;
-        html += `</div>`;
-
-        // Contenuto Scheda Mappe Base
+        // Blocco 1: Mappe Base (Toggle affiancati senza schede)
         html += `
-            <div id="tab-mappe" class="sidebar-tab-content active">
-                <div style="font-weight:bold; margin-bottom:6px; color:#555;">Scegli Mappa Base</div>
-                <label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
-                    <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
-                </label>
-                <label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
-                    <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Google Satellite
-                </label>
+            <div style="margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #eee;">
+                <div style="font-weight:bold; margin-bottom:6px; color:#555;">Mappe Base</div>
+                <div style="display:flex; gap:15px;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
+                    </label>
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Google Satellite
+                    </label>
+                </div>
             </div>
         `;
 
-        // Contenuto Schede per ciascun Tavolo Tematico
+        // Blocco 2: Cluster Tematici con pulsanti VOLA colorati
+        html += '<div style="font-weight:bold; margin-bottom:6px; color:#555;">Cluster Tematici (Proposte)</div>';
+
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
             html += `
-                <div id="tab-${cleanKey}" class="sidebar-tab-content">
-                    <div style="font-weight:bold; margin-bottom:6px; color:#555; display:flex; align-items:center; gap:6px;">
-                        <span style="display:inline-block; width:10px; height:10px; background-color:${catColor}; border:1px solid #333; flex-shrink:0;"></span>
-                        Proposte: ${tavolo.toUpperCase()} (${items.length})
+                <div style="margin-bottom:6px; border:1px solid #eee; border-radius:6px; overflow:hidden;">
+                    <div class="table-header-${cleanKey}" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:#f8f9fa; font-weight:bold;">
+                        <span style="display:flex; align-items:center; gap:6px;">
+                            <span style="display:inline-block; width:10px; height:10px; background-color:${catColor}; border:1px solid #333; flex-shrink:0;"></span>
+                            ${tavolo.toUpperCase()} (${items.length})
+                        </span>
+                        <span class="arrow-${cleanKey}">►</span>
                     </div>
+                    <div class="table-content-${cleanKey}" style="display:none; padding:6px 8px; background:#fff; border-top:1px solid #eee;">
             `;
 
             items.forEach((item, itemIdx) => {
                 html += `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid rgba(0,0,0,0.05);">
                         <span style="font-size:11px; color:#333; flex-grow:1; margin-right:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
-                        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${itemIdx}" style="font-weight:bold; font-size:9px; padding:3px 6px; cursor:pointer; background:#e74c3c; color:white; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
+                        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${itemIdx}" style="font-weight:bold; font-size:9px; padding:3px 6px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
                     </div>
                 `;
             });
 
-            html += `</div>`;
+            html += `</div></div>`;
         }
 
-        // Contenuto Scheda Contesto Urbano
-        html += `
-            <div id="tab-contesto" class="sidebar-tab-content">
-                <div style="font-weight:bold; margin-bottom:6px; color:#555;">Elementi di Contesto</div>
-        `;
-        const contextLayers = [
-            { name: 'Stazioni', layer: layer_iconestazioni_2 },
-            { name: 'Ospedali', layer: layer_hospital_1 },
-            { name: 'Quartieri', layer: layer_iconaquartieri_0 }
-        ];
-        contextLayers.forEach((ctx, idx) => {
-            const isChecked = map.hasLayer(ctx.layer);
-            html += `<label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
-                <input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}>
-                ${ctx.name}
-            </label>`;
-        });
-        html += `</div>`;
+        bottomPanel.innerHTML = html;
 
-        sidebar.innerHTML = html;
-
-        // Chiusura barra
-        sidebar.querySelector('.sidebar-close-btn').onclick = () => {
-            sidebar.classList.remove('open');
+        // Chiusura pannello
+        bottomPanel.querySelector('.panel-close-btn').onclick = () => {
+            bottomPanel.classList.remove('open');
         };
 
-        // Logica di interazione tra le schede (Tabs)
-        const tabBtns = sidebar.querySelectorAll('.sidebar-tab-btn');
-        const tabContents = sidebar.querySelectorAll('.sidebar-tab-content');
+        // Gestione Accordion dei cluster
+        for (const [tavolo] of Object.entries(atlasCategories)) {
+            const cleanKey = tavolo.replace(/\s+/g, '');
+            const header = bottomPanel.querySelector(`.table-header-${cleanKey}`);
+            const content = bottomPanel.querySelector(`.table-content-${cleanKey}`);
+            const arrow = bottomPanel.querySelector(`.arrow-${cleanKey}`);
 
-        tabBtns.forEach(btn => {
-            btn.onclick = () => {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-
-                btn.classList.add('active');
-                const targetTabId = btn.getAttribute('data-tab');
-                sidebar.querySelector(`#${targetTabId}`).classList.add('active');
-            };
-        });
+            if (header) {
+                header.onclick = () => {
+                    const isHidden = content.style.display === 'none';
+                    content.style.display = isHidden ? 'block' : 'none';
+                    arrow.innerHTML = isHidden ? '▼' : '►';
+                };
+            }
+        }
 
         // Eventi pulsanti VOLA
-        sidebar.querySelectorAll('.vola-btn').forEach(btn => {
+        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 const tavolo = e.target.getAttribute('data-tavolo');
                 const idx = parseInt(e.target.getAttribute('data-index'));
@@ -474,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Eventi Mappe Base
-        sidebar.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
+        bottomPanel.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
             radio.onchange = (e) => {
                 if (e.target.value === 'osm') {
                     map.addLayer(layer_OpenStreetMap_4);
@@ -482,19 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     map.addLayer(layer_GoogleSatellite_3);
                     map.removeLayer(layer_OpenStreetMap_4);
-                }
-            };
-        });
-
-        // Eventi Contesto
-        sidebar.querySelectorAll('.custom-context-chk').forEach(chk => {
-            chk.onchange = (e) => {
-                const index = parseInt(e.target.getAttribute('data-index'));
-                const targetLayer = [layer_iconestazioni_2, layer_hospital_1, layer_iconaquartieri_0][index];
-                if (e.target.checked) {
-                    map.addLayer(targetLayer);
-                } else {
-                    map.removeLayer(targetLayer);
                 }
             };
         });
@@ -556,10 +489,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        // 0. Pulsante Gestione Layer / Tavoli (apre la barra a schede)
+        // 0. Pulsante Centro di Controllo (apre il pannello dal basso)
         createBtn('🗂️', "Centro di Controllo", () => {
-            renderSidebarContent();
-            sidebar.classList.toggle('open');
+            renderPanelContent();
+            bottomPanel.classList.toggle('open');
         }, 'btn-tutorial-layers');
 
         // 1. Home
