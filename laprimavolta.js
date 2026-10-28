@@ -5,9 +5,9 @@ let highlightLayer;
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-expanded {
-        min-width: 180px !important;
-        max-width: 180px !important;
-        padding: 10px 12px !important;
+        min-width: 220px !important;
+        max-width: 220px !important;
+        padding: 8px 10px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
