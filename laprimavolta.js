@@ -1,13 +1,17 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS corretti per il pannello dei layer (compatto e allineato a sinistra)
+// Iniezione di stili CSS per uniformare il toggle dei layer e i pulsanti a 44x44px
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
+    .leaflet-control-layers-toggle {
+        width: 44px !important;
+        height: 44px !important;
+    }
     .leaflet-control-layers-expanded {
-        min-width: 220px !important;
-        max-width: 220px !important;
-        padding: 8px 10px !important;
+        min-width: 240px !important;
+        max-width: 260px !important;
+        padding: 10px 12px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
@@ -18,24 +22,27 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-list, 
     .leaflet-control-layers-base, 
     .leaflet-control-layers-overlays,
+    .leaflet-control-layers-tree,
     .leaflet-control-layers-expanded span,
-    .leaflet-control-layers-expanded label {
+    .leaflet-control-layers-expanded label,
+    .leaflet-control-layers-group label {
         text-align: left !important;
         direction: ltr !important;
+        width: 100% !important;
     }
-    .leaflet-control-layers-expanded label {
+    .leaflet-control-layers-expanded label,
+    .leaflet-control-layers-group label {
         display: flex !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        gap: 6px !important;
+        gap: 8px !important;
         font-size: 12px !important;
-        line-height: 1.5 !important;
+        line-height: 1.4 !important;
         cursor: pointer;
-        margin: 3px 0 !important;
-        width: 100% !important;
+        margin: 4px 0 !important;
     }
     .leaflet-control-layers-selector {
-        margin: 0 4px 0 0 !important;
+        margin: 0 !important;
         flex-shrink: 0 !important;
     }
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
@@ -400,7 +407,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. PULSANTI IN ALTO A DESTRA (Fissati rigorosamente a 36x36px) ---
+    // --- 5. LOCATE CONTROL (Istanza per geolocalizzazione) ---
+    const locateControl = L.control.locate({
+        flyTo: { duration: 6 },
+        strings: { title: "Posizione" }
+    });
+
+    // --- 6. PULSANTI IN ALTO A DESTRA (Fissati rigorosamente a 44x44px) ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -421,14 +434,14 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = html;
             btn.title = title;
             btn.href = '#';
-            btn.style.width = '36px';
-            btn.style.height = '36px';
-            btn.style.lineHeight = '36px';
+            btn.style.width = '44px';
+            btn.style.height = '44px';
+            btn.style.lineHeight = '44px';
             btn.style.textAlign = 'center';
             btn.style.display = 'flex';
             btn.style.alignItems = 'center';
             btn.style.justifyContent = 'center';
-            btn.style.fontSize = '16px';
+            btn.style.fontSize = '18px';
             btn.style.backgroundColor = 'white';
             btn.style.color = '#333';
             btn.style.borderBottom = '1px solid #ccc';
@@ -442,12 +455,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        // Home
+        // 1. Home
         createBtn('🌍', "Torna alla vista iniziale", () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
-        // Cluster tematici ❤️
+        // 2. Geolocalizzazione (Dimensioni 44x44px)
+        createBtn('📍', "Posizione", () => {
+            locateControl.start();
+        }, 'btn-tutorial-locate');
+
+        // 3. Cluster tematici ❤️
         createBtn('❤️', "Cluster tematici", () => {
             const hb = document.getElementById('hearts-list-box');
             if(hb) hb.style.display = (hb.style.display === 'none') ? 'block' : 'none';
@@ -457,25 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     btnControl.addTo(map);
 
-    // Locate control (forzato anch'esso a 36x36px per coerenza perfetta)
-    const locateControl = L.control.locate({
-        position: 'topright',
-        flyTo: { duration: 6 },
-        strings: { title: "Posizione" }
-    }).addTo(map);
-
-    const locContainer = locateControl.getContainer();
-    if (locContainer) {
-        locContainer.classList.add('btn-tutorial-locate');
-        locContainer.style.width = '36px';
-        locContainer.style.height = '36px';
-        locContainer.style.lineHeight = '36px';
-        locContainer.style.display = 'flex';
-        locContainer.style.alignItems = 'center';
-        locContainer.style.justifyContent = 'center';
-    }
-
-    // --- 6. PANNELLO CLUSTER TEMATICI (BASSO SINISTRA) ---
+    // --- 7. PANNELLO CLUSTER TEMATICI (BASSO SINISTRA) ---
     const sideInfoControl = L.control({ position: 'bottomleft' });
     sideInfoControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'info-container-bottom');
@@ -568,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sideInfoControl.addTo(map);
 });
 
-// --- TUTORIAL (Con posizionamento popup calibrato sui pulsanti) ---
+// --- TUTORIAL ---
 const tutorialSteps = [
     { 
         id: ".btn-tutorial-home", 
@@ -618,7 +618,6 @@ function showStep() {
     let popupPoint;
     if (target) {
         const rect = target.getBoundingClientRect();
-        // Calcolo preciso basato sul bounding rect del pulsante target sulla destra dello schermo
         popupPoint = map.containerPointToLayerPoint([rect.left - 130, rect.top + (rect.height / 2)]);
     } else {
         popupPoint = map.containerPointToLayerPoint([100, 100]);
