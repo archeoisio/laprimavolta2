@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     html += `
                         <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 5px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
                             <span style="font-size:12px; color:#333; flex-grow:1; margin-right:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
-                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-weight:bold; font-size:8px; padding:2px 4px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
+                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-weight:bold; font-size:8px; padding:2px 4px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">🔍</button>
                         </div>
                     `;
                 });
