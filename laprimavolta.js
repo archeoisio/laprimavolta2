@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per il pannello inferiore a due colonne + stili tutorial
+// Iniezione di stili CSS per il pannello a due colonne forzato anche su mobile
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -9,25 +9,25 @@ customStyleTag.innerHTML = `
         height: 44px !important;
     }
     
-    /* Pannello inferiore a scomparsa (Bottom Sheet) */
+    /* Pannello inferiore a scomparsa (Bottom Sheet) compatto */
     #custom-bottom-panel {
         position: fixed;
-        bottom: -380px; /* Nascosto sotto lo schermo */
+        bottom: -360px;
         left: 50%;
         transform: translateX(-50%);
-        width: 95%;
-        max-width: 950px;
-        max-height: 360px;
+        width: 98%;
+        max-width: 980px;
+        max-height: 310px; /* Altezza ridotta per lasciare libera la mappa */
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
         transition: bottom 0.3s ease-in-out;
         z-index: 2000;
-        padding: 15px;
+        padding: 10px 12px;
         box-sizing: border-box;
         text-align: left;
         font-family: sans-serif;
-        font-size: 12px;
+        font-size: 11px;
         color: #333;
         border-top-left-radius: 14px;
         border-top-right-radius: 14px;
@@ -37,13 +37,13 @@ customStyleTag.innerHTML = `
     }
 
     #custom-bottom-panel.open {
-        bottom: 0; /* Sale dal basso */
+        bottom: 0;
     }
 
     .panel-close-btn {
         background: none;
         border: none;
-        font-size: 16px;
+        font-size: 15px;
         cursor: pointer;
         float: right;
         color: #666;
@@ -53,47 +53,41 @@ customStyleTag.innerHTML = `
         color: #000;
     }
 
-    /* Intestazione fissa in alto con titolo e chiusura */
+    /* Intestazione fissa in alto */
     .panel-main-header {
         flex-shrink: 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-bottom: 8px;
+        padding-bottom: 5px;
         border-bottom: 1px solid #e1e1e1;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
 
-    /* Layout principale a 2 Colonne */
+    /* Layout principale SEMPRE a 2 Colonne (anche su mobile) */
     .panel-two-columns {
         display: grid;
-        grid-template-columns: 280px 1fr;
-        gap: 15px;
+        grid-template-columns: 210px 1fr; /* Colonna sinistra più compatta per mobile */
+        gap: 10px;
         flex-grow: 1;
         overflow: hidden;
-    }
-
-    @media (max-width: 768px) {
-        .panel-two-columns {
-            grid-template-columns: 1fr;
-            overflow-y: auto;
-        }
     }
 
     /* Colonna di sinistra (Mappa Base + Altri Layer) */
     .left-column {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 6px;
         border-right: 1px solid #e1e1e1;
-        padding-right: 12px;
+        padding-right: 8px;
+        overflow-y: auto;
     }
 
     .sub-section-title {
         font-weight: bold;
         color: #555;
-        margin-bottom: 4px;
-        font-size: 11px;
+        margin-bottom: 3px;
+        font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -109,8 +103,8 @@ customStyleTag.innerHTML = `
     .sidebar-tabs {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 6px;
+        gap: 4px;
+        margin-bottom: 4px;
         flex-shrink: 0;
     }
 
@@ -118,14 +112,14 @@ customStyleTag.innerHTML = `
         background: #f1f2f6;
         border: 1px solid #dcdde1;
         border-radius: 4px;
-        padding: 4px 8px;
-        font-size: 11px;
+        padding: 3px 6px;
+        font-size: 10px;
         cursor: pointer;
         font-weight: bold;
         color: #57606f;
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
         transition: all 0.2s ease;
     }
 
@@ -141,31 +135,31 @@ customStyleTag.innerHTML = `
         display: flex;
     }
 
-    /* Conteggio proposte fisso (fuori dallo scroll) */
+    /* Conteggio proposte fisso */
     .cluster-counter-fixed {
         flex-shrink: 0;
-        font-size: 11px;
+        font-size: 10px;
         color: #666;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
 
-    /* Area SCORREVOLE interna limitata ESCLUSIVAMENTE alla griglia a 3 colonne */
+    /* Area SCORREVOLE interna limitata alla griglia a 3 colonne */
     .panel-scrollable-grid {
         flex-grow: 1;
         overflow-y: auto;
-        padding-right: 4px;
+        padding-right: 2px;
     }
 
-    /* Layout a 3 Colonne per le feature */
+    /* Layout a 3 Colonne per le feature (mantenuto anche su schermi stretti) */
     .features-grid-3col {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+        gap: 6px;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 600px) {
         .features-grid-3col {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr); /* Su schermi piccolissimi 2 colonne per evitare elementi troppo compressi */
         }
     }
 
@@ -432,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
         map.addLayer(layerPoligoniTavolo);
     }
 
-    // --- 4. CREAZIONE PANNELLO INFERIORE A 2 COLONNE ---
+    // --- 4. CREAZIONE PANNELLO INFERIORE A 2 COLONNE FORZATE ---
     const bottomPanel = document.createElement('div');
     bottomPanel.id = 'custom-bottom-panel';
     document.body.appendChild(bottomPanel);
@@ -441,28 +435,28 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = `
             <!-- Intestazione principale fissa -->
             <div class="panel-main-header">
-                <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
+                <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <button class="panel-close-btn">&times;</button>
             </div>
 
-            <!-- Layout a 2 Colonne -->
+            <!-- Layout a 2 Colonne costante -->
             <div class="panel-two-columns">
                 
                 <!-- COLONNA DI SINISTRA: Mappa Base + Altri Layer -->
                 <div class="left-column">
                     <div>
                         <div class="sub-section-title">Mappa Base</div>
-                        <div style="display:flex; gap:12px;">
-                            <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                        <div style="display:flex; gap:8px;">
+                            <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
                                 <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
                             </label>
-                            <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
-                                <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Satellite
+                            <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
+                                <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Sat
                             </label>
                         </div>
                     </div>
 
-                    <div style="border-top:1px solid #e1e1e1; padding-top:8px;">
+                    <div style="border-top:1px solid #e1e1e1; padding-top:6px;">
                         <div class="sub-section-title">Altri Layer</div>
         `;
 
@@ -474,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         contextLayers.forEach((ctx, idx) => {
             const isChecked = map.hasLayer(ctx.layer);
-            html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
+            html += `<label style="display:flex; align-items:center; gap:5px; margin:3px 0; cursor:pointer;">
                 <input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}>
                 ${ctx.name}
             </label>`;
@@ -515,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                 <div id="tab-${cleanKey}" class="sidebar-tab-content ${firstTab ? 'active' : ''}">
                     <!-- Conteggio proposte FISSO -->
-                    <div class="cluster-counter-fixed">Proposte registrate: <b>${items.length}</b></div>
+                    <div class="cluster-counter-fixed">Proposte: <b>${items.length}</b></div>
                     
                     <!-- Area SCORREVOLE -->
                     <div class="panel-scrollable-grid">
@@ -524,9 +518,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             items.forEach((item, itemIdx) => {
                 html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 7px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:5px;">
-                        <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
-                        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${itemIdx}" style="font-weight:bold; font-size:9px; padding:2px 5px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
+                        <span style="font-size:10px; color:#333; flex-grow:1; margin-right:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
+                        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${itemIdx}" style="font-weight:bold; font-size:8px; padding:2px 4px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
                     </div>
                 `;
             });
@@ -664,18 +658,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        // 0. Pulsante Centro di Controllo (con classe btn-tutorial-layers)
+        // 0. Pulsante Centro di Controllo
         createBtn('🗂️', "Centro di Controllo", () => {
             renderPanelContent();
             bottomPanel.classList.toggle('open');
         }, 'btn-tutorial-layers');
 
-        // 1. Home (con classe btn-tutorial-home)
+        // 1. Home
         createBtn('🌍', "Torna alla vista iniziale", () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
-        // 2. Geolocalizzazione (con classe btn-tutorial-locate)
+        // 2. Geolocalizzazione
         createBtn('📍', "Posizione", () => {
             map.locate({setView: true, maxZoom: 16});
         }, 'btn-tutorial-locate');
@@ -725,11 +719,10 @@ function startTutorial() {
     currentStep = 0;
     
     if (typeof map === 'undefined') {
-        console.error("Mappa non trovata! Assicurati che 'map' sia inizializzata.");
+        console.error("Mappa non trovata!");
         return;
     }
 
-    // BLOCCA INTERAZIONI MAPPA
     try {
         map.dragging.disable();
         map.touchZoom.disable();
@@ -801,7 +794,6 @@ function nextTutorialStep() {
     if (currentStep < tutorialSteps.length) {
         showStep();
     } else {
-        // SBLOCCA LA MAPPA
         if (typeof map !== 'undefined') {
             map.dragging.enable();
             map.touchZoom.enable();
@@ -809,7 +801,6 @@ function nextTutorialStep() {
             map.scrollWheelZoom.enable();
             if (map.tap) map.tap.enable();
             
-            // Chiudi popup tutorial e pannello
             map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
         }
         const bp = document.getElementById('custom-bottom-panel');
@@ -817,7 +808,6 @@ function nextTutorialStep() {
     }
 }
 
-// Esposizione funzioni globali per richiamo da HTML
 window.startTutorial = startTutorial;
 window.nextTutorialStep = nextTutorialStep;
 window.closeModal = closeModal;
