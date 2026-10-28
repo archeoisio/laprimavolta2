@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const geocode = async (query) => {
-                const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                const r = await fetch("https://nominatim.openstreetmap.org/search?format=json&q=" + encodeURIComponent(query));
                 const d = await r.json();
                 if (d.length === 0) throw new Error("Località non trovata: " + query);
                 return L.latLng(d[0].lat, d[0].lon);
@@ -200,14 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
         routeBox.style.width = '180px';
         routeBox.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
         
-        routeBox.innerHTML = `
-            <input id="start" placeholder="Partenza" style="width:100%; margin-bottom:5px; padding:4px;">
-            <input id="end" placeholder="Destinazione" style="width:100%; margin-bottom:8px; padding:4px;">
-            <div style="display:flex; gap:5px;">
-                <button id="route-btn" style="flex:1; cursor:pointer; padding:5px; border-radius:4px; border:none; background:white; font-weight:bold;">Calcola</button>
-                <button id="clear-btn" style="flex:1; cursor:pointer; padding:5px; border-radius:4px; border:none; background:#ff5252; color:white;">Reset</button>
-            </div>
-        `;
+        routeBox.innerHTML = '<input id="start" placeholder="Partenza" style="width:100%; margin-bottom:5px; padding:4px;">' +
+            '<input id="end" placeholder="Destinazione" style="width:100%; margin-bottom:8px; padding:4px;">' +
+            '<div style="display:flex; gap:5px;">' +
+            '<button id="route-btn" style="flex:1; cursor:pointer; padding:5px; border-radius:4px; border:none; background:white; font-weight:bold;">Calcola</button>' +
+            '<button id="clear-btn" style="flex:1; cursor:pointer; padding:5px; border-radius:4px; border:none; background:#ff5252; color:white;">Reset</button>' +
+            '</div>';
 
         setTimeout(() => {
             const rb = document.getElementById('route-btn');
@@ -310,6 +308,8 @@ function showStep() {
 
     const popupLatLng = map.layerPointToLatLng(popupPoint);
 
+    const btnText = isLast ? 'INIZIA' : 'AVANTI';
+
     L.popup({ 
         closeButton: false, 
         closeOnClick: false,
@@ -318,21 +318,21 @@ function showStep() {
         offset: L.point(-10, 0) 
     })
     .setLatLng(popupLatLng)
-    .setContent(`
-        <div style="width: 180px; font-family: sans-serif; display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <b style="color:#3498db; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;">
-                    ${step.titolo}
-                </b>
-                <button onclick="nextTutorialStep()" style="background:#3498db; color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size: 9px; font-weight: bold; flex-shrink: 0; margin-left: 6px;">
-                    ${isLast ? 'INIZIA' : 'AVANTI'}
-                </button>
-            </div>
-            <div style="font-size: 12px; line-height: 1.2; border-top: 1px solid #eee; padding-top: 4px; color: #333;">
-                ${step.testo}
-            </div>
-        </div>
-    `)
+    .setContent(
+        '<div style="width: 180px; font-family: sans-serif; display: flex; flex-direction: column; gap: 4px;">' +
+            '<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">' +
+                '<b style="color:#3498db; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;">' +
+                    step.titolo +
+                '</b>' +
+                '<button onclick="nextTutorialStep()" style="background:#3498db; color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size: 9px; font-weight: bold; flex-shrink: 0; margin-left: 6px;">' +
+                    btnText +
+                '</button>' +
+            '</div>' +
+            '<div style="font-size: 12px; line-height: 1.2; border-top: 1px solid #eee; padding-top: 4px; color: #333;">' +
+                step.testo +
+            '</div>' +
+        '</div>'
+    )
     .openOn(map);
 }
 
