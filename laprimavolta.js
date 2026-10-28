@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS puliti per il pannello layer nativo
+// Iniezione di stili CSS corretti per allineare perfettamente a sinistra il pannello layer nativo
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -21,6 +21,7 @@ customStyleTag.innerHTML = `
         font-size: 12px !important;
     }
     
+    /* AZZERAMENTO MARGINI E PADDING PER EVITARE SPAZI VUoti A SINISTRA */
     .leaflet-control-layers label {
         display: flex !important;
         align-items: center !important;
@@ -30,11 +31,21 @@ customStyleTag.innerHTML = `
         font-size: 12px !important;
         line-height: 1.4 !important;
         margin: 4px 0 !important;
+        padding-left: 0 !important;
+        margin-left: 0 !important;
     }
 
     .leaflet-control-layers-selector {
-        margin: 0 4px 0 0 !important;
+        margin-left: 0 !important;
+        margin-right: 6px !important;
+        position: static !important;
         flex-shrink: 0 !important;
+    }
+
+    .leaflet-control-layers-base, 
+    .leaflet-control-layers-overlays {
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
@@ -327,10 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- 4. CONTROLLO LAYER NATIVO STANDARD ---
-    L.control.layers(baseMaps, overlayMaps, {
+    const layersControl = L.control.layers(baseMaps, overlayMaps, {
         collapsed: true,
         position: 'topright'
     }).addTo(map);
+
+    const layersContainer = layersControl.getContainer();
+    layersContainer.style.marginRight = '2px';
 
     // Photon Search Control
     const photonUrl = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&"};
