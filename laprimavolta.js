@@ -17,7 +17,7 @@ customStyleTag.innerHTML = `
         transform: translateX(-50%);
         width: 95%;
         max-width: 800px;
-        max-height: 320px;
+        max-height: 250px;
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
