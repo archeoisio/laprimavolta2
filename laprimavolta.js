@@ -9,35 +9,37 @@ customStyleTag.innerHTML = `
         height: 44px !important;
     }
     
-    /* Stile della barra laterale a scomparsa da destra */
+    /* Barra laterale a scomparsa da destra, della stessa larghezza del vecchio pannello (260px) */
     #custom-sidebar-layers {
         position: fixed;
-        top: 0;
-        right: -320px; /* Nascosta fuori dallo schermo */
-        width: 300px;
-        height: 100vh;
+        top: 60px; /* Parte subito sotto i pulsanti in alto a destra */
+        right: -280px; /* Nascosta fuori dallo schermo */
+        width: 260px;
+        height: calc(100vh - 70px); /* Lascia spazio sopra e sotto */
         background: rgba(255, 255, 255, 0.97);
         backdrop-filter: blur(10px);
         box-shadow: -5px 0 25px rgba(0,0,0,0.3);
         transition: right 0.3s ease-in-out;
         z-index: 2000;
-        padding: 20px;
+        padding: 15px;
         box-sizing: border-box;
         overflow-y: auto;
         text-align: left;
         font-family: sans-serif;
-        font-size: 13px;
+        font-size: 12px;
         color: #333;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
     }
 
     #custom-sidebar-layers.open {
-        right: 0; /* Mostra la barra */
+        right: 0; /* Mostra la barra scorrendo da destra */
     }
 
     .sidebar-close-btn {
         background: none;
         border: none;
-        font-size: 20px;
+        font-size: 18px;
         cursor: pointer;
         float: right;
         color: #666;
