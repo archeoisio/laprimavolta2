@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per il pannello inferiore a scomparsa
+// Iniezione di stili CSS per il pannello inferiore a scomparsa con separatori netti
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -12,12 +12,12 @@ customStyleTag.innerHTML = `
     /* Pannello inferiore a scomparsa (Bottom Sheet) */
     #custom-bottom-panel {
         position: fixed;
-        bottom: -360px; /* Nascosto sotto lo schermo */
+        bottom: -380px; /* Nascosto sotto lo schermo */
         left: 50%;
         transform: translateX(-50%);
         width: 95%;
         max-width: 800px;
-        max-height: 250px;
+        max-height: 200px;
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
@@ -56,16 +56,28 @@ customStyleTag.innerHTML = `
     /* Area fissa in alto (Intestazione + Mappe Base + Tabs dei Cluster) */
     .panel-fixed-header {
         flex-shrink: 0;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 8px;
     }
 
-    /* Area scorrevole inferiore (SOLO l'elenco delle feature a 3 colonne) */
+    /* Linee divisorie pulite tra le sezioni fisse */
+    .panel-section {
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #e1e1e1; /* Linea di separazione */
+    }
+
+    .panel-section:last-child {
+        border-bottom: none;
+        margin-bottom: 4px;
+        padding-bottom: 4px;
+    }
+
+    /* Area SCORREVOLE inferiore (SOLO l'elenco delle feature) */
     .panel-scrollable-features {
         flex-grow: 1;
         overflow-y: auto; /* Solo questa parte scorre! */
+        padding-top: 8px;
         padding-right: 4px;
+        border-top: 1px solid #e1e1e1; /* Linea che separa le tab dall'elenco scrollabile */
     }
 
     /* Stile per le schede (Tabs) dei cluster tematici */
@@ -394,14 +406,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPanelContent() {
         let html = `
-            <!-- Area FISSA in alto: Intestazione + Mappe Base + Tabs dei Cluster -->
+            <!-- Area FISSA in alto con sezioni separate da linee -->
             <div class="panel-fixed-header">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                
+                <!-- Sezione 1: Intestazione -->
+                <div class="panel-section" style="display:flex; justify-content:space-between; align-items:center;">
                     <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                     <button class="panel-close-btn">&times;</button>
                 </div>
-                <div style="margin-bottom:6px;">
-                    <div style="font-weight:bold; margin-bottom:2px; color:#555;">Mappe Base</div>
+
+                <!-- Sezione 2: Mappe Base -->
+                <div class="panel-section">
+                    <div style="font-weight:bold; margin-bottom:4px; color:#555;">Mappe Base</div>
                     <div style="display:flex; gap:15px;">
                         <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
                             <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
@@ -411,7 +427,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         </label>
                     </div>
                 </div>
-                <div>
+
+                <!-- Sezione 3: Tabs Cluster Tematici -->
+                <div class="panel-section">
                     <div style="font-weight:bold; margin-bottom:4px; color:#555;">Cluster Tematici</div>
                     <div class="sidebar-tabs">
         `;
@@ -518,17 +536,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Eventi Mappe Base
-        bottomPanel.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
-            radio.onchange = (e) => {
-                if (e.target.value === 'osm') {
-                    map.addLayer(layer_OpenStreetMap_4);
-                    map.removeLayer(layer_GoogleSatellite_3);
-                } else {
-                    map.addLayer(layer_GoogleSatellite_3);
-                    map.removeLayer(layer_OpenStreetMap_4);
-                }
-            };
-        });
+    bottomPanel.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
+        radio.onchange = (e) => {
+            if (e.target.value === 'osm') {
+                map.addLayer(layer_OpenStreetMap_4);
+                map.removeLayer(layer_GoogleSatellite_3);
+            } else {
+                map.addLayer(layer_GoogleSatellite_3);
+                map.removeLayer(layer_OpenStreetMap_4);
+            }
+        };
+    });
     }
 
     // --- 5. GESTIONE EVENTI GEOLOCALIZZAZIONE ---
