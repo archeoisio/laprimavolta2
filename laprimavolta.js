@@ -5,7 +5,7 @@ const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     #custom-bottom-panel {
-        position: fixed; bottom: -360px; left: 50%; transform: translateX(-50%);
+        position: fixed; bottom: -270px; left: 50%; transform: translateX(-50%);
         width: 98%; max-width: 1000px; max-height: 310px;
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: bottom 0.3s ease-in-out;
@@ -15,9 +15,9 @@ customStyleTag.innerHTML = `
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
     }
     #custom-bottom-panel.open { bottom: 0; }
-    .panel-close-btn { background: none; border: none; font-size: 15px; cursor: pointer; float: right; color: #666; }
+    .panel-close-btn { background: none; border: none; font-size: 15px; cursor: pointer; color: #666; }
     .panel-close-btn:hover { color: #000; }
-    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; }
+    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
     
     /* Layout Principale a 3 Colonne */
     .panel-three-columns { display: grid; grid-template-columns: 80px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
@@ -42,7 +42,7 @@ customStyleTag.innerHTML = `
     /* Contenitore con scorrimento orizzontale per le colonne verticali */
     .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
     
-    /* Singola colonna verticale (max 4 elementi) */
+    /* Singola colonna verticale */
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
@@ -189,10 +189,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(bottomPanel);
 
     window.renderPanelContent = function() {
+        const isOpen = bottomPanel.classList.contains('open');
+        const arrowSymbol = isOpen ? '▼' : '▲';
+
         let html = `
-            <div class="panel-main-header">
+            <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent();">
                 <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
-                <button class="panel-close-btn">&times;</button>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
+                    <button class="panel-close-btn" onclick="event.stopPropagation(); document.getElementById('custom-bottom-panel').classList.remove('open'); renderPanelContent();">&times;</button>
+                </div>
             </div>
             <div class="panel-three-columns">
                 <!-- COLONNA 1: MAPPA BASE (VERTICALE) + ALTRI LAYER -->
@@ -234,15 +240,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div></div>`;
 
-        // COLONNA 3: ELENCO PROPOSTE (DIVISO IN COLONNE VERTICALI DA 4 ELEMENTI)
+        // COLONNA 3: ELENCO PROPOSTE (DINAMICO: 5 DESKTOP, 6 MOBILE)
         html += `<div class="col-right">`;
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
             
-            // Dividiamo gli items in gruppi verticali di massimo 4 elementi
-            const itemsPerColumn = 4;
+            const isMobile = window.innerWidth <= 650;
+            const itemsPerColumn = isMobile ? 6 : 5;
+            
             const columns = [];
             for (let i = 0; i < items.length; i += itemsPerColumn) {
                 columns.push(items.slice(i, i + itemsPerColumn));
@@ -257,14 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
             columns.forEach(colItems => {
                 html += `<div class="feature-vertical-column">`;
                 colItems.forEach((item) => {
-                    // Troviamo l'indice globale originale dell'item per il tasto VOLA
                     const globalIdx = items.indexOf(item);
-                   html += `
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
-        <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
-        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:11px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
-    </div>
-`;
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
+                            <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
+                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:11px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
+                        </div>
+                    `;
                 });
                 html += `</div>`;
             });
@@ -274,7 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div></div>`; bottomPanel.innerHTML = html;
 
-        bottomPanel.querySelector('.panel-close-btn').onclick = () => { bottomPanel.classList.remove('open'); };
         const tabBtns = bottomPanel.querySelectorAll('.sidebar-tab-btn');
         const tabContents = bottomPanel.querySelectorAll('.sidebar-tab-content');
         tabBtns.forEach(btn => {
@@ -315,6 +320,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Render iniziale del pannello (chiuso con freccia verso l'alto)
+    renderPanelContent();
+
     map.on('locationfound', function(e) {
         var radius = e.accuracy / 2;
         L.marker(e.latlng).addTo(map).bindPopup("Ti trovi qui (entro " + Math.round(radius) + " metri)").openPopup();
@@ -338,7 +346,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        createBtn('🗂️', "Centro di Controllo", () => { renderPanelContent(); bottomPanel.classList.toggle('open'); }, 'btn-tutorial-layers');
+        createBtn('🗂️', "Centro di Controllo", () => { 
+            bottomPanel.classList.toggle('open'); 
+            renderPanelContent(); 
+        }, 'btn-tutorial-layers');
         createBtn('🌍', "Torna alla vista iniziale", () => { map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]); }, 'btn-tutorial-home');
         createBtn('📍', "Posizione", () => { map.locate({setView: true, maxZoom: 16}); }, 'btn-tutorial-locate');
         return container;
@@ -410,9 +421,11 @@ function showStep() {
     const isPanel = step.id === "#custom-bottom-panel";
 
     if (step.action === "openPanel") {
-        if (typeof renderPanelContent === 'function') renderPanelContent();
         const bp = document.getElementById('custom-bottom-panel');
-        if (bp) bp.classList.add('open');
+        if (bp) {
+            bp.classList.add('open');
+            if (typeof renderPanelContent === 'function') renderPanelContent();
+        }
     }
 
     let popupPoint;
@@ -471,7 +484,10 @@ function nextTutorialStep() {
             map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
         }
         const bp = document.getElementById('custom-bottom-panel');
-        if (bp) bp.classList.remove('open');
+        if (bp) {
+            bp.classList.remove('open');
+            renderPanelContent();
+        }
     }
 }
 
