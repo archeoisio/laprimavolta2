@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per il pannello inferiore a due colonne
+// Iniezione di stili CSS per il pannello inferiore a due colonne con scroll mirato
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -16,14 +16,14 @@ customStyleTag.innerHTML = `
         left: 50%;
         transform: translateX(-50%);
         width: 95%;
-        max-width: 950px; /* Larghezza ampliata per ospitare le due colonne */
-        max-height: 350px;
+        max-width: 950px;
+        max-height: 360px;
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
         transition: bottom 0.3s ease-in-out;
         z-index: 2000;
-        padding: 15px;
+        padding: 10px;
         box-sizing: border-box;
         text-align: left;
         font-family: sans-serif;
@@ -64,7 +64,7 @@ customStyleTag.innerHTML = `
         margin-bottom: 10px;
     }
 
-    /* Layout principale a 2 Colonne (Sinistra: Mappe/Altri layer | Destra: Cluster Tematici) */
+    /* Layout principale a 2 Colonne */
     .panel-two-columns {
         display: grid;
         grid-template-columns: 280px 1fr;
@@ -75,12 +75,12 @@ customStyleTag.innerHTML = `
 
     @media (max-width: 768px) {
         .panel-two-columns {
-            grid-template-columns: 1fr; /* Su mobile torna a colonna singola */
+            grid-template-columns: 1fr;
             overflow-y: auto;
         }
     }
 
-    /* Colonna di sinistra (Mappe Base + Altri Layer) */
+    /* Colonna di sinistra (Mappa Base + Altri Layer) */
     .left-column {
         display: flex;
         flex-direction: column;
@@ -98,27 +98,20 @@ customStyleTag.innerHTML = `
         letter-spacing: 0.5px;
     }
 
-    /* Colonna di destra (Cluster Tematici con scroll interno) */
+    /* Colonna di destra (Cluster Tematici) */
     .right-column {
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
-    /* Area SCORREVOLE interna per i cluster tematici */
-    .panel-scrollable-features {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding-top: 6px;
-        padding-right: 4px;
-    }
-
-    /* Stile per le schede (Tabs) dei cluster tematici */
+    /* Stile per le schede (Tabs) dei cluster tematici (Fisse) */
     .sidebar-tabs {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        flex-shrink: 0;
     }
 
     .sidebar-tab-btn {
@@ -136,7 +129,34 @@ customStyleTag.innerHTML = `
         transition: all 0.2s ease;
     }
 
-    /* Layout a 3 Colonne per le feature del cluster attivo */
+    /* Contenitore della scheda attiva */
+    .sidebar-tab-content {
+        display: none;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    .sidebar-tab-content.active {
+        display: flex;
+    }
+
+    /* Conteggio proposte fisso (fuori dallo scroll) */
+    .cluster-counter-fixed {
+        flex-shrink: 0;
+        font-size: 11px;
+        color: #666;
+        margin-bottom: 6px;
+    }
+
+    /* Area SCORREVOLE interna limitata ESCLUSIVAMENTE alla griglia a 3 colonne */
+    .panel-scrollable-grid {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    /* Layout a 3 Colonne per le feature */
     .features-grid-3col {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -147,14 +167,6 @@ customStyleTag.innerHTML = `
         .features-grid-3col {
             grid-template-columns: repeat(2, 1fr);
         }
-    }
-
-    .sidebar-tab-content {
-        display: none;
-    }
-
-    .sidebar-tab-content.active {
-        display: block;
     }
 
     /* Stile etichette quartieri */
@@ -448,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <!-- Layout a 2 Colonne -->
             <div class="panel-two-columns">
                 
-                <!-- COLONNA DI SINISTRA: Mappa Base (sopra) + Altri Layer / Contesto (sotto) -->
+                <!-- COLONNA DI SINISTRA: Mappa Base + Altri Layer -->
                 <div class="left-column">
                     <div>
                         <div class="sub-section-title">Mappa Base</div>
@@ -482,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         html += `</div></div>`; // Chiusura left-column
 
-        // COLONNA DI DESTRA: Cluster Tematici (con tabs fisse e griglia a 3 colonne scorrevole)
+        // COLONNA DI DESTRA: Cluster Tematici (Tab fisse, Conteggio fisso, Griglia scorrevole)
         html += `
             <div class="right-column">
                 <div class="sub-section-title">Cluster Tematici</div>
@@ -507,17 +519,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div>`; // Chiusura sidebar-tabs
 
-        // Area scorrevole per i contenuti dei cluster
-        html += `<div class="panel-scrollable-features">`;
-
+        // Contenuti delle schede
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
             html += `
                 <div id="tab-${cleanKey}" class="sidebar-tab-content ${firstTab ? 'active' : ''}">
-                    <div style="font-size:11px; color:#666; margin-bottom:6px;">Proposte: <b>${items.length}</b></div>
-                    <div class="features-grid-3col">
+                    <!-- Conteggio proposte FISSO (fuori dall'area di scorrimento) -->
+                    <div class="cluster-counter-fixed">Proposte registrate: <b>${items.length}</b></div>
+                    
+                    <!-- Area SCORREVOLE limitata unicamente alla griglia delle feature -->
+                    <div class="panel-scrollable-grid">
+                        <div class="features-grid-3col">
             `;
 
             items.forEach((item, itemIdx) => {
@@ -529,11 +543,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             });
 
-            html += `</div></div>`;
+            html += `</div></div></div>`; // Chiusura features-grid-3col, panel-scrollable-grid, sidebar-tab-content
             firstTab = false;
         }
 
-        html += `</div></div></div>`; // Chiusura panel-scrollable-features, right-column, panel-two-columns
+        html += `</div></div>`; // Chiusura right-column, panel-two-columns
         bottomPanel.innerHTML = html;
 
         // Chiusura pannello
