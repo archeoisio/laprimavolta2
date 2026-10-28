@@ -21,35 +21,26 @@ customStyleTag.innerHTML = `
         font-size: 12px !important;
     }
     
-    /* ANNULLAMENTO FORZATO DEI MARGINI INTERNI DEL PLUGIN TREE */
-    .leaflet-control-layers-tree {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    .leaflet-control-layers-list {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    /* Rimuove qualsiasi indentazione applicata ai rami dell'albero */
-    .leaflet-control-layers-tree ul, 
-    .leaflet-control-layers-tree li,
-    .leaflet-control-layers-group {
+    /* AZZERAMENTO DELLE LISTE DEL TREE SENZA TOCCARE LE ICONE */
+    .leaflet-control-layers-list, 
+    .leaflet-control-layers-base, 
+    .leaflet-control-layers-overlays,
+    .leaflet-control-layers-tree,
+    .leaflet-control-layers-tree ul,
+    .leaflet-control-layers-tree li {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        text-align: left !important;
         list-style: none !important;
-        padding-left: 0 !important;
-        margin-left: 0 !important;
-        text-indent: 0 !important;
     }
 
-    /* Forza i sotto-gruppi a tirarsi completamente a sinistra */
-    .leaflet-control-layers-group subgroup,
-    .leaflet-control-layers-subgroup {
+    /* Rimuove l'indentazione forzata dei rami figli generata dal plugin */
+    .leaflet-control-layers-tree ul {
         padding-left: 0 !important;
         margin-left: 0 !important;
     }
 
-    /* Etichette rigorosamente allineate */
+    /* Allineamento rigido a sinistra delle singole righe */
     .leaflet-control-layers-tree label {
         display: flex !important;
         align-items: center !important;
@@ -69,7 +60,7 @@ customStyleTag.innerHTML = `
         flex-shrink: 0 !important;
     }
 
-    /* Protezione delle icone colorate per evitare che si deformino */
+    /* ISOLAMENTO DELLE ICONE: Impedisce a qualsiasi span di stirarsi o allargarsi */
     .leaflet-control-layers-tree label span {
         width: auto !important;
         max-width: none !important;
@@ -92,6 +83,7 @@ customStyleTag.innerHTML = `
     }
 `;
 document.head.appendChild(customStyleTag);
+
 // Palette di colori distinti per i Tavoli / Categorie
 const tavoloColors = {
     'ambiente': '#2ecc71',
