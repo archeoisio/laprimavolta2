@@ -1,5 +1,6 @@
 let map; 
 let highlightLayer;
+let selectedLayer = null; // Traccia l'elemento attualmente selezionato
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
@@ -10,7 +11,7 @@ customStyleTag.innerHTML = `
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
         z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
-        font-family: sans-serif; font-size: 11px; color: #333;
+        font-family: sans-serif; font-size: 12px; color: #333;
         border-top-left-radius: 14px; border-top-right-radius: 14px;
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
     }
@@ -21,11 +22,12 @@ customStyleTag.innerHTML = `
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     /* Layout Principale a 3 Colonne */
-    .panel-three-columns { display: grid; grid-template-columns: 80px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
+    .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
     
-    /* Colonna 1: Sinistra (Mappa Base + Layer Contesto) */
-    .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow-y: auto; }
-    .col-left .base-map-vertical { display: flex; flex-direction: column; gap: 3px; }
+    /* Colonna 1: Sinistra (Mappa Base fissa + Altro scrollabile) */
+    .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
+    .col-left .base-map-vertical { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+    .col-left-scrollable { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex-grow: 1; border-top: 1px solid #e1e1e1; padding-top: 4px; }
     
     /* Colonna 2: Centrale (Pulsanti Cluster con scorrimento proprio) */
     .col-middle { display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow-y: auto; }
@@ -153,7 +155,23 @@ document.addEventListener('DOMContentLoaded', () => {
             interactive: true, pane: 'pane_puntiprimavolta_5',
             onEachFeature: function(feature, layer) {
                 registerItem(feature, layer);
-                layer.on({ mouseout: function(e) { resetFeatureStyle(e); layer.closePopup(); }, mouseover: highlightFeature });
+                layer.on({ 
+                    mouseout: function(e) { 
+                        if (selectedLayer !== layer) {
+                            resetFeatureStyle(e); 
+                            layer.closePopup(); 
+                        }
+                    }, 
+                    mouseover: highlightFeature,
+                    click: function(e) {
+                        if (selectedLayer && selectedLayer !== layer) {
+                            resetFeatureStyle({ target: selectedLayer });
+                        }
+                        selectedLayer = layer;
+                        highlightFeature(e);
+                        layer.openPopup();
+                    }
+                });
                 var popupContent = '<table><tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Stato</th><td>' + (feature.properties['Stato'] !== null ? autolinker.link(String(feature.properties['Stato']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Tavolo</th><td>' + (feature.properties['Tavolo'] !== null ? autolinker.link(String(feature.properties['Tavolo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
                 layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
             },
@@ -177,13 +195,38 @@ document.addEventListener('DOMContentLoaded', () => {
             style: function(feature) { return { opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: catColor }; },
             onEachFeature: function(feature, layer) {
                 registerItem(feature, layer);
-                layer.on({ mouseout: function(e) { resetFeatureStyle(e); layer.closePopup(); }, mouseover: highlightFeature });
+                layer.on({ 
+                    mouseout: function(e) { 
+                        if (selectedLayer !== layer) {
+                            resetFeatureStyle(e); 
+                            layer.closePopup(); 
+                        }
+                    }, 
+                    mouseover: highlightFeature,
+                    click: function(e) {
+                        if (selectedLayer && selectedLayer !== layer) {
+                            resetFeatureStyle({ target: selectedLayer });
+                        }
+                        selectedLayer = layer;
+                        highlightFeature(e);
+                        layer.openPopup();
+                    }
+                });
                 var popupContent = '<table><tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
                 layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
             }
         });
         map.addLayer(layerPoligoniTavolo);
     }
+
+    // Deseleziona quando si clicca sulla mappa vuota
+    map.on('click', () => {
+        if (selectedLayer) {
+            resetFeatureStyle({ target: selectedLayer });
+            selectedLayer = null;
+        }
+        map.closePopup();
+    });
 
     const bottomPanel = document.createElement('div');
     bottomPanel.id = 'custom-bottom-panel';
@@ -195,13 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = `
             <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent();">
-                <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
+                <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
                 </div>
             </div>
             <div class="panel-three-columns">
-                <!-- COLONNA 1: MAPPA BASE (VERTICALE) + ALTRI LAYER -->
+                <!-- COLONNA 1: MAPPA BASE + ALTRO SCORRIBILE -->
                 <div class="col-left">
                     <div>
                         <div class="sub-section-title">Base map</div>
@@ -214,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </label>
                         </div>
                     </div>
-                    <div style="border-top:1px solid #e1e1e1; padding-top:4px;">
+                    <div class="col-left-scrollable">
                         <div class="sub-section-title">Altro</div>
         `;
         const contextLayers = [{ name: 'Stazioni', layer: layer_iconestazioni_2 }, { name: 'Ospedali', layer: layer_hospital_1 }, { name: 'Quartieri', layer: layer_iconaquartieri_0 }];
@@ -294,10 +337,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
+                e.stopPropagation();
                 const tavolo = e.target.getAttribute('data-tavolo');
                 const idx = parseInt(e.target.getAttribute('data-index'));
                 const targetItem = atlasCategories[tavolo][idx];
-                map.flyTo(targetItem.latlng, 16, { animate: true, duration: 3 });
+                
+                if (selectedLayer && selectedLayer !== targetItem.layer) {
+                    resetFeatureStyle({ target: selectedLayer });
+                }
+                
+                selectedLayer = targetItem.layer;
+                map.closePopup();
+                map.flyTo(targetItem.latlng, 16, { animate: true, duration: 2 });
+                
+                const fakeEvent = { target: targetItem.layer };
+                highlightFeature(fakeEvent);
                 targetItem.layer.openPopup();
             };
         });
