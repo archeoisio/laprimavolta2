@@ -12,13 +12,12 @@ customStyleTag.innerHTML = `
     /* Pannello inferiore a scomparsa (Bottom Sheet) */
     #custom-bottom-panel {
         position: fixed;
-        bottom: -320px; /* Nascosto sotto lo schermo */
+        bottom: -360px; /* Nascosto sotto lo schermo */
         left: 50%;
         transform: translateX(-50%);
-        width: 90%;
-        max-width: 450px;
-        max-height: 300px; /* Altezza massima bloccata a 300px */
-        overflow-y: auto; /* Attiva la barra di scorrimento verticale */
+        width: 95%;
+        max-width: 800px;
+        max-height: 320px;
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
@@ -33,10 +32,12 @@ customStyleTag.innerHTML = `
         border-top-left-radius: 14px;
         border-top-right-radius: 14px;
         border: 1px solid rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
     }
 
     #custom-bottom-panel.open {
-        bottom: 0; /* Sale dal basso ed emerge */
+        bottom: 0; /* Sale dal basso */
     }
 
     .panel-close-btn {
@@ -52,35 +53,55 @@ customStyleTag.innerHTML = `
         color: #000;
     }
 
+    /* Area fissa in alto (Intestazione + Mappe Base + Tabs dei Cluster) */
+    .panel-fixed-header {
+        flex-shrink: 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 8px;
+    }
+
+    /* Area scorrevole inferiore (SOLO l'elenco delle feature a 3 colonne) */
+    .panel-scrollable-features {
+        flex-grow: 1;
+        overflow-y: auto; /* Solo questa parte scorre! */
+        padding-right: 4px;
+    }
+
     /* Stile per le schede (Tabs) dei cluster tematici */
     .sidebar-tabs {
         display: flex;
         flex-wrap: wrap;
-        gap: 4px;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 8px;
-        margin-bottom: 8px;
+        gap: 6px;
+        padding-top: 4px;
     }
 
     .sidebar-tab-btn {
         background: #f1f2f6;
         border: 1px solid #dcdde1;
         border-radius: 4px;
-        padding: 4px 8px;
+        padding: 5px 10px;
         font-size: 11px;
         cursor: pointer;
-        font-weight: 600;
+        font-weight: bold;
         color: #57606f;
         display: flex;
         align-items: center;
         gap: 4px;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
     }
 
-    .sidebar-tab-btn.active {
-        background: #2f3542;
-        color: white;
-        border-color: #2f3542;
+    /* Layout a 3 Colonne per le feature del cluster attivo */
+    .features-grid-3col {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+        .features-grid-3col {
+            grid-template-columns: repeat(1, 1fr);
+        }
     }
 
     .sidebar-tab-content {
@@ -91,7 +112,7 @@ customStyleTag.innerHTML = `
         display: block;
     }
 
-    /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
+    /* Stile etichette quartieri */
     .quartiere-label {
         background: rgba(255, 255, 255, 0.9);
         border: 1px solid #000;
@@ -373,62 +394,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPanelContent() {
         let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:6px; margin-bottom:8px;">
-                <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
-                <button class="panel-close-btn">&times;</button>
-            </div>
-        `;
-
-        // Blocco 1: Mappe Base (Fisso in alto, affiancate senza scheda)
-        html += `
-            <div style="margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #eee;">
-                <div style="font-weight:bold; margin-bottom:4px; color:#555;">Mappe Base</div>
-                <div style="display:flex; gap:15px;">
-                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                        <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
-                    </label>
-                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                        <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Google Satellite
-                    </label>
+            <!-- Area FISSA in alto: Intestazione + Mappe Base + Tabs dei Cluster -->
+            <div class="panel-fixed-header">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
+                    <button class="panel-close-btn">&times;</button>
                 </div>
-            </div>
+                <div style="margin-bottom:6px;">
+                    <div style="font-weight:bold; margin-bottom:2px; color:#555;">Mappe Base</div>
+                    <div style="display:flex; gap:15px;">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                            <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                            <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Google Satellite
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-weight:bold; margin-bottom:4px; color:#555;">Cluster Tematici</div>
+                    <div class="sidebar-tabs">
         `;
 
-        // Blocco 2: Cluster Tematici strutturati a Schede (Tabs)
-        html += '<div style="font-weight:bold; margin-bottom:4px; color:#555;">Cluster Tematici</div>';
-        html += '<div class="sidebar-tabs">';
-        
+        // Imposta colore iniziale per la prima tab attiva
         let firstTab = true;
+        let firstColor = '';
+        for (const [tavolo] of Object.entries(atlasCategories)) {
+            if (firstTab) {
+                firstColor = getTavoloColor(tavolo);
+                break;
+            }
+        }
+
+        firstTab = true;
         for (const tavolo of Object.keys(atlasCategories)) {
             const cleanKey = tavolo.replace(/\s+/g, '');
-            html += `<button class="sidebar-tab-btn ${firstTab ? 'active' : ''}" data-tab="tab-${cleanKey}">${tavolo.toUpperCase()}</button>`;
+            const catColor = getTavoloColor(tavolo);
+            const activeStyle = firstTab ? `background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : '';
+            
+            html += `
+                <button class="sidebar-tab-btn ${firstTab ? 'active' : ''}" 
+                        data-tab="tab-${cleanKey}" 
+                        data-color="${catColor}"
+                        style="${activeStyle}">
+                    ${tavolo.toUpperCase()}
+                </button>
+            `;
             firstTab = false;
         }
-        html += `</div>`;
+        html += `</div></div></div>`; // Chiusura panel-fixed-header
 
-        // Contenuto delle Schede per ciascun Cluster
+        // Area SCORREVOLE inferiore (SOLO l'elenco delle feature)
+        html += `<div class="panel-scrollable-features">`;
+
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
             html += `
                 <div id="tab-${cleanKey}" class="sidebar-tab-content ${firstTab ? 'active' : ''}">
-                    <div style="font-size:11px; color:#666; margin-bottom:6px;">Proposte registrate: <b>${items.length}</b></div>
+                    <div style="font-size:11px; color:#666; margin-bottom:8px;">Proposte registrate: <b>${items.length}</b></div>
+                    <div class="features-grid-3col">
             `;
 
             items.forEach((item, itemIdx) => {
                 html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px;">
                         <span style="font-size:11px; color:#333; flex-grow:1; margin-right:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
                         <button class="vola-btn" data-tavolo="${tavolo}" data-index="${itemIdx}" style="font-weight:bold; font-size:9px; padding:3px 6px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
                     </div>
                 `;
             });
 
-            html += `</div>`;
+            html += `</div></div>`;
             firstTab = false;
         }
 
+        html += `</div>`; // Chiusura panel-scrollable-features
         bottomPanel.innerHTML = html;
 
         // Chiusura pannello
@@ -436,16 +478,29 @@ document.addEventListener('DOMContentLoaded', () => {
             bottomPanel.classList.remove('open');
         };
 
-        // Logica di interazione tra le schede (Tabs) dei cluster
+        // Logica di interazione tra le schede (Tabs) con cambio colore del pulsante
         const tabBtns = bottomPanel.querySelectorAll('.sidebar-tab-btn');
         const tabContents = bottomPanel.querySelectorAll('.sidebar-tab-content');
 
         tabBtns.forEach(btn => {
             btn.onclick = () => {
-                tabBtns.forEach(b => b.classList.remove('active'));
+                tabBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = '#f1f2f6';
+                    b.style.color = '#57606f';
+                    b.style.borderColor = '#dcdde1';
+                });
+
                 tabContents.forEach(c => c.classList.remove('active'));
 
                 btn.classList.add('active');
+                const catColor = btn.getAttribute('data-color');
+                const textColor = ['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white';
+                
+                btn.style.background = catColor;
+                btn.style.color = textColor;
+                btn.style.borderColor = catColor;
+
                 const targetTabId = btn.getAttribute('data-tab');
                 bottomPanel.querySelector(`#${targetTabId}`).classList.add('active');
             };
