@@ -37,7 +37,7 @@ customStyleTag.innerHTML = `
     .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 4px 6px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; }
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
-    .cluster-counter-fixed { flex-shrink: 0; font-size: 10px; color: #666; margin-bottom: 4px; }
+    .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
     .panel-scrollable-grid { flex-grow: 1; overflow-y: auto; padding-right: 2px; }
     .features-grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
     @media (max-width: 650px) { .features-grid-3col { grid-template-columns: repeat(2, 1fr); } }
