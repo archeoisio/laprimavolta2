@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- COLONNA 1: MAPPA BASE (VERTICALE) + ALTRI LAYER -->
                 <div class="col-left">
                     <div>
-                        <div class="sub-section-title">Mappa Base</div>
+                        <div class="sub-section-title">Base map</div>
                         <div class="base-map-vertical">
                             <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
                                 <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div style="border-top:1px solid #e1e1e1; padding-top:4px;">
-                        <div class="sub-section-title">Altri Layer</div>
+                        <div class="sub-section-title">Altro</div>
         `;
         const contextLayers = [{ name: 'Stazioni', layer: layer_iconestazioni_2 }, { name: 'Ospedali', layer: layer_hospital_1 }, { name: 'Quartieri', layer: layer_iconaquartieri_0 }];
         contextLayers.forEach((ctx, idx) => {
