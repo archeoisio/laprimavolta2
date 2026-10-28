@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per azzerare lo spazio vuoto a sinistra nel pannello layer
+// Iniezione di stili CSS avanzati per azzerare completamente il margine sinistro del Tree Layers
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -21,7 +21,7 @@ customStyleTag.innerHTML = `
         font-size: 12px !important;
     }
     
-    /* AZZERAMENTO TOTALE DEGLI SPAZI E RIENTRI A SINISTRA DEL PLUGIN TREE */
+    /* ELIMINAZIONE TOTALE DI QUALSIASI RIENTRO O SPAZIO A SINISTRA NEL TREE */
     .leaflet-control-layers-list, 
     .leaflet-control-layers-base, 
     .leaflet-control-layers-overlays,
@@ -29,14 +29,23 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-tree ul,
     .leaflet-control-layers-tree li,
     .leaflet-control-layers-tree div,
-    .leaflet-control-layers-group {
+    .leaflet-control-layers-group,
+    .leaflet-control-layers-subgroup {
         margin-left: 0 !important;
-        padding-left: 0 !important;
+        padding-left: 0 !important.
         text-align: left !important;
         direction: ltr !important;
+        text-indent: 0 !important;
     }
 
-    /* Allineamento a sinistra e flex per ogni singola riga di voce */
+    /* Rimuove i margini interni specifici dei nodi foglia/ramo dell'albero */
+    .leaflet-control-layers-tree li {
+        list-style: none !important;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    /* Forza le etichette a partire da sinistra senza spazi riservati */
     .leaflet-control-layers-tree label {
         display: flex !important;
         align-items: center !important;
@@ -45,7 +54,7 @@ customStyleTag.innerHTML = `
         cursor: pointer;
         font-size: 12px !important;
         line-height: 1.4 !important;
-        margin: 2px 0 !important;
+        margin: 3px 0 !important;
         padding-left: 0 !important;
         margin-left: 0 !important;
         width: 100% !important;
@@ -56,7 +65,6 @@ customStyleTag.innerHTML = `
         flex-shrink: 0 !important;
     }
 
-    /* Evita che gli span delle icone colore vengano stirati */
     .leaflet-control-layers-tree label span {
         width: auto !important;
         flex-shrink: 0 !important;
@@ -595,7 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sideInfoControl.addTo(map);
 });
 
-// --- TUTORIAL (ispirato allo stile Atlas ma adattato a La Prima Volta) ---
+// --- TUTORIAL (Stile Atlas / La Prima Volta) ---
 const tutorialSteps = [
     { 
         id: ".leaflet-control-layers", 
