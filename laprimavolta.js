@@ -22,7 +22,7 @@ customStyleTag.innerHTML = `
         box-shadow: -5px 0 25px rgba(0,0,0,0.3);
         transition: right 0.3s ease-in-out;
         z-index: 2000;
-        padding: 15px;
+        padding: 12px;
         box-sizing: border-box;
         text-align: left;
         font-family: sans-serif;
@@ -46,6 +46,45 @@ customStyleTag.innerHTML = `
 
     .sidebar-close-btn:hover {
         color: #000;
+    }
+
+    /* Stile per le schede (Tabs) superiori */
+    .sidebar-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+    }
+
+    .sidebar-tab-btn {
+        background: #f1f2f6;
+        border: 1px solid #dcdde1;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #57606f;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s;
+    }
+
+    .sidebar-tab-btn.active {
+        background: #2f3542;
+        color: white;
+        border-color: #2f3542;
+    }
+
+    .sidebar-tab-content {
+        display: none;
+    }
+
+    .sidebar-tab-content.active {
+        display: block;
     }
 
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
@@ -129,14 +168,13 @@ function resetFeatureStyle(e) {
     }
 }
 
-// Funzioni di sicurezza globali per evitare errori se richiamate da index2.html
+// Funzioni di sicurezza globali
 window.closeModal = function() {
     const modal = document.getElementById('welcome-modal');
     if (modal) modal.style.display = 'none';
 };
 
 window.nextTutorialStep = function() {
-    // Svuota eventuali popup rimasti aperti
     if (typeof map !== 'undefined') {
         map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
     }
@@ -169,8 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. CARICAMENTO LAYER DI CONTESTO ---
-    
-    // Quartieri (Solo etichetta con riquadro bianco e bordo nero)
     function pop_iconaquartieri_0(feature, layer) {
         var nomeQuartiere = feature.properties['nome'] || '';
         if (nomeQuartiere) {
@@ -191,7 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     map.addLayer(layer_iconaquartieri_0);
 
-    // Ospedali
     function pop_hospital_1(feature, layer) {
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
@@ -205,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     map.addLayer(layer_hospital_1);
 
-    // Stazioni (Con icona SVG corretta)
     function pop_iconestazioni_2(feature, layer) {
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
@@ -227,7 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     map.addLayer(layer_iconestazioni_2);
 
-    // Basemaps
     map.createPane('pane_GoogleSatellite_3');
     map.getPane('pane_GoogleSatellite_3').style.zIndex = 403;
     var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28 });
@@ -257,7 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
         atlasCategories[tavolo].push({ name, latlng, layer });
     }
 
-    // Caricamento Punti per Tavolo
     const puntiPerTavolo = {};
     json_puntiprimavolta_5.features.forEach(f => {
         const t = f.properties['Tavolo'] || f.properties['Tavolo di '] || f.properties['Tavolo di'] || 'Altro';
@@ -295,7 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
         map.addLayer(layerPuntiTavolo);
     }
 
-    // Caricamento Poligoni per Tavolo
     const poligoniPerTavolo = {};
     json_poligoniprimavolta_6.features.forEach(f => {
         const t = f.properties['Tavolo'] || f.properties['Tavolo di '] || f.properties['Tavolo di'] || 'Altro';
@@ -331,43 +362,51 @@ document.addEventListener('DOMContentLoaded', () => {
         map.addLayer(layerPoligoniTavolo);
     }
 
-    // --- 4. CREAZIONE BARRA LATERALE A SCOMPARSA CON I TAVOLI TEMATICI ---
+    // --- 4. CREAZIONE BARRA LATERALE A SCHEDE (TABS) ---
     const sidebar = document.createElement('div');
     sidebar.id = 'custom-sidebar-layers';
     document.body.appendChild(sidebar);
 
     function renderSidebarContent() {
         let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #ddd; padding-bottom:6px; margin-bottom:10px;">
-                <b style="font-size:14px; color:#2c3e50;">🗂️ Gestione Mappe e Tavoli</b>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:6px; margin-bottom:8px;">
+                <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <button class="sidebar-close-btn">&times;</button>
+            </div>
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab-btn active" data-tab="tab-mappe">🗺️ Mappe</button>
+        `;
+
+        // Pulsanti delle schede per ogni Tavolo
+        for (const tavolo of Object.keys(atlasCategories)) {
+            html += `<button class="sidebar-tab-btn" data-tab="tab-${tavolo.replace(/\s+/g, '')}">${tavolo.charAt(0).toUpperCase() + tavolo.slice(1)}</button>`;
+        }
+        html += `<button class="sidebar-tab-btn" data-tab="tab-contesto">🏙️ Contesto</button>`;
+        html += `</div>`;
+
+        // Contenuto Scheda Mappe Base
+        html += `
+            <div id="tab-mappe" class="sidebar-tab-content active">
+                <div style="font-weight:bold; margin-bottom:6px; color:#555;">Scegli Mappa Base</div>
+                <label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
+                    <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
+                    <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Google Satellite
+                </label>
             </div>
         `;
 
-        // Mappe Base
-        html += '<div style="font-weight:bold; margin-bottom:4px; color:#555;">Mappe Base</div>';
-        html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
-            <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
-        </label>`;
-        html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
-            <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Google Satellite
-        </label>`;
-
-        html += '<div style="font-weight:bold; margin:12px 0 4px 0; color:#555;">Tavoli Tematici (Proposte)</div>';
-
-        // Tavoli Tematici ad Albero con marker quadrato e tasto VOLA
+        // Contenuto Schede per ciascun Tavolo Tematico
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
+            const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
             html += `
-                <div style="margin-bottom:6px; border:1px solid #eee; border-radius:6px; overflow:hidden;">
-                    <div class="table-header-${tavolo.replace(/\s+/g, '')}" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:#f8f9fa; font-weight:bold;">
-                        <span style="display:flex; align-items:center; gap:6px;">
-                            <span style="display:inline-block; width:10px; height:10px; background-color:${catColor}; border:1px solid #333; flex-shrink:0;"></span>
-                            ${tavolo.toUpperCase()} (${items.length})
-                        </span>
-                        <span class="arrow-${tavolo.replace(/\s+/g, '')}">►</span>
+                <div id="tab-${cleanKey}" class="sidebar-tab-content">
+                    <div style="font-weight:bold; margin-bottom:6px; color:#555; display:flex; align-items:center; gap:6px;">
+                        <span style="display:inline-block; width:10px; height:10px; background-color:${catColor}; border:1px solid #333; flex-shrink:0;"></span>
+                        Proposte: ${tavolo.toUpperCase()} (${items.length})
                     </div>
-                    <div class="table-content-${tavolo.replace(/\s+/g, '')}" style="display:none; padding:6px 8px; background:#fff; border-top:1px solid #eee;">
             `;
 
             items.forEach((item, itemIdx) => {
@@ -379,11 +418,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             });
 
-            html += `</div></div>`;
+            html += `</div>`;
         }
 
-        // Contesto Urbano
-        html += '<div style="font-weight:bold; margin:12px 0 4px 0; color:#555;">Contesto Urbano</div>';
+        // Contenuto Scheda Contesto Urbano
+        html += `
+            <div id="tab-contesto" class="sidebar-tab-content">
+                <div style="font-weight:bold; margin-bottom:6px; color:#555;">Elementi di Contesto</div>
+        `;
         const contextLayers = [
             { name: 'Stazioni', layer: layer_iconestazioni_2 },
             { name: 'Ospedali', layer: layer_hospital_1 },
@@ -391,11 +433,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         contextLayers.forEach((ctx, idx) => {
             const isChecked = map.hasLayer(ctx.layer);
-            html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
+            html += `<label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
                 <input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}>
                 ${ctx.name}
             </label>`;
         });
+        html += `</div>`;
 
         sidebar.innerHTML = html;
 
@@ -404,21 +447,20 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebar.classList.remove('open');
         };
 
-        // Gestione Accordion e Pulsanti VOLA per ogni Tavolo
-        for (const [tavolo, items] of Object.entries(atlasCategories)) {
-            const cleanKey = tavolo.replace(/\s+/g, '');
-            const header = sidebar.querySelector(`.table-header-${cleanKey}`);
-            const content = sidebar.querySelector(`.table-content-${cleanKey}`);
-            const arrow = sidebar.querySelector(`.arrow-${cleanKey}`);
+        // Logica di interazione tra le schede (Tabs)
+        const tabBtns = sidebar.querySelectorAll('.sidebar-tab-btn');
+        const tabContents = sidebar.querySelectorAll('.sidebar-tab-content');
 
-            if (header) {
-                header.onclick = () => {
-                    const isHidden = content.style.display === 'none';
-                    content.style.display = isHidden ? 'block' : 'none';
-                    arrow.innerHTML = isHidden ? '▼' : '►';
-                };
-            }
-        }
+        tabBtns.forEach(btn => {
+            btn.onclick = () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.add('active');
+                const targetTabId = btn.getAttribute('data-tab');
+                sidebar.querySelector(`#${targetTabId}`).classList.add('active');
+            };
+        });
 
         // Eventi pulsanti VOLA
         sidebar.querySelectorAll('.vola-btn').forEach(btn => {
@@ -514,8 +556,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        // 0. Pulsante Gestione Layer / Tavoli (apre la barra laterale)
-        createBtn('🗂️', "Gestione Tavoli e Mappe", () => {
+        // 0. Pulsante Gestione Layer / Tavoli (apre la barra a schede)
+        createBtn('🗂️', "Centro di Controllo", () => {
             renderSidebarContent();
             sidebar.classList.toggle('open');
         }, 'btn-tutorial-layers');
