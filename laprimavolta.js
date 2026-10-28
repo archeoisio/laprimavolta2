@@ -1,24 +1,35 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per allargare il pannello dei layer e renderlo leggibile
+// Iniezione di stili CSS corretti per il pannello dei layer (più compatto e allineato a sinistra)
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-expanded {
-        min-width: 280px !important;
-        max-width: 340px !important;
-        padding: 12px 14px !important;
+        min-width: 220px !important;
+        max-width: 270px !important;
+        padding: 10px 12px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     }
     .leaflet-control-layers-list label {
-        font-size: 13px !important;
-        line-height: 1.8 !important;
+        font-size: 12px !important;
+        line-height: 1.6 !important;
         cursor: pointer;
-        display: flex;
-        align-items: center;
+        text-align: left !important;
+    }
+    /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
+    .quartiere-label {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #000;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 11px;
+        color: #000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        white-space: nowrap;
     }
 `;
 document.head.appendChild(customStyleTag);
@@ -116,24 +127,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. CARICAMENTO LAYER DI CONTESTO ---
+    
+    // Quartieri (Solo etichetta con riquadro bianco e bordo nero)
     function pop_iconaquartieri_0(feature, layer) {
-        layer.on({
-            mouseout: function(e) { resetFeatureStyle(e); layer.closePopup(); },
-            mouseover: highlightFeature,
-        });
-        var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-        layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
+        var nomeQuartiere = feature.properties['nome'] || '';
+        if (nomeQuartiere) {
+            layer.bindTooltip(nomeQuartiere, {
+                permanent: true,
+                direction: 'center',
+                className: 'quartiere-label'
+            });
+        }
     }
     map.createPane('pane_iconaquartieri_0');
     map.getPane('pane_iconaquartieri_0').style.zIndex = 400;
     var layer_iconaquartieri_0 = new L.geoJson(json_iconaquartieri_0, {
-        interactive: false, pane: 'pane_iconaquartieri_0', onEachFeature: pop_iconaquartieri_0,
-        pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, { radius: 4.0, stroke: false, fill: true, fillOpacity: 1, fillColor: 'rgba(190,178,151,0.0)' }); },
+        interactive: true, pane: 'pane_iconaquartieri_0', onEachFeature: pop_iconaquartieri_0,
+        pointToLayer: function (feature, latlng) { 
+            return L.circleMarker(latlng, { radius: 0.1, stroke: false, fill: false, opacity: 0 }); 
+        },
     });
     map.addLayer(layer_iconaquartieri_0);
 
+    // Ospedali
     function pop_hospital_1(feature, layer) {
-        layer.on({ mouseout: function(e) { resetFeatureStyle(e); layer.closePopup(); }, mouseover: highlightFeature });
+        layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
         layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
     }
@@ -145,19 +163,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     map.addLayer(layer_hospital_1);
 
+    // Stazioni (Con icona SVG corretta)
     function pop_iconestazioni_2(feature, layer) {
-        layer.on({ mouseout: function(e) { resetFeatureStyle(e); layer.closePopup(); }, mouseover: highlightFeature });
+        layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
         layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
     }
     map.createPane('pane_iconestazioni_2');
     map.getPane('pane_iconestazioni_2').style.zIndex = 402;
-    var layer_iconestazioni_2 = new L.geoJson.multiStyle(json_iconestazioni_2, {
-        interactive: false, pane: 'pane_iconestazioni_2', onEachFeature: pop_iconestazioni_2,
-        pointToLayers: [
-            function (feature, latlng) { return L.marker(latlng, { radius: 12.0, opacity: 1, color: 'rgba(35,35,35,1.0)', fill: true, fillOpacity: 1, fillColor: 'rgba(255,255,255,1.0)' }); },
-            function (feature, latlng) { return L.marker(latlng, { icon: L.icon({ iconUrl: 'markers/iconestazioni_2.svg', iconSize: [19.0, 19.0] }) }); }
-        ]
+    var layer_iconestazioni_2 = new L.geoJson(json_iconestazioni_2, {
+        interactive: true, pane: 'pane_iconestazioni_2', onEachFeature: pop_iconestazioni_2,
+        pointToLayer: function (feature, latlng) { 
+            return L.marker(latlng, { 
+                icon: L.icon({ 
+                    iconUrl: 'markers/iconestazioni_2.svg', 
+                    iconSize: [22.0, 22.0],
+                    iconAnchor: [11, 11]
+                }) 
+            }); 
+        }
     });
     map.addLayer(layer_iconestazioni_2);
 
@@ -229,8 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         map.addLayer(layerPuntiTavolo);
         
-        // Icona cerchietto colorato nel menu layer
-        const iconHtml = '<span style="display:inline-block; width:12px; height:12px; background-color:' + catColor + '; border-radius:50%; margin-right:8px; border:1px solid #333; vertical-align:middle;"></span>';
+        const iconHtml = '<span style="display:inline-block; width:10px; height:10px; background-color:' + catColor + '; border-radius:50%; margin-right:6px; border:1px solid #333; vertical-align:middle;"></span>';
         puntiChildren.push({ label: iconHtml + tavolo.toUpperCase(), layer: layerPuntiTavolo });
     }
 
@@ -270,8 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         map.addLayer(layerPoligoniTavolo);
         
-        // Icona quadratino colorato nel menu layer
-        const iconHtml = '<span style="display:inline-block; width:12px; height:12px; background-color:' + catColor + '; margin-right:8px; border:1px solid #333; vertical-align:middle;"></span>';
+        const iconHtml = '<span style="display:inline-block; width:10px; height:10px; background-color:' + catColor + '; margin-right:6px; border:1px solid #333; vertical-align:middle;"></span>';
         poligoniChildren.push({ label: iconHtml + tavolo.toUpperCase(), layer: layerPoligoniTavolo });
     }
 
