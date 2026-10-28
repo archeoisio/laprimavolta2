@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS corretti per il pannello dei layer (più compatto e allineato a sinistra)
+// Iniezione di stili CSS corretti per il pannello dei layer (compatto e allineato a sinistra)
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-expanded {
@@ -12,12 +12,31 @@ customStyleTag.innerHTML = `
         backdrop-filter: blur(6px);
         border-radius: 10px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-    }
-    .leaflet-control-layers-list label {
-        font-size: 12px !important;
-        line-height: 1.6 !important;
-        cursor: pointer;
         text-align: left !important;
+        direction: ltr !important;
+    }
+    .leaflet-control-layers-list, 
+    .leaflet-control-layers-base, 
+    .leaflet-control-layers-overlays,
+    .leaflet-control-layers-expanded span,
+    .leaflet-control-layers-expanded label {
+        text-align: left !important;
+        direction: ltr !important;
+    }
+    .leaflet-control-layers-expanded label {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 6px !important;
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+        cursor: pointer;
+        margin: 3px 0 !important;
+        width: 100% !important;
+    }
+    .leaflet-control-layers-selector {
+        margin: 0 4px 0 0 !important;
+        flex-shrink: 0 !important;
     }
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
     .quartiere-label {
