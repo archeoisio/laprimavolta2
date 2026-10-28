@@ -1,6 +1,32 @@
 let map; 
 let highlightLayer;
 
+// Palette di colori distinti per i Tavoli / Categorie
+const tavoloColors = {
+    'ambiente': '#2ecc71',
+    'cultura': '#e67e22',
+    'sociale': '#3498db',
+    'urbanistica': '#9b59b6',
+    'economia': '#f1c40f',
+    'mobilità': '#e74c3c',
+    'altro': '#1abc9c'
+};
+
+function getTavoloColor(tavoloName) {
+    if (!tavoloName) return '#3b71e6';
+    const key = tavoloName.toLowerCase().trim();
+    for (const [k, color] of Object.entries(tavoloColors)) {
+        if (key.includes(k)) return color;
+    }
+    // Colore di fallback basato su hash stringa se non trovato nella palette
+    let hash = 0;
+    for (let i = 0; i < tavoloName.length; i++) {
+        hash = tavoloName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const palette = ['#3b71e6', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'];
+    return palette[Math.abs(hash) % palette.length];
+}
+
 function highlightFeature(e) {
     var layer = e.target;
     layer.setStyle({
@@ -16,6 +42,10 @@ function highlightFeature(e) {
 
 function resetFeatureStyle(e) {
     var layer = e.target;
+    const prop = layer.feature.properties;
+    const tavolo = prop['Tavolo'] || prop['Tavolo di '] || prop['Tavolo di'] || 'Altro';
+    const catColor = getTavoloColor(tavolo);
+
     if (layer.feature.geometry.type === 'Point') {
         layer.setStyle({
             radius: 6.0,
@@ -24,7 +54,7 @@ function resetFeatureStyle(e) {
             weight: 1,
             fill: true,
             fillOpacity: 1,
-            fillColor: 'rgba(59,113,230,1.0)'
+            fillColor: catColor
         });
     } else {
         layer.setStyle({
@@ -33,7 +63,7 @@ function resetFeatureStyle(e) {
             weight: 1.0,
             fill: true,
             fillOpacity: 0.6,
-            fillColor: 'rgba(140,83,231,1.0)'
+            fillColor: catColor
         });
     }
 }
@@ -64,8 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
          return tempDiv.innerHTML;
     }
 
-    // --- 2. CARICAMENTO LAYER DI BASE E CONTESTO ---
-    // iconaquartieri_0
+    // --- 2. CARICAMENTO LAYER DI CONTESTO ---
     function pop_iconaquartieri_0(feature, layer) {
         layer.on({
             mouseout: function(e) { resetFeatureStyle(e); layer.closePopup(); },
@@ -82,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     map.addLayer(layer_iconaquartieri_0);
 
-    // hospital_1
     function pop_hospital_1(feature, layer) {
         layer.on({ mouseout: function(e) { resetFeatureStyle(e); layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
@@ -96,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     map.addLayer(layer_hospital_1);
 
-    // iconestazioni_2
     function pop_iconestazioni_2(feature, layer) {
         layer.on({ mouseout: function(e) { resetFeatureStyle(e); layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
@@ -123,10 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28 });
     map.addLayer(layer_OpenStreetMap_4);
 
-    // --- 3. SUDDIVISIONE DINAMICA PER TAVOLI (PUNTI E POLIGONI) ---
+    // --- 3. COSTRUZIONE ALBERO CATEGORIE (PUNTI E POLIGONI) ---
     const atlasCategories = {};
-    const tavoliPuntiLayers = {};
-    const tavoliPoligoniLayers = {};
 
     function registerItem(feature, layer) {
         const tavolo = feature.properties['Tavolo'] || feature.properties['Tavolo di '] || feature.properties['Tavolo di'] || 'Altro';
@@ -145,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         atlasCategories[tavolo].push({ name, latlng, layer });
     }
 
-    // Organizzazione Punti per Tavolo
+    // Punti per Tavolo
     const puntiPerTavolo = {};
     json_puntiprimavolta_5.features.forEach(f => {
         const t = f.properties['Tavolo'] || f.properties['Tavolo di '] || f.properties['Tavolo di'] || 'Altro';
@@ -155,14 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     map.createPane('pane_puntiprimavolta_5');
     map.getPane('pane_puntiprimavolta_5').style.zIndex = 405;
-    
-    const overlays = {
-        "Stazioni": layer_iconestazioni_2,
-        "Ospedali": layer_hospital_1,
-        "Quartieri": layer_iconaquartieri_0
-    };
 
+    const puntiChildren = [];
     for (const [tavolo, features] of Object.entries(puntiPerTavolo)) {
+        const catColor = getTavoloColor(tavolo);
         const layerPuntiTavolo = new L.geoJson({ type: "FeatureCollection", features: features }, {
             interactive: true,
             pane: 'pane_puntiprimavolta_5',
@@ -182,14 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
             },
             pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: 'rgba(59,113,230,1.0)' });
+                return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
             }
         });
         map.addLayer(layerPuntiTavolo);
-        overlays["📍 Punti: " + tavolo] = layerPuntiTavolo;
+        puntiChildren.push({ label: tavolo.toUpperCase(), layer: layerPuntiTavolo });
     }
 
-    // Organizzazione Poligoni per Tavolo
+    // Poligoni per Tavolo
     const poligoniPerTavolo = {};
     json_poligoniprimavolta_6.features.forEach(f => {
         const t = f.properties['Tavolo'] || f.properties['Tavolo di '] || f.properties['Tavolo di'] || 'Altro';
@@ -200,12 +221,14 @@ document.addEventListener('DOMContentLoaded', () => {
     map.createPane('pane_poligoniprimavolta_6');
     map.getPane('pane_poligoniprimavolta_6').style.zIndex = 406;
 
+    const poligoniChildren = [];
     for (const [tavolo, features] of Object.entries(poligoniPerTavolo)) {
+        const catColor = getTavoloColor(tavolo);
         const layerPoligoniTavolo = new L.geoJson({ type: "FeatureCollection", features: features }, {
             interactive: true,
             pane: 'pane_poligoniprimavolta_6',
             style: function(feature) {
-                return { opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: 'rgba(140,83,231,1.0)' };
+                return { opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: catColor };
             },
             onEachFeature: function(feature, layer) {
                 registerItem(feature, layer);
@@ -222,15 +245,45 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPoligoniTavolo);
-        overlays["🗺️ Poligoni: " + tavolo] = layerPoligoniTavolo;
+        poligoniChildren.push({ label: tavolo.toUpperCase(), layer: layerPoligoniTavolo });
     }
 
-    // --- 4. CONTROLLO LAYER E SATELLITE (ALTO A DESTRA) ---
-    var baseLayers = {
-        "OpenStreetMap": layer_OpenStreetMap_4,
-        "Google Satellite": layer_GoogleSatellite_3
+    // --- 4. CONTROLLO LAYER ALBERO (ALTO A DESTRA) ---
+    var baseTree = {
+        label: "<b>Mappe Base</b>",
+        children: [
+            { label: "OpenStreetMap", layer: layer_OpenStreetMap_4, radioGroup: 'bm' },
+            { label: "Google Satellite", layer: layer_GoogleSatellite_3, radioGroup: 'bm' }
+        ]
     };
-    L.control.layers(baseLayers, overlays, { collapsed: true, position: 'topright' }).addTo(map);
+
+    var overlaysTree = {
+        label: "<b>Layer Tematici</b>",
+        children: [
+            {
+                label: "📍 <b>Punti d'interesse</b>",
+                children: puntiChildren
+            },
+            {
+                label: "🗺️ <b>Poligoni</b>",
+                children: poligoniChildren
+            },
+            {
+                label: "<b>Contesto</b>",
+                children: [
+                    { label: "Stazioni", layer: layer_iconestazioni_2 },
+                    { label: "Ospedali", layer: layer_hospital_1 },
+                    { label: "Quartieri", layer: layer_iconaquartieri_0 }
+                ]
+            }
+        ]
+    };
+
+    L.control.layers.tree(baseTree, overlaysTree, {
+        collapsed: true,
+        position: 'topright',
+        sortLayers: false
+    }).addTo(map);
 
     // Photon Search Control
     const photonUrl = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&"};
@@ -279,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. PULSANTI IN ALTO A DESTRA (DIMENSIONI UNIFICATE) ---
+    // --- 5. PULSANTI IN ALTO A DESTRA (DIMENSIONI 36x36px UNIFICATE) ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -300,9 +353,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = html;
             btn.title = title;
             btn.href = '#';
-            btn.style.width = '34px';
-            btn.style.height = '34px';
-            btn.style.lineHeight = '34px';
+            btn.style.width = '36px';
+            btn.style.height = '36px';
+            btn.style.lineHeight = '36px';
             btn.style.textAlign = 'center';
             btn.style.display = 'flex';
             btn.style.alignItems = 'center';
@@ -336,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     btnControl.addTo(map);
 
-    // Locate control
+    // Locate control (forzato a 36x36px)
     const locateControl = L.control.locate({
         position: 'topright',
         flyTo: { duration: 6 },
@@ -346,11 +399,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const locContainer = locateControl.getContainer();
     if (locContainer) {
         locContainer.classList.add('btn-tutorial-locate');
-        locContainer.style.width = '34px';
-        locContainer.style.height = '34px';
+        locContainer.style.width = '36px';
+        locContainer.style.height = '36px';
     }
 
-    // --- 6. PANNELLO ATLAS LAYERS (BASSO SINISTRA - FORMATO ORIGINALE ATLAS) ---
+    // --- 6. PANNELLO ATLAS LAYERS (BASSO SINISTRA) ---
     const sideInfoControl = L.control({ position: 'bottomleft' });
     sideInfoControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'info-container-bottom');
@@ -527,7 +580,6 @@ function showStep() {
     .openOn(map);
 }
 
-// --- Funzione globale per far avanzare il tutorial ---
 window.nextTutorialStep = function() {
     currentStep++;
     if (currentStep < tutorialSteps.length) {
