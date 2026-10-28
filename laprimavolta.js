@@ -14,9 +14,9 @@ customStyleTag.innerHTML = `
         position: fixed;
         top: 60px; /* Posizionato subito sotto i pulsanti in alto a destra */
         right: -280px; /* Nascosto fuori dallo schermo */
-        width: 220px;
+        width: 260px;
         max-height: 300px; /* Altezza massima bloccata a 300px */
-        overflow-y: auto; /* Attiva la barra di scorrimento verticale se il contenuto eccede */
+        overflow-y: auto; /* Attiva la barra di scorrimento verticale */
         background: rgba(255, 255, 255, 0.97);
         backdrop-filter: blur(10px);
         box-shadow: -5px 0 25px rgba(0,0,0,0.3);
@@ -38,7 +38,7 @@ customStyleTag.innerHTML = `
     .sidebar-close-btn {
         background: none;
         border: none;
-        font-size: 18px;
+        font-size: 16px;
         cursor: pointer;
         float: right;
         color: #666;
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28 });
     map.addLayer(layer_OpenStreetMap_4);
 
-    // --- 3. COSTRUZIONE ELEMENTI E RACCOLTA DATI ---
+    // --- 3. COSTRUZIONE ELEMENTI E RACCOLTA DATI PER I TAVOLI ---
     const atlasCategories = {};
 
     function registerItem(feature, layer) {
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         atlasCategories[tavolo].push({ name, latlng, layer });
     }
 
-    // Punti per Tavolo
+    // Caricamento Punti per Tavolo
     const puntiPerTavolo = {};
     json_puntiprimavolta_5.features.forEach(f => {
         const t = f.properties['Tavolo'] || f.properties['Tavolo di '] || f.properties['Tavolo di'] || 'Altro';
@@ -255,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
     map.createPane('pane_puntiprimavolta_5');
     map.getPane('pane_puntiprimavolta_5').style.zIndex = 405;
 
-    const puntiLayersGroup = [];
     for (const [tavolo, features] of Object.entries(puntiPerTavolo)) {
         const catColor = getTavoloColor(tavolo);
         const layerPuntiTavolo = new L.geoJson({ type: "FeatureCollection", features: features }, {
@@ -281,10 +280,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPuntiTavolo);
-        puntiLayersGroup.push({ name: tavolo.toUpperCase(), color: catColor, layer: layerPuntiTavolo });
     }
 
-    // Poligoni per Tavolo
+    // Caricamento Poligoni per Tavolo
     const poligoniPerTavolo = {};
     json_poligoniprimavolta_6.features.forEach(f => {
         const t = f.properties['Tavolo'] || f.properties['Tavolo di '] || f.properties['Tavolo di'] || 'Altro';
@@ -295,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
     map.createPane('pane_poligoniprimavolta_6');
     map.getPane('pane_poligoniprimavolta_6').style.zIndex = 406;
 
-    const areeLayersGroup = [];
     for (const [tavolo, features] of Object.entries(poligoniPerTavolo)) {
         const catColor = getTavoloColor(tavolo);
         const layerPoligoniTavolo = new L.geoJson({ type: "FeatureCollection", features: features }, {
@@ -319,80 +316,61 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPoligoniTavolo);
-        areeLayersGroup.push({ name: tavolo.toUpperCase(), color: catColor, layer: layerPoligoniTavolo });
     }
 
-    // --- 4. CREAZIONE BARRA LATERALE A SCOMPARSA (DESTRA) ---
-    // Creiamo il contenitore HTML fisso nel DOM per la barra laterale
+    // --- 4. CREAZIONE BARRA LATERALE A SCOMPARSA CON I TAVOLI TEMATICI ---
     const sidebar = document.createElement('div');
     sidebar.id = 'custom-sidebar-layers';
     document.body.appendChild(sidebar);
 
     function renderSidebarContent() {
         let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #ddd; padding-bottom:8px; margin-bottom:12px;">
-                <b style="font-size:15px; color:#2c3e50;">🗂️ Gestione Layer</b>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #ddd; padding-bottom:6px; margin-bottom:10px;">
+                <b style="font-size:14px; color:#2c3e50;">🗂️ Gestione Mappe e Tavoli</b>
                 <button class="sidebar-close-btn">&times;</button>
             </div>
         `;
 
-        html += '<div style="font-weight:bold; margin-bottom:6px; color:#555;">Mappe Base</div>';
-        html += `<label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
+        // Mappe Base
+        html += '<div style="font-weight:bold; margin-bottom:4px; color:#555;">Mappe Base</div>';
+        html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
             <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
         </label>`;
-        html += `<label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
+        html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
             <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Google Satellite
         </label>`;
 
-        html += '<div style="font-weight:bold; margin:16px 0 6px 0; color:#555;">Layer Tematici</div>';
+        html += '<div style="font-weight:bold; margin:12px 0 4px 0; color:#555;">Tavoli Tematici (Proposte)</div>';
 
-        // Ramo 1: Punti (Accordion)
-        html += `
-            <div style="margin-bottom:8px; border:1px solid #eee; border-radius:6px; overflow:hidden;">
-                <div class="tree-header-punti" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#f8f9fa; font-weight:bold;">
-                    <span>📍 Punti di interesse</span>
-                    <span class="arrow-punti">►</span>
-                </div>
-                <div class="tree-content-punti" style="display:none; padding:8px 10px; background:#fff; border-top:1px solid #eee;">
-        `;
-        puntiLayersGroup.forEach((item, idx) => {
-            const isChecked = map.hasLayer(item.layer);
-            html += `<label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
-                <input type="checkbox" class="custom-layer-chk" data-type="punti" data-index="${idx}" ${isChecked ? 'checked' : ''}>
-                <span style="display:inline-block; width:10px; height:10px; background-color:${item.color}; border-radius:50%; border:1px solid #333; flex-shrink:0;"></span>
-                ${item.name}
-            </label>`;
-        });
-        html += `</div></div>`;
+        // Tavoli Tematici ad Albero con marker quadrato e tasto VOLA
+        for (const [tavolo, items] of Object.entries(atlasCategories)) {
+            const catColor = getTavoloColor(tavolo);
+            html += `
+                <div style="margin-bottom:6px; border:1px solid #eee; border-radius:6px; overflow:hidden;">
+                    <div class="table-header-${tavolo.replace(/\s+/g, '')}" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:#f8f9fa; font-weight:bold;">
+                        <span style="display:flex; align-items:center; gap:6px;">
+                            <span style="display:inline-block; width:10px; height:10px; background-color:${catColor}; border:1px solid #333; flex-shrink:0;"></span>
+                            ${tavolo.toUpperCase()} (${items.length})
+                        </span>
+                        <span class="arrow-${tavolo.replace(/\s+/g, '')}">►</span>
+                    </div>
+                    <div class="table-content-${tavolo.replace(/\s+/g, '')}" style="display:none; padding:6px 8px; background:#fff; border-top:1px solid #eee;">
+            `;
 
-        // Ramo 2: Aree (Accordion)
-        html += `
-            <div style="margin-bottom:8px; border:1px solid #eee; border-radius:6px; overflow:hidden;">
-                <div class="tree-header-aree" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#f8f9fa; font-weight:bold;">
-                    <span>🗺️ Aree di interesse</span>
-                    <span class="arrow-aree">►</span>
-                </div>
-                <div class="tree-content-aree" style="display:none; padding:8px 10px; background:#fff; border-top:1px solid #eee;">
-        `;
-        areeLayersGroup.forEach((item, idx) => {
-            const isChecked = map.hasLayer(item.layer);
-            html += `<label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
-                <input type="checkbox" class="custom-layer-chk" data-type="aree" data-index="${idx}" ${isChecked ? 'checked' : ''}>
-                <span style="display:inline-block; width:10px; height:10px; background-color:${item.color}; border:1px solid #333; flex-shrink:0;"></span>
-                ${item.name}
-            </label>`;
-        });
-        html += `</div></div>`;
+            items.forEach((item, itemIdx) => {
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid rgba(0,0,0,0.05);">
+                        <span style="font-size:11px; color:#333; flex-grow:1; margin-right:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
+                        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${itemIdx}" style="font-weight:bold; font-size:9px; padding:3px 6px; cursor:pointer; background:#e74c3c; color:white; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
+                    </div>
+                `;
+            });
 
-        // Ramo 3: Contesto (Accordion)
-        html += `
-            <div style="margin-bottom:8px; border:1px solid #eee; border-radius:6px; overflow:hidden;">
-                <div class="tree-header-contesto" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#f8f9fa; font-weight:bold;">
-                    <span>🏛️ Contesto Urbano</span>
-                    <span class="arrow-contesto">►</span>
-                </div>
-                <div class="tree-content-contesto" style="display:none; padding:8px 10px; background:#fff; border-top:1px solid #eee;">
-        `;
+            html += `</div></div>`;
+        }
+
+        // Contesto Urbano
+        html += '<div style="font-weight:bold; margin:12px 0 4px 0; color:#555;">Contesto Urbano</div>';
         const contextLayers = [
             { name: 'Stazioni', layer: layer_iconestazioni_2 },
             { name: 'Ospedali', layer: layer_hospital_1 },
@@ -400,46 +378,47 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         contextLayers.forEach((ctx, idx) => {
             const isChecked = map.hasLayer(ctx.layer);
-            html += `<label style="display:flex; align-items:center; gap:6px; margin:6px 0; cursor:pointer;">
+            html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
                 <input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}>
                 ${ctx.name}
             </label>`;
         });
-        html += `</div></div>`;
 
         sidebar.innerHTML = html;
 
-        // Evento chiusura
+        // Chiusura barra
         sidebar.querySelector('.sidebar-close-btn').onclick = () => {
             sidebar.classList.remove('open');
         };
 
-        // Eventi Accordion
-        sidebar.querySelector('.tree-header-punti').onclick = () => {
-            const content = sidebar.querySelector('.tree-content-punti');
-            const arrow = sidebar.querySelector('.arrow-punti');
-            const isHidden = content.style.display === 'none';
-            content.style.display = isHidden ? 'block' : 'none';
-            arrow.innerHTML = isHidden ? '▼' : '►';
-        };
+        // Gestione Accordion e Pulsanti VOLA per ogni Tavolo
+        for (const [tavolo, items] of Object.entries(atlasCategories)) {
+            const cleanKey = tavolo.replace(/\s+/g, '');
+            const header = sidebar.querySelector(`.table-header-${cleanKey}`);
+            const content = sidebar.querySelector(`.table-content-${cleanKey}`);
+            const arrow = sidebar.querySelector(`.arrow-${cleanKey}`);
 
-        sidebar.querySelector('.tree-header-aree').onclick = () => {
-            const content = sidebar.querySelector('.tree-content-aree');
-            const arrow = sidebar.querySelector('.arrow-aree');
-            const isHidden = content.style.display === 'none';
-            content.style.display = isHidden ? 'block' : 'none';
-            arrow.innerHTML = isHidden ? '▼' : '►';
-        };
+            if (header) {
+                header.onclick = () => {
+                    const isHidden = content.style.display === 'none';
+                    content.style.display = isHidden ? 'block' : 'none';
+                    arrow.innerHTML = isHidden ? '▼' : '►';
+                };
+            }
+        }
 
-        sidebar.querySelector('.tree-header-contesto').onclick = () => {
-            const content = sidebar.querySelector('.tree-content-contesto');
-            const arrow = sidebar.querySelector('.arrow-contesto');
-            const isHidden = content.style.display === 'none';
-            content.style.display = isHidden ? 'block' : 'none';
-            arrow.innerHTML = isHidden ? '▼' : '►';
-        };
+        // Eventi pulsanti VOLA
+        sidebar.querySelectorAll('.vola-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                const tavolo = e.target.getAttribute('data-tavolo');
+                const idx = parseInt(e.target.getAttribute('data-index'));
+                const targetItem = atlasCategories[tavolo][idx];
+                map.flyTo(targetItem.latlng, 16, { animate: true, duration: 3 });
+                targetItem.layer.openPopup();
+            };
+        });
 
-        // Eventi modifica layer
+        // Eventi Mappe Base
         sidebar.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
             radio.onchange = (e) => {
                 if (e.target.value === 'osm') {
@@ -452,19 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        sidebar.querySelectorAll('.custom-layer-chk').forEach(chk => {
-            chk.onchange = (e) => {
-                const type = e.target.getAttribute('data-type');
-                const index = parseInt(e.target.getAttribute('data-index'));
-                const targetLayer = (type === 'punti') ? puntiLayersGroup[index].layer : areeLayersGroup[index].layer;
-                if (e.target.checked) {
-                    map.addLayer(targetLayer);
-                } else {
-                    map.removeLayer(targetLayer);
-                }
-            };
-        });
-
+        // Eventi Contesto
         sidebar.querySelectorAll('.custom-context-chk').forEach(chk => {
             chk.onchange = (e) => {
                 const index = parseInt(e.target.getAttribute('data-index'));
@@ -490,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("Impossibile determinare la posizione: " + e.message);
     });
 
-    // --- 6. PULSANTI IN ALTO A DESTRA (Incluso il pulsante Layer) ---
+    // --- 6. PULSANTI IN ALTO A DESTRA ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -534,8 +501,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        // 0. Pulsante Gestione Layer (apre la barra laterale)
-        createBtn('🗂️', "Gestione Layer", () => {
+        // 0. Pulsante Gestione Layer / Tavoli (apre la barra laterale)
+        createBtn('🗂️', "Gestione Tavoli e Mappe", () => {
             renderSidebarContent();
             sidebar.classList.toggle('open');
         }, 'btn-tutorial-layers');
@@ -550,236 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
             map.locate({setView: true, maxZoom: 16});
         }, 'btn-tutorial-locate');
 
-        // 3. Cluster tematici ❤️
-        createBtn('❤️', "Cluster tematici", () => {
-            const hb = document.getElementById('hearts-list-box');
-            if(hb) hb.style.display = (hb.style.display === 'none') ? 'block' : 'none';
-        }, 'btn-tutorial-hearts');
-
         return container;
     };
     btnControl.addTo(map);
-
-    // --- 7. PANNELLO CLUSTER TEMATICI (BASSO SINISTRA) ---
-    const sideInfoControl = L.control({ position: 'bottomleft' });
-    sideInfoControl.onAdd = function(map) {
-        const container = L.DomUtil.create('div', 'info-container-bottom');
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
-        container.style.alignItems = 'flex-start';
-        container.style.marginBottom = '12px'; 
-        container.style.marginLeft = '10px';   
-        container.style.pointerEvents = 'auto';
-        
-        const heartsListBox = L.DomUtil.create('div', '', container);
-        heartsListBox.id = 'hearts-list-box';
-        heartsListBox.style.display = 'none';
-        heartsListBox.style.marginTop = '5px';
-        heartsListBox.style.backgroundColor = 'rgba(20, 20, 20, 0.9)';
-        heartsListBox.style.backdropFilter = 'blur(10px)';
-        heartsListBox.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-        heartsListBox.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.5)';
-        heartsListBox.style.padding = '15px';
-        heartsListBox.style.borderRadius = '12px';
-        heartsListBox.style.width = '300px';
-        heartsListBox.style.maxHeight = '420px';
-        heartsListBox.style.overflowY = 'auto';
-        heartsListBox.style.color = 'white';
-
-        L.DomEvent.disableScrollPropagation(heartsListBox);
-        L.DomEvent.disableClickPropagation(heartsListBox);
-
-        setTimeout(() => {
-            for (const [tavolo, items] of Object.entries(atlasCategories)) {
-                const wrapper = document.createElement('div');
-                wrapper.style.marginBottom = '10px';
-                wrapper.innerHTML = `
-                    <div class="header" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:rgba(255,255,255,0.1); border-radius:6px;">
-                        <span style="color:#ffeb3b; font-size:13px; font-weight:bold;">📋 ${tavolo.toUpperCase()} (${items.length})</span>
-                        <span class="arrow" style="color:white; font-size:12px;">►</span>
-                    </div>
-                    <div class="content" style="display:none; padding:8px 0 0 5px;"></div>
-                `;
-                const header = wrapper.querySelector('.header');
-                const content = wrapper.querySelector('.content');
-
-                items.forEach(item => {
-                    const row = document.createElement('div');
-                    row.style.display = 'flex';
-                    row.style.justifyContent = 'space-between';
-                    row.style.alignItems = 'center';
-                    row.style.marginBottom = '6px';
-                    row.style.paddingBottom = '4px';
-                    row.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
-                    
-                    row.innerHTML = '<span style="font-size:12px; font-weight:500; color:#f1f1f1; flex-grow:1; margin-right:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + item.name + '</span>';
-
-                    const vBtn = document.createElement('button');
-                    vBtn.innerText = 'VOLA';
-                    vBtn.style.fontWeight = 'bold';
-                    vBtn.style.fontSize = '10px';
-                    vBtn.style.padding = '4px 8px';
-                    vBtn.style.cursor = 'pointer';
-                    vBtn.style.backgroundColor = '#e74c3c';
-                    vBtn.style.color = 'white';
-                    vBtn.style.border = 'none';
-                    vBtn.style.borderRadius = '4px';
-                    vBtn.style.flexShrink = '0';
-
-                    vBtn.onclick = () => {
-                        map.flyTo(item.latlng, 16, { animate: true, duration: 3 });
-                        item.layer.openPopup();
-                    };
-
-                    row.appendChild(vBtn);
-                    content.appendChild(row);
-                });
-
-                header.onclick = () => {
-                    const isHidden = content.style.display === 'none';
-                    content.style.display = isHidden ? 'block' : 'none';
-                    const arrowEl = wrapper.querySelector('.arrow');
-                    if (arrowEl) {
-                        arrowEl.innerHTML = isHidden ? '▼' : '►';
-                    }
-                };
-
-                heartsListBox.appendChild(wrapper);
-            }
-        }, 200);
-
-        return container;
-    };
-    sideInfoControl.addTo(map);
 });
-
-// --- TUTORIAL ---
-const tutorialSteps = [
-    { 
-        id: ".btn-tutorial-layers", 
-        titolo: "Gestione Layer", 
-        testo: "Clicca qui per aprire la barra laterale e scegliere mappe base, punti, aree e contesto.",
-        action: "openSidebar" 
-    },
-    { 
-        id: ".btn-tutorial-home", 
-        titolo: "Tasto Home", 
-        testo: "Resetta la mappa alla vista zoom iniziale su Salerno." 
-    },
-    { 
-        id: ".btn-tutorial-locate", 
-        titolo: "Geolocalizzazione", 
-        testo: "Trova la tua posizione attuale sulla mappa." 
-    },
-    { 
-        id: ".btn-tutorial-hearts", 
-        titolo: "Cluster Tematici", 
-        testo: "Clicca qui per aprire il pannello di riepilogo dei tavoli tematici." 
-    },
-    { 
-        id: "#hearts-list-box", 
-        titolo: "Esplora Proposte", 
-        testo: "Elenco delle proposte divise per tavolo. Clicca su 'VOLA' per raggiungere direttamente la destinazione.",
-        action: "openHearts" 
-    }
-];
-
-let currentStep = 0;
-
-function closeModal() {
-    const modal = document.getElementById('welcome-modal');
-    if (modal) modal.style.display = 'none';
-}
-
-function startTutorial() {
-    closeModal();
-    currentStep = 0;
-    if (typeof map === 'undefined') return;
-
-    try {
-        map.dragging.disable();
-        map.touchZoom.disable();
-        map.doubleClickZoom.disable();
-        map.scrollWheelZoom.disable();
-        if (map.tap) map.tap.disable();
-    } catch (e) { console.warn(e); }
-    
-    setTimeout(showStep, 20);
-}
-
-function showStep() {
-    const step = tutorialSteps[currentStep];
-    const isHeartBox = step.id === "#hearts-list-box";
-
-    if (step.action === "openHearts") {
-        const hb = document.getElementById('hearts-list-box');
-        if (hb) hb.style.display = 'block';
-    }
-    if (step.action === "openSidebar") {
-        const sb = document.getElementById('custom-sidebar-layers');
-        if (sb) {
-            renderSidebarContent(); // Rigenera al volo se necessario
-            sb.classList.add('open');
-        }
-    }
-
-    const target = document.querySelector(step.id);
-    const isLast = currentStep === tutorialSteps.length - 1;
-
-    let popupPoint;
-    if (target) {
-        const rect = target.getBoundingClientRect();
-        if (isHeartBox) {
-            popupPoint = map.containerPointToLayerPoint([rect.left + 120, rect.top - 10]);
-        } else {
-            popupPoint = map.containerPointToLayerPoint([rect.left - 130, rect.top + (rect.height / 2)]);
-        }
-    } else {
-        popupPoint = map.containerPointToLayerPoint([100, 100]);
-    }
-
-    const popupLatLng = map.layerPointToLatLng(popupPoint);
-    const btnText = isLast ? 'INIZIA' : 'AVANTI';
-
-    L.popup({ 
-        closeButton: false, 
-        closeOnClick: false,
-        autoPan: false,
-        className: 'tutorial-pointer' + (isHeartBox ? ' heart-box-popup' : ''),
-        offset: isHeartBox ? L.point(0, -15) : L.point(0, 0) 
-    })
-    .setLatLng(popupLatLng)
-    .setContent(
-        '<div style="width: 180px; font-family: sans-serif; display: flex; flex-direction: column; gap: 4px;">' +
-            '<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">' +
-                '<b style="color:#3498db; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;">' +
-                    step.titolo +
-                '</b>' +
-                '<button onclick="nextTutorialStep()" style="background:#3498db; color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size: 9px; font-weight: bold; flex-shrink: 0; margin-left: 6px;">' +
-                    btnText +
-                '</button>' +
-            '</div>' +
-            '<div style="font-size: 12px; line-height: 1.2; border-top: 1px solid #eee; padding-top: 4px; color: #333;">' +
-                step.testo +
-            '</div>' +
-        '</div>'
-    )
-    .openOn(map);
-}
-
-window.nextTutorialStep = function() {
-    currentStep++;
-    if (currentStep < tutorialSteps.length) {
-        showStep(); 
-    } else {
-        map.dragging.enable();
-        map.touchZoom.enable();
-        map.doubleClickZoom.enable();
-        map.scrollWheelZoom.enable();
-        map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
-        const hb = document.getElementById('hearts-list-box');
-        if (hb) hb.style.display = 'none';
-        const sb = document.getElementById('custom-sidebar-layers');
-        if (sb) sb.classList.remove('open');
-    }
-}
