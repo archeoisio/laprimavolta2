@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS corretti per il pannello dei layer e uniformità pulsanti (44x44px)
+// Iniezione di stili CSS corretti e sicuri per il plugin Tree Layers e pulsanti (44x44px)
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -9,15 +9,16 @@ customStyleTag.innerHTML = `
         height: 44px !important;
     }
     .leaflet-control-layers-expanded {
-        min-width: 240px !important;
-        max-width: 260px !important;
-        padding: 10px 12px !important;
+        min-width: 250px !important;
+        max-width: 280px !important;
+        padding: 12px 14px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.25);
         text-align: left !important;
         direction: ltr !important;
+        font-size: 12px !important;
     }
     .leaflet-control-layers-list, 
     .leaflet-control-layers-base, 
@@ -26,27 +27,14 @@ customStyleTag.innerHTML = `
         text-align: left !important;
         direction: ltr !important;
     }
-    .leaflet-control-layers-expanded label,
-    .leaflet-control-layers-group label {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        gap: 8px !important;
-        font-size: 12px !important;
-        line-height: 1.4 !important;
+    /* Stile pulito per le voci del tree layers senza forzare flex sui gruppi principali */
+    .leaflet-control-layers-tree label {
         cursor: pointer;
-        margin: 4px 0 !important;
-        text-align: left !important;
-        width: 100% !important;
-    }
-    /* Evita che gli span delle icone colore vengano stirati al 100% */
-    .leaflet-control-layers-expanded label span {
-        width: auto !important;
-        flex-shrink: 0 !important;
+        font-size: 12px !important;
+        line-height: 1.5 !important;
     }
     .leaflet-control-layers-selector {
-        margin: 0 !important;
-        flex-shrink: 0 !important;
+        margin-right: 6px !important;
     }
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
     .quartiere-label {
@@ -416,12 +404,11 @@ document.addEventListener('DOMContentLoaded', () => {
         strings: { title: "Posizione" }
     });
 
-    // --- 6. PULSANTI IN ALTO A DESTRA (44x44px con margini regolabili dal bordo schermo) ---
+    // --- 6. PULSANTI IN ALTO A DESTRA (44x44px con margini regolabili) ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
         
-        // PUOI REGOLARE QUI I MARGINI DAL BORDO SCHERMO:
         container.style.marginTop = '4px';
         container.style.marginRight = '10px';
         container.style.display = 'flex';
