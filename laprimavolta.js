@@ -23,7 +23,7 @@ customStyleTag.innerHTML = `
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
         transition: bottom 0.3s ease-in-out;
         z-index: 2000;
-        padding: 10px 12px;
+        padding: 8px 10px;
         box-sizing: border-box;
         text-align: left;
         font-family: sans-serif;
