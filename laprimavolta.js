@@ -9,13 +9,14 @@ customStyleTag.innerHTML = `
         height: 44px !important;
     }
     
-    /* Barra laterale a scomparsa da destra, della stessa larghezza del vecchio pannello (260px) */
+    /* Barra/Pannello laterale con altezza massima a 300px e scroll interno */
     #custom-sidebar-layers {
         position: fixed;
-        top: 60px; /* Parte subito sotto i pulsanti in alto a destra */
-        right: -280px; /* Nascosta fuori dallo schermo */
-        width: 250px;
-        height: calc(100vh - 70px); /* Lascia spazio sopra e sotto */
+        top: 60px; /* Posizionato subito sotto i pulsanti in alto a destra */
+        right: -280px; /* Nascosto fuori dallo schermo */
+        width: 220px;
+        max-height: 300px; /* Altezza massima bloccata a 300px */
+        overflow-y: auto; /* Attiva la barra di scorrimento verticale se il contenuto eccede */
         background: rgba(255, 255, 255, 0.97);
         backdrop-filter: blur(10px);
         box-shadow: -5px 0 25px rgba(0,0,0,0.3);
@@ -23,17 +24,15 @@ customStyleTag.innerHTML = `
         z-index: 2000;
         padding: 15px;
         box-sizing: border-box;
-        overflow-y: auto;
         text-align: left;
         font-family: sans-serif;
         font-size: 12px;
         color: #333;
-        border-top-left-radius: 12px;
-        border-bottom-left-radius: 12px;
+        border-radius: 10px;
     }
 
     #custom-sidebar-layers.open {
-        right: 0; /* Mostra la barra scorrendo da destra */
+        right: 0; /* Mostra la barra */
     }
 
     .sidebar-close-btn {
