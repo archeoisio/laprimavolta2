@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per eliminare lo spazio a sinistra nel pannello layer, allineamento e pulsanti a 44x44px
+// Iniezione di stili CSS per azzerare lo spazio vuoto a sinistra nel pannello layer
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -11,7 +11,7 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-expanded {
         min-width: 240px !important;
         max-width: 270px !important;
-        padding: 10px 10px !important;
+        padding: 10px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
@@ -20,38 +20,42 @@ customStyleTag.innerHTML = `
         direction: ltr !important;
         font-size: 12px !important;
     }
+    
+    /* AZZERAMENTO TOTALE DEGLI SPAZI E RIENTRI A SINISTRA DEL PLUGIN TREE */
     .leaflet-control-layers-list, 
     .leaflet-control-layers-base, 
     .leaflet-control-layers-overlays,
-    .leaflet-control-layers-tree {
+    .leaflet-control-layers-tree,
+    .leaflet-control-layers-tree ul,
+    .leaflet-control-layers-tree li,
+    .leaflet-control-layers-tree div,
+    .leaflet-control-layers-group {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
         text-align: left !important;
         direction: ltr !important;
-        margin-left: 0 !important;
-        padding-left: 0 !important;
     }
-    /* Riduzione drastica dello spazio sinistro nelle liste ad albero del plugin */
-    .leaflet-control-layers-tree ul {
-        padding-left: 8px !important;
-        margin-left: 0 !important;
-    }
-    .leaflet-control-layers-tree li {
-        margin-left: 0 !important;
-        padding-left: 0 !important;
-    }
-    /* Centratura verticale perfetta per le singole voci (checkbox + testo + pallino) */
+
+    /* Allineamento a sinistra e flex per ogni singola riga di voce */
     .leaflet-control-layers-tree label {
-        display: inline-flex !important;
+        display: flex !important;
         align-items: center !important;
+        justify-content: flex-start !important;
         gap: 6px !important;
         cursor: pointer;
         font-size: 12px !important;
         line-height: 1.4 !important;
+        margin: 2px 0 !important;
+        padding-left: 0 !important;
         margin-left: 0 !important;
+        width: 100% !important;
     }
+
     .leaflet-control-layers-selector {
-        margin: 0 !important;
+        margin: 0 4px 0 0 !important;
         flex-shrink: 0 !important;
     }
+
     /* Evita che gli span delle icone colore vengano stirati */
     .leaflet-control-layers-tree label span {
         width: auto !important;
@@ -59,6 +63,7 @@ customStyleTag.innerHTML = `
         display: inline-flex !important;
         align-items: center !important;
     }
+
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
     .quartiere-label {
         background: rgba(255, 255, 255, 0.9);
