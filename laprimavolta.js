@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per il pannello a scomparsa dal basso
+// Iniezione di stili CSS per il pannello inferiore a scomparsa
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -50,6 +50,45 @@ customStyleTag.innerHTML = `
 
     .panel-close-btn:hover {
         color: #000;
+    }
+
+    /* Stile per le schede (Tabs) dei cluster tematici */
+    .sidebar-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+    }
+
+    .sidebar-tab-btn {
+        background: #f1f2f6;
+        border: 1px solid #dcdde1;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #57606f;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s;
+    }
+
+    .sidebar-tab-btn.active {
+        background: #2f3542;
+        color: white;
+        border-color: #2f3542;
+    }
+
+    .sidebar-tab-content {
+        display: none;
+    }
+
+    .sidebar-tab-content.active {
+        display: block;
     }
 
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
@@ -327,23 +366,23 @@ document.addEventListener('DOMContentLoaded', () => {
         map.addLayer(layerPoligoniTavolo);
     }
 
-    // --- 4. CREAZIONE PANNELLO INFERIORE A SCOMPARSA (BOTTOM SHEET) ---
+    // --- 4. CREAZIONE PANNELLO INFERIORE A SCOMPARSA ---
     const bottomPanel = document.createElement('div');
     bottomPanel.id = 'custom-bottom-panel';
     document.body.appendChild(bottomPanel);
 
     function renderPanelContent() {
         let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:6px; margin-bottom:10px;">
-                <b style="font-size:14px; color:#2c3e50;">🗂️ Centro di Controllo</b>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:6px; margin-bottom:8px;">
+                <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <button class="panel-close-btn">&times;</button>
             </div>
         `;
 
-        // Blocco 1: Mappe Base (Toggle affiancati senza schede)
+        // Blocco 1: Mappe Base (Fisso in alto, affiancate senza scheda)
         html += `
-            <div style="margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #eee;">
-                <div style="font-weight:bold; margin-bottom:6px; color:#555;">Mappe Base</div>
+            <div style="margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #eee;">
+                <div style="font-weight:bold; margin-bottom:4px; color:#555;">Mappe Base</div>
                 <div style="display:flex; gap:15px;">
                     <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
                         <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
@@ -355,22 +394,26 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Blocco 2: Cluster Tematici con pulsanti VOLA colorati
-        html += '<div style="font-weight:bold; margin-bottom:6px; color:#555;">Cluster Tematici (Proposte)</div>';
+        // Blocco 2: Cluster Tematici strutturati a Schede (Tabs)
+        html += '<div style="font-weight:bold; margin-bottom:4px; color:#555;">Cluster Tematici</div>';
+        html += '<div class="sidebar-tabs">';
+        
+        let firstTab = true;
+        for (const tavolo of Object.keys(atlasCategories)) {
+            const cleanKey = tavolo.replace(/\s+/g, '');
+            html += `<button class="sidebar-tab-btn ${firstTab ? 'active' : ''}" data-tab="tab-${cleanKey}">${tavolo.toUpperCase()}</button>`;
+            firstTab = false;
+        }
+        html += `</div>`;
 
+        // Contenuto delle Schede per ciascun Cluster
+        firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
             html += `
-                <div style="margin-bottom:6px; border:1px solid #eee; border-radius:6px; overflow:hidden;">
-                    <div class="table-header-${cleanKey}" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:#f8f9fa; font-weight:bold;">
-                        <span style="display:flex; align-items:center; gap:6px;">
-                            <span style="display:inline-block; width:10px; height:10px; background-color:${catColor}; border:1px solid #333; flex-shrink:0;"></span>
-                            ${tavolo.toUpperCase()} (${items.length})
-                        </span>
-                        <span class="arrow-${cleanKey}">►</span>
-                    </div>
-                    <div class="table-content-${cleanKey}" style="display:none; padding:6px 8px; background:#fff; border-top:1px solid #eee;">
+                <div id="tab-${cleanKey}" class="sidebar-tab-content ${firstTab ? 'active' : ''}">
+                    <div style="font-size:11px; color:#666; margin-bottom:6px;">Proposte registrate: <b>${items.length}</b></div>
             `;
 
             items.forEach((item, itemIdx) => {
@@ -382,7 +425,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             });
 
-            html += `</div></div>`;
+            html += `</div>`;
+            firstTab = false;
         }
 
         bottomPanel.innerHTML = html;
@@ -392,21 +436,20 @@ document.addEventListener('DOMContentLoaded', () => {
             bottomPanel.classList.remove('open');
         };
 
-        // Gestione Accordion dei cluster
-        for (const [tavolo] of Object.entries(atlasCategories)) {
-            const cleanKey = tavolo.replace(/\s+/g, '');
-            const header = bottomPanel.querySelector(`.table-header-${cleanKey}`);
-            const content = bottomPanel.querySelector(`.table-content-${cleanKey}`);
-            const arrow = bottomPanel.querySelector(`.arrow-${cleanKey}`);
+        // Logica di interazione tra le schede (Tabs) dei cluster
+        const tabBtns = bottomPanel.querySelectorAll('.sidebar-tab-btn');
+        const tabContents = bottomPanel.querySelectorAll('.sidebar-tab-content');
 
-            if (header) {
-                header.onclick = () => {
-                    const isHidden = content.style.display === 'none';
-                    content.style.display = isHidden ? 'block' : 'none';
-                    arrow.innerHTML = isHidden ? '▼' : '►';
-                };
-            }
-        }
+        tabBtns.forEach(btn => {
+            btn.onclick = () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.add('active');
+                const targetTabId = btn.getAttribute('data-tab');
+                bottomPanel.querySelector(`#${targetTabId}`).classList.add('active');
+            };
+        });
 
         // Eventi pulsanti VOLA
         bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
