@@ -11,7 +11,7 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-expanded {
         min-width: 240px !important;
         max-width: 270px !important;
-        padding: 10px !important;
+        padding: 8px 10px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
@@ -21,7 +21,7 @@ customStyleTag.innerHTML = `
         font-size: 12px !important;
     }
     
-    /* ELIMINAZIONE TOTALE DI QUALSIASI RIENTRO O SPAZIO A SINISTRA NEL TREE */
+    /* AZZERAMENTO RADICALE DI OGNI SPAZIO, MARGINE E RIENTRO DEL TREE */
     .leaflet-control-layers-list, 
     .leaflet-control-layers-base, 
     .leaflet-control-layers-overlays,
@@ -32,20 +32,27 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-group,
     .leaflet-control-layers-subgroup {
         margin-left: 0 !important;
-        padding-left: 0 !important.
+        padding-left: 0 !important;
         text-align: left !important;
         direction: ltr !important;
         text-indent: 0 !important;
     }
 
-    /* Rimuove i margini interni specifici dei nodi foglia/ramo dell'albero */
+    /* Rimuove i pallini/indicatori di lista e azzera il padding dei nodi */
     .leaflet-control-layers-tree li {
         list-style: none !important;
         margin-left: 0 !important;
         padding-left: 0 !important;
+        text-indent: 0 !important;
     }
 
-    /* Forza le etichette a partire da sinistra senza spazi riservati */
+    /* ELIMINA IL MARGINE FORZATO DEI RAMI FIGLI NEL PLUGIN TREE */
+    .leaflet-control-layers-tree ul {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    /* Allineamento rigoroso a sinistra per ogni singola etichetta */
     .leaflet-control-layers-tree label {
         display: flex !important;
         align-items: center !important;
@@ -54,7 +61,7 @@ customStyleTag.innerHTML = `
         cursor: pointer;
         font-size: 12px !important;
         line-height: 1.4 !important;
-        margin: 3px 0 !important;
+        margin: 2px 0 !important;
         padding-left: 0 !important;
         margin-left: 0 !important;
         width: 100% !important;
