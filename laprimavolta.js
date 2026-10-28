@@ -1,6 +1,28 @@
 let map; 
 let highlightLayer;
 
+// Iniezione di stili CSS per allargare il pannello dei layer e renderlo leggibile
+const customStyleTag = document.createElement('style');
+customStyleTag.innerHTML = `
+    .leaflet-control-layers-expanded {
+        min-width: 280px !important;
+        max-width: 340px !important;
+        padding: 12px 14px !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        backdrop-filter: blur(6px);
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+    .leaflet-control-layers-list label {
+        font-size: 13px !important;
+        line-height: 1.8 !important;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+`;
+document.head.appendChild(customStyleTag);
+
 // Palette di colori distinti per i Tavoli / Categorie
 const tavoloColors = {
     'ambiente': '#2ecc71',
@@ -18,7 +40,6 @@ function getTavoloColor(tavoloName) {
     for (const [k, color] of Object.entries(tavoloColors)) {
         if (key.includes(k)) return color;
     }
-    // Colore di fallback basato su hash stringa se non trovato nella palette
     let hash = 0;
     for (let i = 0; i < tavoloName.length; i++) {
         hash = tavoloName.charCodeAt(i) + ((hash << 5) - hash);
@@ -150,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28 });
     map.addLayer(layer_OpenStreetMap_4);
 
-    // --- 3. COSTRUZIONE ALBERO CATEGORIE (PUNTI E POLIGONI) ---
+    // --- 3. COSTRUZIONE ALBERO CATEGORIE ---
     const atlasCategories = {};
 
     function registerItem(feature, layer) {
@@ -207,7 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPuntiTavolo);
-        puntiChildren.push({ label: tavolo.toUpperCase(), layer: layerPuntiTavolo });
+        
+        // Icona cerchietto colorato nel menu layer
+        const iconHtml = '<span style="display:inline-block; width:12px; height:12px; background-color:' + catColor + '; border-radius:50%; margin-right:8px; border:1px solid #333; vertical-align:middle;"></span>';
+        puntiChildren.push({ label: iconHtml + tavolo.toUpperCase(), layer: layerPuntiTavolo });
     }
 
     // Poligoni per Tavolo
@@ -245,7 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPoligoniTavolo);
-        poligoniChildren.push({ label: tavolo.toUpperCase(), layer: layerPoligoniTavolo });
+        
+        // Icona quadratino colorato nel menu layer
+        const iconHtml = '<span style="display:inline-block; width:12px; height:12px; background-color:' + catColor + '; margin-right:8px; border:1px solid #333; vertical-align:middle;"></span>';
+        poligoniChildren.push({ label: iconHtml + tavolo.toUpperCase(), layer: layerPoligoniTavolo });
     }
 
     // --- 4. CONTROLLO LAYER ALBERO (ALTO A DESTRA) ---
@@ -261,11 +288,11 @@ document.addEventListener('DOMContentLoaded', () => {
         label: "<b>Layer Tematici</b>",
         children: [
             {
-                label: "📍 <b>Punti d'interesse</b>",
+                label: "📍 <b>Punti di interesse</b>",
                 children: puntiChildren
             },
             {
-                label: "🗺️ <b>Poligoni</b>",
+                label: "🗺️ <b>Aree di interesse</b>",
                 children: poligoniChildren
             },
             {
@@ -332,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. PULSANTI IN ALTO A DESTRA (DIMENSIONI 36x36px UNIFICATE) ---
+    // --- 5. PULSANTI IN ALTO A DESTRA (36x36px) ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -389,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     btnControl.addTo(map);
 
-    // Locate control (forzato a 36x36px)
+    // Locate control
     const locateControl = L.control.locate({
         position: 'topright',
         flyTo: { duration: 6 },
