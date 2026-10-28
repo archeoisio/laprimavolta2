@@ -110,8 +110,30 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28 });
     map.addLayer(layer_OpenStreetMap_4);
 
-    // puntiprimavolta_5 (I tuoi punti dell'assemblea)
+    // Raccolta dati dinamica per gli Atlas Layers basati sui Tavoli
+    const atlasCategories = {};
+
+    function registerAtlasItem(feature, layer) {
+        const tavolo = feature.properties['Tavolo'] || feature.properties['Tavolo di '] || feature.properties['Tavolo di'] || 'Altro';
+        const name = feature.properties['Nome'] || 'Elemento';
+        
+        let latlng;
+        if (feature.geometry.type === 'Point') {
+            const coords = feature.geometry.coordinates;
+            latlng = [coords[1], coords[0]];
+        } else {
+            latlng = layer.getBounds().getCenter();
+        }
+
+        if (!atlasCategories[tavolo]) {
+            atlasCategories[tavolo] = [];
+        }
+        atlasCategories[tavolo].push({ name, latlng, layer });
+    }
+
+    // puntiprimavolta_5
     function pop_puntiprimavolta_5(feature, layer) {
+        registerAtlasItem(feature, layer);
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table>\
                 <tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
@@ -134,8 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     map.addLayer(layer_puntiprimavolta_5);
 
-    // poligoniprimavolta_6 (I tuoi poligoni dell'assemblea)
+    // poligoniprimavolta_6
     function pop_poligoniprimavolta_6(feature, layer) {
+        registerAtlasItem(feature, layer);
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table>\
                 <tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
@@ -155,18 +178,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     map.addLayer(layer_poligoniprimavolta_6);
 
-    // Layer Tree Control
-    var overlaysTree = [
-        {label: 'poligoniprimavolta', layer: layer_poligoniprimavolta_6},
-        {label: 'puntiprimavolta', layer: layer_puntiprimavolta_5},
-        {label: "OpenStreetMap", layer: layer_OpenStreetMap_4, radioGroup: 'bm' },
-        {label: "Google Satellite", layer: layer_GoogleSatellite_3, radioGroup: 'bm' },
-        {label: 'iconestazioni', layer: layer_iconestazioni_2},
-        {label: 'hospital', layer: layer_hospital_1},
-        {label: 'iconaquartieri', layer: layer_iconaquartieri_0}
-    ];
-    var lay = L.control.layers.tree(null, overlaysTree, { collapsed: true });
-    lay.addTo(map);
+    // --- 3. CONTROLLO LAYER E SATELLITE (ALTO A DESTRA) ---
+    var baseLayers = {
+        "OpenStreetMap": layer_OpenStreetMap_4,
+        "Google Satellite": layer_GoogleSatellite_3
+    };
+    var overlays = {
+        "Punti Prima Volta": layer_puntiprimavolta_5,
+        "Poligoni Prima Volta": layer_poligoniprimavolta_6,
+        "Stazioni": layer_iconestazioni_2,
+        "Ospedali": layer_hospital_1,
+        "Quartieri": layer_iconaquartieri_0
+    };
+    L.control.layers(baseLayers, overlays, { collapsed: true, position: 'topright' }).addTo(map);
 
     // Photon Search Control
     const photonUrl = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&"};
@@ -215,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 3. CONTROLLI INTERFACCIA E ROUTING ---
+    // --- 4. GESTIONE ROUTING E PULSANTI (ALTO A DESTRA) ---
     let control = null; 
     async function startRouting() {
         const startInput = document.getElementById('start');
@@ -302,14 +326,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
+        // Home
         createBtn('🌍', "Torna alla vista iniziale", () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
+        // Routing
         createBtn('🗺️', "Mostra/Nascondi indicazioni", () => {
             const rb = document.getElementById('route-box');
+            const hb = document.getElementById('hearts-list-box');
+            if(hb) hb.style.display = 'none';
             if(rb) rb.style.display = (rb.style.display === 'none') ? 'flex' : 'none';
         }, 'btn-tutorial-route');
+
+        // Atlas Layers ❤️
+        createBtn('❤️', "Atlas Layers", () => {
+            const rb = document.getElementById('route-box');
+            const hb = document.getElementById('hearts-list-box');
+            if(rb) rb.style.display = 'none';
+            if(hb) hb.style.display = (hb.style.display === 'none') ? 'flex' : 'none';
+        }, 'btn-tutorial-hearts');
 
         return container;
     };
@@ -327,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         locContainer.classList.add('btn-tutorial-locate');
     }
 
-    // Side info control (Routing box)
+    // --- 5. PANNELLI INFORMATIVI E ATLAS LAYERS DINAMICI (BASSO SINISTRA) ---
     const sideInfoControl = L.control({ position: 'bottomleft' });
     sideInfoControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'info-container-bottom');
@@ -338,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.style.marginLeft = '10px';   
         container.style.pointerEvents = 'auto';
         
+        // Box Routing
         const routeBox = L.DomUtil.create('div', '', container);
         routeBox.id = 'route-box';
         L.DomEvent.disableClickPropagation(routeBox);
@@ -381,6 +418,77 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 100);
 
+        // Box Atlas Layers ❤️ (Generato dinamicamente dai Tavoli)
+        const heartsListBox = L.DomUtil.create('div', '', container);
+        heartsListBox.id = 'hearts-list-box';
+        heartsListBox.style.display = 'none';
+        heartsListBox.style.marginTop = '5px';
+        heartsListBox.style.background = 'rgba(0,0,0,0.7)';
+        heartsListBox.style.backdropFilter = 'blur(5px)';
+        heartsListBox.style.padding = '10px';
+        heartsListBox.style.borderRadius = '8px';
+        heartsListBox.style.width = '220px';
+        heartsListBox.style.maxHeight = '300px';
+        heartsListBox.style.overflowY = 'auto';
+        heartsListBox.style.color = 'white';
+
+        L.DomEvent.disableScrollPropagation(heartsListBox);
+        L.DomEvent.disableClickPropagation(heartsListBox);
+
+        // Popolamento dinamico delle categorie in base ai Tavoli
+        setTimeout(() => {
+            for (const [tavolo, items] of Object.entries(atlasCategories)) {
+                const wrapper = document.createElement('div');
+                wrapper.style.marginBottom = '8px';
+                wrapper.innerHTML = `
+                    <div class="header" style="cursor:pointer; display:flex; justify-content:space-between; padding:5px; background:rgba(255,255,255,0.1); border-radius:4px;">
+                        <span style="color:#ffeb3b; font-size:12px; font-weight:bold;">📋 ${tavolo.toUpperCase()}</span>
+                        <span class="arrow" style="color:white;">►</span>
+                    </div>
+                    <div class="content" style="display:none; padding:5px 0 0 10px;"></div>
+                `;
+                const header = wrapper.querySelector('.header');
+                const content = wrapper.querySelector('.content');
+
+                items.forEach(item => {
+                    const row = document.createElement('div');
+                    row.style.display = 'flex';
+                    row.style.justifyName = 'space-between';
+                    row.style.alignItems = 'center';
+                    row.style.marginBottom = '5px';
+                    row.innerHTML = `<span style="font-size:12px; font-weight:bold; color:white; flex-grow:1; margin-right:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>`;
+
+                    const vBtn = document.createElement('button');
+                    vBtn.innerText = 'VOLA';
+                    vBtn.style.fontWeight = 'bold';
+                    vBtn.style.fontSize = '11px';
+                    vBtn.style.padding = '2px 6px';
+                    vBtn.style.cursor = 'pointer';
+                    vBtn.style.backgroundColor = '#e74c3c';
+                    vBtn.style.color = 'white';
+                    vBtn.style.border = 'none';
+                    vBtn.style.borderRadius = '4px';
+                    vBtn.style.flexShrink = '0';
+
+                    vBtn.onclick = () => {
+                        map.flyTo(item.latlng, 16, { animate: true, duration: 4 });
+                        item.layer.openPopup();
+                    };
+
+                    row.appendChild(vBtn);
+                    content.appendChild(row);
+                });
+
+                header.onclick = () => {
+                    const isHidden = content.style.display === 'none';
+                    content.style.display = isHidden ? 'block' : 'none';
+                    wrapper.querySelector('.arrowinnerHTML = isHidden ? '▼' : '►';
+                };
+
+                heartsListBox.appendChild(wrapper);
+            }
+        }, 200);
+
         return container;
     };
     sideInfoControl.addTo(map);
@@ -402,6 +510,11 @@ const tutorialSteps = [
         id: ".btn-tutorial-route", 
         titolo: "Percorsi", 
         testo: "Calcola itinerari tra due punti inserendo partenza e destinazione." 
+    },
+    { 
+        id: ".btn-tutorial-hearts", 
+        titolo: "Atlas Layers ❤️", 
+        testo: "Apri il pannello dei tavoli per volare direttamente sulle proposte." 
     }
 ];
 
