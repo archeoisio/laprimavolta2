@@ -155,15 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
             map.flyTo(initialView.center, initialView.zoom, { animate: true, duration: 4, easeLinearity: 0.1 });
         }, 'btn-tutorial-home');
         
-        // Pulsante Locate 📍
-        const locateControl = L.control.locate({
-            flyTo: { duration: 6 },
-            strings: { title: "Posizione" }
-        });
-        const locBtn = locateControl.onAdd(map);
-        locBtn.classList.add('btn-tutorial-locate');
-        container.appendChild(locBtn);
-        
         // Pulsante Routing 🗺️
         createBtn('🗺️', "Mostra/Nascondi indicazioni", () => {
             const rb = document.getElementById('route-box');
@@ -173,6 +164,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return container;
     };
     btnControl.addTo(map);
+
+    // Pulsante Locate 📍 (Controllo indipendente in topright)
+    const locateControl = L.control.locate({
+        position: 'topright',
+        flyTo: { duration: 6 },
+        strings: { title: "Posizione" }
+    }).addTo(map);
+
+    const locContainer = locateControl.getContainer();
+    if (locContainer) {
+        locContainer.classList.add('btn-tutorial-locate');
+    }
 
     // --- 4. PANNELLI INFORMATIVI (BASSO SINISTRA) ---
     const sideInfoControl = L.control({ position: 'bottomleft' });
@@ -307,7 +310,6 @@ function showStep() {
     }
 
     const popupLatLng = map.layerPointToLatLng(popupPoint);
-
     const btnText = isLast ? 'INIZIA' : 'AVANTI';
 
     L.popup({ 
