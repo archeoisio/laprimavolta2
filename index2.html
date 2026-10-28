@@ -5,10 +5,10 @@
         async src="//gc.zgo.at/count.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>LA PRIMA VOLTA</title>
+<title>FDB+MM ATLAS</title>
 
-<!-- Fogli di stile CSS (Leaflet, Plugin e qgis2web) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Fogli di stile CSS -->
+<link rel="stylesheet" href="css/leaflet.css" />
 <link rel="stylesheet" href="css/L.Control.Layers.Tree.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
@@ -18,92 +18,7 @@
 <link rel="stylesheet" href="css/leaflet.photon.css">
 
 <style>
-  /* Reset totale */
   *, *::before, *::after { box-sizing: border-box; }
-
-  /* 1. RESET TILE */
-  .leaflet-tile-container img {
-    width: 256px !important; 
-    height: 256px !important;
-    margin: 0 !important;
-  }
-
-  /* Nasconde checkbox e span vuoti per il titolo personalizzato nei layers */
-  .leaflet-control-layers-overlays label:has(.atlas-title) input,
-  .leaflet-control-layers-overlays label:has(.atlas-title) span.leaflet-control-layers-selector {
-    display: none !important;
-  }
-
-  .leaflet-control-layers-overlays label:has(.atlas-title) {
-    padding-left: 0 !important;
-    margin-left: -4px !important;
-    cursor: default !important;
-  }
-
-  .atlas-title {
-    pointer-events: none;
-    display: block;
-    padding-top: 12px; 
-    padding-bottom: 4px;
-    font-size: 0.95em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 800;
-    color: #2c3e50;
-    border-bottom: 2px solid rgba(44, 62, 80, 0.2);
-    width: 100%;
-  }
-
-  /* Gestione pannelli e popup */
-  .leaflet-popup-pane { z-index: 1000 !important; }
-
-  .tutorial-pointer .leaflet-popup-content {
-    margin: 8px !important;
-    width: 180px !important;
-  }
-  @media (max-width: 600px) {
-    .tutorial-pointer .leaflet-popup-content-wrapper {
-        width: 180px !important;
-    }
-    .tutorial-pointer .leaflet-popup-content {
-        width: 160px !important;
-        margin: 5px !important;
-    }
-  }
-
-  .tutorial-pointer .leaflet-popup-tip-container {
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    transform: rotate(-90deg) !important;
-    top: 25% !important;
-    margin-top: -10px !important;
-    right: -20px !important; 
-    left: auto !important;
-    z-index: 1000;
-  }
-
-  .tutorial-pointer .leaflet-popup-content-wrapper {
-    width: 200px !important;
-    min-width: 0 !important;
-    max-width: 200px !important;
-    border: 2px solid #3498db;
-  }
-
-  .tutorial-pointer { z-index: 10000 !important; }
-  .tutorial-pointer .leaflet-popup-tip { background: #3498db !important; }
-
-  /* Smoothing e Antialiasing */
-  .leaflet-overlay-pane { transition: opacity 0.2s ease-in-out; }
-  .leaflet-tile {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-    box-shadow: 0 0 0.5px 0.5px rgba(26, 26, 26, 0.5); 
-    transform-origin: 0 0;
-  }
-  .leaflet-tile-pane { background-color: #1a1a1a !important; }
-
-  /* Body e Mappa a schermo intero con tema scuro */
   html, body {
     margin: 0 !important;
     padding: 0 !important;
@@ -112,7 +27,6 @@
     overflow: hidden !important;
     background-color: #0b0b0b;
   }
-
   #map {
     position: fixed !important;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -121,34 +35,16 @@
     z-index: 1;
     background: #0b0b0b !important;
   }
-
-  #info-panel {
-    display: none;
-    position: fixed;
-    bottom: 12px;
-    left: 235px;
-    max-width: 230px;
-    min-height: 30px;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    font-family: sans-serif;
-    font-size: 14px;
-    z-index: 1000;
-  }
-
   .leaflet-control-geocoder { z-index: 2000 !important; margin-bottom: 0; }
 </style>
 </head>
 <body>
   <div id="map"></div>
-  <div id="info-panel"><div id="info-content"></div></div>
-
-  <!-- Modal di Benvenuto / Tutorial -->
+  
+  <!-- Modale di Benvenuto -->
   <div id="welcome-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 9999;">
     <div style="background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; font-family: sans-serif;">
-      <h2 style="margin-top: 0;">Benvenuti <br> sulla mappa partecipata di Salerno 🗺️</h2>
+      <h2 style="margin-top: 0;">FDB+MM ATLAS 🗺️</h2>
       <p>Vuoi visualizzare il tutorial rapido <br> per scoprire i comandi?</p>
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
         <button onclick="startTutorial()" style="padding: 10px 20px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold;">Si</button>
@@ -157,12 +53,14 @@
     </div>
   </div>
 
-  <!-- Java e  di libreria -->
-  < src="js/qgis2web_expressions.js"></>
-  < src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></>
-  < src="js/L.Control.Layers.Tree.min.js"></>
-  < src="js/L.Control.Locate.min.js"></>
-  < src="js/multi-style-layer.js"></script>
+  <!-- 1. CORE LEAFlet JS (DEVE ESSERE IL PRIMO IN ABSOLUTO) -->
+  <script src="js/leaflet.js"></script>
+
+  <!-- 2. Tutti i plugin e le librerie di QGIS / Leaflet -->
+  <script src="js/qgis2web_expressions.js"></script>
+  <script src="js/L.Control.Layers.Tree.min.js"></script>
+  <script src="js/L.Control.Locate.min.js"></script>
+  <script src="js/multi-style-layer.js"></script>
   <script src="js/leaflet.rotatedMarker.js"></script>
   <script src="js/leaflet.pattern.js"></script>
   <script src="js/leaflet-hash.js"></script>
@@ -172,233 +70,16 @@
   <script src="js/labels.js"></script>
   <script src="js/leaflet.photon.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-  <script src="https://unpkg.com/leaflet-labeltextcollision"></script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-  <!-- Dati GeoJSON dei Layer (aggiornati da laprimavolta2) -->
+  <!-- 3. Dati GeoJSON dei Layer QGIS -->
   <script src="data/iconaquartieri_0.js"></script>
   <script src="data/hospital_1.js"></script>
   <script src="data/iconestazioni_2.js"></script>
   <script src="data/puntiprimavolta_5.js"></script>
   <script src="data/poligoniprimavolta_6.js"></script>
 
-  <!-- Script personalizzato del progetto -->
+  <!-- 4. Il tuo file di script personalizzato (es. laprimavolta.js) -->
   <script src="laprimavolta.js"></script>
-
-  <script>
-        var highlightLayer;
-        function highlightFeature(e) {
-            highlightLayer = e.target;
-
-            if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
-              highlightLayer.setStyle({
-                color: 'rgba(255, 255, 0, 1.00)',
-              });
-            } else {
-              highlightLayer.setStyle({
-                fillColor: 'rgba(255, 255, 0, 1.00)',
-                fillOpacity: 1
-              });
-            }
-        }
-
-        var map = L.map('map', {
-            zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
-        
-        var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
-        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
-
-        function removeEmptyRowsFromPopupContent(content, feature) {
-         var tempDiv = document.createElement('div');
-         tempDiv.innerHTML = content;
-         var rows = tempDiv.querySelectorAll('tr');
-         for (var i = 0; i < rows.length; i++) {
-             var td = rows[i].querySelector('td.visible-with-data');
-             var key = td ? td.id : '';
-             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                 rows[i].parentNode.removeChild(rows[i]);
-             }
-         }
-         return tempDiv.innerHTML;
-        }
-
-        function addClassToPopupIfMedia(content, popup) {
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = content;
-            var imgTd = tempDiv.querySelector('td img');
-            if (imgTd) {
-                var src = imgTd.getAttribute('src');
-                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
-                    popup._contentNode.classList.add('media');
-                    var img = popup._contentNode.querySelector('td img');
-                    if (img) {
-                        if (img.complete && img.naturalHeight > 0) {
-                            popup.update();
-                        } else {
-                            img.addEventListener('load', function() { popup.update(); });
-                            img.addEventListener('error', function() { popup.update(); });
-                        }
-                    }
-                } else {
-                    popup._contentNode.classList.remove('media');
-                }
-            } else {
-                popup._contentNode.classList.remove('media');
-            }
-        }
-
-        var zoomControl = L.control.zoom({ position: 'topleft' }).addTo(map);
-        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
-        var bounds_group = new L.featureGroup([]);
-        function setBounds() {
-            map.setMaxBounds(map.getBounds());
-            map.setMinZoom(map.getZoom());
-        }
-
-        // --- Layer Icona Quartieri ---
-        function pop_iconaquartieri_0(feature, layer) {
-            layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
-            var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-            layer.bindPopup(content, { maxHeight: 400 });
-        }
-        function style_iconaquartieri_0_0() {
-            return { pane: 'pane_iconaquartieri_0', radius: 4.0, stroke: false, fill: true, fillOpacity: 1, fillColor: 'rgba(190,178,151,0.0)', interactive: false };
-        }
-        map.createPane('pane_iconaquartieri_0');
-        map.getPane('pane_iconaquartieri_0').style.zIndex = 400;
-        var layer_iconaquartieri_0 = new L.geoJson(json_iconaquartieri_0, {
-            interactive: false, pane: 'pane_iconaquartieri_0', onEachFeature: pop_iconaquartieri_0,
-            pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, style_iconaquartieri_0_0(feature)); },
-        });
-        bounds_group.addLayer(layer_iconaquartieri_0);
-        map.addLayer(layer_iconaquartieri_0);
-
-        // --- Layer Hospital ---
-        function pop_hospital_1(feature, layer) {
-            layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
-            var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-            layer.bindPopup(content, { maxHeight: 400 });
-        }
-        function style_hospital_1_0() {
-            return { pane: 'pane_hospital_1', icon: L.icon({ iconUrl: 'markers/hospital_1.svg', iconSize: [16.72, 16.72] }), interactive: false };
-        }
-        map.createPane('pane_hospital_1');
-        map.getPane('pane_hospital_1').style.zIndex = 401;
-        var layer_hospital_1 = new L.geoJson(json_hospital_1, {
-            interactive: false, pane: 'pane_hospital_1', onEachFeature: pop_hospital_1,
-            pointToLayer: function (feature, latlng) { return L.marker(latlng, style_hospital_1_0(feature)); },
-        });
-        bounds_group.addLayer(layer_hospital_1);
-        map.addLayer(layer_hospital_1);
-
-        // --- Layer Icona Stazioni ---
-        function pop_iconestazioni_2(feature, layer) {
-            layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
-            var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-            layer.bindPopup(content, { maxHeight: 400 });
-        }
-        function style_iconestazioni_2_0() {
-            return { pane: 'pane_iconestazioni_2', radius: 12.0, opacity: 1, color: 'rgba(35,35,35,1.0)', fill: true, fillOpacity: 1, fillColor: 'rgba(255,255,255,1.0)', interactive: false };
-        }
-        function style_iconestazioni_2_1() {
-            return { pane: 'pane_iconestazioni_2', icon: L.icon({ iconUrl: 'markers/iconestazioni_2.svg', iconSize: [19.0, 19.0] }), interactive: false };
-        }
-        map.createPane('pane_iconestazioni_2');
-        map.getPane('pane_iconestazioni_2').style.zIndex = 402;
-        var layer_iconestazioni_2 = new L.geoJson.multiStyle(json_iconestazioni_2, {
-            interactive: false, pane: 'pane_iconestazioni_2', onEachFeature: pop_iconestazioni_2,
-            pointToLayers: [
-                function (feature, latlng) { return L.marker(latlng, style_iconestazioni_2_0(feature)); },
-                function (feature, latlng) { return L.marker(latlng, style_iconestazioni_2_1(feature)); }
-            ]
-        });
-        bounds_group.addLayer(layer_iconestazioni_2);
-        map.addLayer(layer_iconestazioni_2);
-
-        // --- Basemaps ---
-        map.createPane('pane_GoogleSatellite_3');
-        map.getPane('pane_GoogleSatellite_3').style.zIndex = 403;
-        var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28 });
-
-        map.createPane('pane_OpenStreetMap_4');
-        map.getPane('pane_OpenStreetMap_4').style.zIndex = 404;
-        var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28 });
-        map.addLayer(layer_OpenStreetMap_4);
-
-        // --- Layer Punti Prima Volta (Aggiornato) ---
-        function pop_puntiprimavolta_5(feature, layer) {
-            layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
-            var popupContent = '<table>\
-                    <tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                    <tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                    <tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                    <tr><th scope="row">Stato</th><td>' + (feature.properties['Stato'] !== null ? autolinker.link(String(feature.properties['Stato']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                    <tr><th scope="row">Tavolo</th><td>' + (feature.properties['Tavolo'] !== null ? autolinker.link(String(feature.properties['Tavolo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                </table>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-            layer.bindPopup(content, { maxHeight: 400 });
-        }
-        function style_puntiprimavolta_5_0(feature) {
-            return { pane: 'pane_puntiprimavolta_5', radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: 'rgba(59,113,230,1.0)', interactive: true };
-        }
-        map.createPane('pane_puntiprimavolta_5');
-        map.getPane('pane_puntiprimavolta_5').style.zIndex = 405;
-        var layer_puntiprimavolta_5 = new L.geoJson(json_puntiprimavolta_5, {
-            interactive: true, pane: 'pane_puntiprimavolta_5', onEachFeature: pop_puntiprimavolta_5,
-            pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, style_puntiprimavolta_5_0(feature)); },
-        });
-        bounds_group.addLayer(layer_puntiprimavolta_5);
-        map.addLayer(layer_puntiprimavolta_5);
-
-        // --- Layer Poligoni Prima Volta (Aggiornato) ---
-        function pop_poligoniprimavolta_6(feature, layer) {
-            layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
-            var popupContent = '<table>\
-                    <tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                    <tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                    <tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                </table>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-            layer.bindPopup(content, { maxHeight: 400 });
-        }
-        function style_poligoniprimavolta_6_0(feature) {
-            return { pane: 'pane_poligoniprimavolta_6', opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: 'rgba(140,83,231,1.0)', interactive: true };
-        }
-        map.createPane('pane_poligoniprimavolta_6');
-        map.getPane('pane_poligoniprimavolta_6').style.zIndex = 406;
-        var layer_poligoniprimavolta_6 = new L.geoJson(json_poligoniprimavolta_6, {
-            interactive: true, pane: 'pane_poligoniprimavolta_6', onEachFeature: pop_poligoniprimavolta_6, style: style_poligoniprimavolta_6_0,
-        });
-        bounds_group.addLayer(layer_poligoniprimavolta_6);
-        map.addLayer(layer_poligoniprimavolta_6);
-
-        // --- Controllo Layer e Ricerca ---
-        var overlaysTree = [
-            {label: 'poligoniprimavolta', layer: layer_poligoniprimavolta_6},
-            {label: 'puntiprimavolta', layer: layer_puntiprimavolta_5},
-            {label: "OpenStreetMap", layer: layer_OpenStreetMap_4, radioGroup: 'bm' },
-            {label: "Google Satellite", layer: layer_GoogleSatellite_3, radioGroup: 'bm' },
-            {label: 'iconestazioni', layer: layer_iconestazioni_2},
-            {label: 'hospital', layer: layer_hospital_1},
-            {label: 'iconaquartieri', layer: layer_iconaquartieri_0}
-        ];
-        var lay = L.control.layers.tree(null, overlaysTree, { collapsed: true });
-        lay.addTo(map);
-        setBounds();
-
-        // Funzioni modale di benvenuto
-        function closeModal() {
-            document.getElementById('welcome-modal').style.display = 'none';
-        }
-        function startTutorial() {
-            closeModal();
-            // Eventuale logica del tutorial esistente in FDB+MM.js
-        }
-  </script>
 </body>
 </html>
