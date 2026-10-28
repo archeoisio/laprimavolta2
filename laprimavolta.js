@@ -5,20 +5,21 @@ const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     #custom-bottom-panel {
-        position: fixed; bottom: -270px; left: 50%; transform: translateX(-50%);
+        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
         width: 98%; max-width: 1000px; max-height: 310px;
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
-        box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: bottom 0.3s ease-in-out;
+        box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
         z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
         font-family: sans-serif; font-size: 11px; color: #333;
         border-top-left-radius: 14px; border-top-right-radius: 14px;
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
     }
-    #custom-bottom-panel.open { bottom: 0; }
-    .panel-close-btn { background: none; border: none; font-size: 15px; cursor: pointer; color: #666; }
-    .panel-close-btn:hover { color: #000; }
-    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
+    #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
+    #custom-bottom-panel:not(.open) { max-height: 44px !important; }
     
+    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
+    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
     /* Layout Principale a 3 Colonne */
     .panel-three-columns { display: grid; grid-template-columns: 80px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
     
@@ -223,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         html += `</div></div>`;
 
-        // COLONNA 2: CLUSTER TEMATICI (PULSANTI CON SCORRIMENTO VERTICALE INDIPENDENTE)
+        // COLONNA 2: CLUSTER TEMATICI
         html += `
             <div class="col-middle">
                 <div class="sub-section-title">Tematiche</div>
@@ -239,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div></div>`;
 
-        // COLONNA 3: ELENCO PROPOSTE (FISSO A 5 ELEMENTI PER COLONNA)
+        // COLONNA 3: ELENCO PROPOSTE (5 ELEMENTI FISSI PER COLONNA)
         html += `<div class="col-right">`;
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
@@ -342,10 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        createBtn('🗂️', "Centro di Controllo", () => { 
-            bottomPanel.classList.toggle('open'); 
-            renderPanelContent(); 
-        }, 'btn-tutorial-layers');
         createBtn('🌍', "Torna alla vista iniziale", () => { map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]); }, 'btn-tutorial-home');
         createBtn('📍', "Posizione", () => { map.locate({setView: true, maxZoom: 16}); }, 'btn-tutorial-locate');
         return container;
@@ -359,9 +356,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const tutorialSteps = [
     { 
-        id: ".btn-tutorial-layers", 
+        id: "#custom-bottom-panel", 
         titolo: "Centro di Controllo", 
-        testo: "Clicca qui per gestire le mappe base, i layer di contesto e accedere ai cluster tematici." 
+        testo: "Clicca qui in basso per aprire il pannello e gestire mappe base, layer e cluster tematici.",
+        action: "openPanel"
     },
     { 
         id: ".btn-tutorial-home", 
@@ -372,12 +370,6 @@ const tutorialSteps = [
         id: ".btn-tutorial-locate", 
         titolo: "Geolocalizzazione", 
         testo: "Trova la tua posizione attuale sulla mappa. Necessario attivare il GPS su telefono/PC." 
-    },
-    { 
-        id: "#custom-bottom-panel", 
-        titolo: "Cluster e Proposte", 
-        testo: "Apri il pannello per esplorare le proposte divise per tavoli e volare direttamente sui punti d'interesse.",
-        action: "openPanel"
     }
 ];
 
