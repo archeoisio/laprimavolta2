@@ -453,10 +453,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 items.forEach(item => {
                     const row = document.createElement('div');
                     row.style.display = 'flex';
-                    row.style.justifyName = 'space-between';
+                    row.style.justifyContent = 'space-between';
                     row.style.alignItems = 'center';
                     row.style.marginBottom = '5px';
-                    row.innerHTML = `<span style="font-size:12px; font-weight:bold; color:white; flex-grow:1; margin-right:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>`;
+                    row.innerHTML = '<span style="font-size:12px; font-weight:bold; color:white; flex-grow:1; margin-right:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + item.name + '</span>';
 
                     const vBtn = document.createElement('button');
                     vBtn.innerText = 'VOLA';
@@ -482,7 +482,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 header.onclick = () => {
                     const isHidden = content.style.display === 'none';
                     content.style.display = isHidden ? 'block' : 'none';
-                    wrapper.querySelector('.arrowinnerHTML = isHidden ? '▼' : '►';
+                    const arrowEl = wrapper.querySelector('.arrow');
+                    if (arrowEl) {
+                        arrowEl.innerHTML = isHidden ? '▼' : '►';
+                    }
                 };
 
                 heartsListBox.appendChild(wrapper);
