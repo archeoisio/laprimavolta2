@@ -328,4 +328,25 @@ function showStep() {
                     ${isLast ? 'INIZIA' : 'AVANTI'}
                 </button>
             </div>
-            <div style="font-size: 12px; line-height: 1.2; border-top: 1px solid
+            <div style="font-size: 12px; line-height: 1.2; border-top: 1px solid #eee; padding-top: 4px; color: #333;">
+                ${step.testo}
+            </div>
+        </div>
+    `)
+    .openOn(map);
+}
+
+function nextTutorialStep() {
+    currentStep++;
+    
+    if (currentStep < tutorialSteps.length) {
+        showStep(); 
+    } else {
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        map.scrollWheelZoom.enable();
+        
+        map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
+    }
+}
