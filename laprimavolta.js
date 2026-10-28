@@ -20,7 +20,7 @@ customStyleTag.innerHTML = `
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; }
     
     /* Layout Principale a 3 Colonne */
-    .panel-three-columns { display: grid; grid-template-columns: 120px 140px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
+    .panel-three-columns { display: grid; grid-template-columns: 120px 180px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
     
     /* Colonna 1: Sinistra (Mappa Base + Layer Contesto) */
     .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow-y: auto; }
