@@ -38,17 +38,13 @@ customStyleTag.innerHTML = `
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
-    .panel-scrollable-grid { flex-grow: 1; overflow-y: auto; padding-right: 2px; }
     
-    /* Griglia a 3 colonne con flusso verticale (riempie prima la colonna 1 in alto-basso) */
-    .features-grid-3col { 
-        display: grid; 
-        grid-template-columns: repeat(3, 1fr); 
-        grid-auto-flow: column; 
-        gap: 5px; 
-    }
+    /* Contenitore con scorrimento orizzontale per le colonne verticali */
+    .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
     
-    @media (max-width: 650px) { .features-grid-3col { grid-template-columns: repeat(2, 1fr); } }
+    /* Singola colonna verticale (max 4 elementi) */
+    .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 180px; flex-shrink: 0; }
+    
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
 `;
 document.head.appendChild(customStyleTag);
@@ -238,27 +234,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div></div>`;
 
-        // COLONNA 3: ELENCO PROPOSTE (3 COLONNE INTERNE + SCORRIMENTO INDIPENDENTE)
+        // COLONNA 3: ELENCO PROPOSTE (DIVISO IN COLONNE VERTICALI DA 4 ELEMENTI)
         html += `<div class="col-right">`;
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
+            
+            // Dividiamo gli items in gruppi verticali di massimo 4 elementi
+            const itemsPerColumn = 4;
+            const columns = [];
+            for (let i = 0; i < items.length; i += itemsPerColumn) {
+                columns.push(items.slice(i, i + itemsPerColumn));
+            }
+
             html += `
                 <div id="tab-${cleanKey}" class="sidebar-tab-content ${firstTab ? 'active' : ''}">
                     <div class="cluster-counter-fixed">Elementi mappati: <b>${items.length}</b></div>
                     <div class="panel-scrollable-grid">
-                        <div class="features-grid-3col">
             `;
-            items.forEach((item, itemIdx) => {
-                html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 5px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
-                        <span style="font-size:12px; color:#333; flex-grow:1; margin-right:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
-                        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${itemIdx}" style="font-weight:bold; font-size:8px; padding:2px 4px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
-                    </div>
-                `;
+
+            columns.forEach(colItems => {
+                html += `<div class="feature-vertical-column">`;
+                colItems.forEach((item) => {
+                    // Troviamo l'indice globale originale dell'item per il tasto VOLA
+                    const globalIdx = items.indexOf(item);
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 5px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
+                            <span style="font-size:12px; color:#333; flex-grow:1; margin-right:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
+                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-weight:bold; font-size:8px; padding:2px 4px; cursor:pointer; background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border:none; border-radius:3px; flex-shrink:0;">VOLA</button>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
             });
-            html += `</div></div></div>`;
+
+            html += `</div></div>`;
             firstTab = false;
         }
         html += `</div></div>`; bottomPanel.innerHTML = html;
