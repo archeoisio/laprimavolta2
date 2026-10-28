@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per il pannello layer personalizzato
+// Iniezione di stili CSS per il pannello layer personalizzato ad albero
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPuntiTavolo);
-        puntiLayersGroup.push({ name: 'Punti: ' + tavolo.toUpperCase(), color: catColor, layer: layerPuntiTavolo });
+        puntiLayersGroup.push({ name: tavolo.toUpperCase(), color: catColor, layer: layerPuntiTavolo });
     }
 
     // Poligoni per Tavolo
@@ -280,10 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPoligoniTavolo);
-        areeLayersGroup.push({ name: 'Aree: ' + tavolo.toUpperCase(), color: catColor, layer: layerPoligoniTavolo });
+        areeLayersGroup.push({ name: tavolo.toUpperCase(), color: catColor, layer: layerPoligoniTavolo });
     }
 
-    // --- 4. CREAZIONE PANNELLO LAYER CUSTOM (HTML PURO) ---
+    // --- 4. CREAZIONE PANNELLO LAYER CUSTOM A STRUTTURA AD ALBERO ---
     const customLayersControl = L.control({ position: 'topright' });
     customLayersControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -316,14 +316,14 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleBtn.style.textDecoration = 'none';
         toggleBtn.style.boxShadow = '0 1px 5px rgba(0,0,0,0.4)';
 
-        // Box a comparsa dei layer
+        // Box a comparsa dei layer ad albero
         const panelBox = L.DomUtil.create('div', '', container);
         panelBox.id = 'custom-layers-panel';
         panelBox.style.display = 'none';
         panelBox.style.position = 'absolute';
         panelBox.style.right = '0px';
         panelBox.style.top = '48px';
-        panelBox.style.minWidth = '240px';
+        panelBox.style.minWidth = '260px';
         panelBox.style.backgroundColor = 'rgba(255, 255, 255, 0.96)';
         panelBox.style.backdropFilter = 'blur(6px)';
         panelBox.style.padding = '10px';
@@ -336,11 +336,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         L.DomEvent.disableScrollPropagation(panelBox);
 
-        // Funzione per costruire l'HTML interno del pannello
+        // Funzione per costruire l'albero HTML con accordion
         function renderPanelContent() {
             let html = '<div style="font-weight:bold; margin-bottom:6px; border-bottom:1px solid #ddd; padding-bottom:4px;">Mappe Base</div>';
             
-            // Radio Base Maps
             html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
                 <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
             </label>`;
@@ -350,7 +349,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             html += '<div style="font-weight:bold; margin:10px 0 6px 0; border-bottom:1px solid #ddd; padding-bottom:4px;">Layer Tematici</div>';
 
-            // Punti
+            // --- RAMO 1: PUNTI DI INTERESSE (ACCORDION) ---
+            html += `
+                <div class="tree-branch" style="margin-bottom:6px;">
+                    <div class="tree-header-punti" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:rgba(0,0,0,0.05); border-radius:4px; font-weight:bold;">
+                        <span>📍 Punti di interesse</span>
+                        <span class="arrow-punti">►</span>
+                    </div>
+                    <div class="tree-content-punti" style="display:none; padding-left:12px; margin-top:4px;">
+            `;
             puntiLayersGroup.forEach((item, idx) => {
                 const isChecked = map.hasLayer(item.layer);
                 html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
@@ -359,8 +366,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${item.name}
                 </label>`;
             });
+            html += `</div></div>`;
 
-            // Aree
+            // --- RAMO 2: AREE DI INTERESSE (ACCORDION) ---
+            html += `
+                <div class="tree-branch" style="margin-bottom:6px;">
+                    <div class="tree-header-aree" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:rgba(0,0,0,0.05); border-radius:4px; font-weight:bold;">
+                        <span>🗺️ Aree di interesse</span>
+                        <span class="arrow-aree">►</span>
+                    </div>
+                    <div class="tree-content-aree" style="display:none; padding-left:12px; margin-top:4px;">
+            `;
             areeLayersGroup.forEach((item, idx) => {
                 const isChecked = map.hasLayer(item.layer);
                 html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
@@ -369,15 +385,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${item.name}
                 </label>`;
             });
+            html += `</div></div>`;
 
-            html += '<div style="font-weight:bold; margin:10px 0 6px 0; border-bottom:1px solid #ddd; padding-bottom:4px;">Contesto</div>';
-            
+            // --- RAMO 3: CONTESTO (ACCORDION) ---
+            html += `
+                <div class="tree-branch" style="margin-bottom:6px;">
+                    <div class="tree-header-contesto" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:rgba(0,0,0,0.05); border-radius:4px; font-weight:bold;">
+                        <span>🏛️ Contesto Urbano</span>
+                        <span class="arrow-contesto">►</span>
+                    </div>
+                    <div class="tree-content-contesto" style="display:none; padding-left:12px; margin-top:4px;">
+            `;
             const contextLayers = [
                 { name: 'Stazioni', layer: layer_iconestazioni_2 },
                 { name: 'Ospedali', layer: layer_hospital_1 },
                 { name: 'Quartieri', layer: layer_iconaquartieri_0 }
             ];
-
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
                 html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
@@ -385,10 +408,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${ctx.name}
                 </label>`;
             });
+            html += `</div></div>`;
 
             panelBox.innerHTML = html;
 
-            // Collegamento eventi sui nuovi elementi generati
+            // --- LOGICA ACCORDION (Espandi/Comprimi rami) ---
+            panelBox.querySelector('.tree-header-punti').onclick = () => {
+                const content = panelBox.querySelector('.tree-content-punti');
+                const arrow = panelBox.querySelector('.arrow-punti');
+                const isHidden = content.style.display === 'none';
+                content.style.display = isHidden ? 'block' : 'none';
+                arrow.innerHTML = isHidden ? '▼' : '►';
+            };
+
+            panelBox.querySelector('.tree-header-aree').onclick = () => {
+                const content = panelBox.querySelector('.tree-content-aree');
+                const arrow = panelBox.querySelector('.arrow-aree');
+                const isHidden = content.style.display === 'none';
+                content.style.display = isHidden ? 'block' : 'none';
+                arrow.innerHTML = isHidden ? '▼' : '►';
+            };
+
+            panelBox.querySelector('.tree-header-contesto').onclick = () => {
+                const content = panelBox.querySelector('.tree-content-contesto');
+                const arrow = panelBox.querySelector('.arrow-contesto');
+                const isHidden = content.style.display === 'none';
+                content.style.display = isHidden ? 'block' : 'none';
+                arrow.innerHTML = isHidden ? '▼' : '►';
+            };
+
+            // --- EVENTI MAPPA BASE E LAYER ---
             panelBox.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
                 radio.onchange = (e) => {
                     if (e.target.value === 'osm') {
@@ -439,7 +488,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // Chiude il pannello se si clicca fuori
         map.on('click', () => {
             panelBox.style.display = 'none';
         });
@@ -670,7 +718,7 @@ const tutorialSteps = [
     { 
         id: "#custom-layers-panel", 
         titolo: "Layer e Mappe", 
-        testo: "Scegli la mappa base e attiva o disattiva i layer tematici e il contesto urbano.",
+        testo: "Scegli la mappa base e attiva o disattiva i layer tematici espandendo i menu.",
         action: "openLayers" 
     },
     { 
