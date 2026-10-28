@@ -9,9 +9,9 @@ customStyleTag.innerHTML = `
         height: 44px !important;
     }
     .leaflet-control-layers-expanded {
-        min-width: 240px !important;
-        max-width: 270px !important;
-        padding: 10px !important;
+        min-width: 250px !important;
+        max-width: 290px !important;
+        padding: 8px 10px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
@@ -21,31 +21,34 @@ customStyleTag.innerHTML = `
         font-size: 12px !important;
     }
     
-    /* AZZERAMENTO MARGINI E PADDING PER EVITARE SPAZI VUoti A SINISTRA */
-    .leaflet-control-layers label {
+    /* CORREZIONE RADICALE DEL LAYOUT DELLE VOCI NEL PANNELLO NATIVO */
+    .leaflet-control-layers-overlays label,
+    .leaflet-control-layers-base label {
         display: flex !important;
         align-items: center !important;
         justify-content: flex-start !important;
         gap: 6px !important;
         cursor: pointer;
         font-size: 12px !important;
-        line-height: 1.4 !important;
-        margin: 4px 0 !important;
-        padding-left: 0 !important;
-        margin-left: 0 !important;
+        line-height: 1.3 !important;
+        margin: 3px 0 !important;
+        padding: 0 !important;
+        /* Annulla qualsiasi indentazione o padding ereditato */
+        text-indent: 0 !important;
     }
 
+    /* Azzeramento dei margini della checkbox nativa */
     .leaflet-control-layers-selector {
-        margin-left: 0 !important;
-        margin-right: 6px !important;
+        margin: 0 !important;
         position: static !important;
         flex-shrink: 0 !important;
     }
 
-    .leaflet-control-layers-base, 
-    .leaflet-control-layers-overlays {
-        margin: 0 !important;
-        padding: 0 !important;
+    /* Assicura che il testo e il pallino colorato si dispongano subito dopo la checkbox senza spazi */
+    .leaflet-control-layers span {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
     }
 
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
