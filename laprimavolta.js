@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS per il pannello inferiore a due colonne con scroll mirato
+// Iniezione di stili CSS per il pannello inferiore a due colonne + stili tutorial
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -23,7 +23,7 @@ customStyleTag.innerHTML = `
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
         transition: bottom 0.3s ease-in-out;
         z-index: 2000;
-        padding: 10px;
+        padding: 15px;
         box-sizing: border-box;
         text-align: left;
         font-family: sans-serif;
@@ -250,7 +250,7 @@ function resetFeatureStyle(e) {
     }
 }
 
-// Funzioni di sicurezza globali
+// --- FUNZIONI DI SUPPORTO PER IL TUTORIAL ---
 window.closeModal = function() {
     const modal = document.getElementById('welcome-modal');
     if (modal) modal.style.display = 'none';
@@ -633,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("Impossibile determinare la posizione: " + e.message);
     });
 
-    // --- 6. PULSANTI IN ALTO A DESTRA ---
+    // --- 6. PULSANTI IN ALTO A DESTRA CON CLASSI PER IL TUTORIAL ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -677,18 +677,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        // 0. Pulsante Centro di Controllo (apre il pannello dal basso)
+        // 0. Pulsante Centro di Controllo (con classe btn-tutorial-layers)
         createBtn('🗂️', "Centro di Controllo", () => {
             renderPanelContent();
             bottomPanel.classList.toggle('open');
         }, 'btn-tutorial-layers');
 
-        // 1. Home
+        // 1. Home (con classe btn-tutorial-home)
         createBtn('🌍', "Torna alla vista iniziale", () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
-        // 2. Geolocalizzazione
+        // 2. Geolocalizzazione (con classe btn-tutorial-locate)
         createBtn('📍', "Posizione", () => {
             map.locate({setView: true, maxZoom: 16});
         }, 'btn-tutorial-locate');
