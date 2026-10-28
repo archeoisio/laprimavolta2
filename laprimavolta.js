@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS corretti e sicuri per il plugin Tree Layers e pulsanti (44x44px)
+// Iniezione di stili CSS per l'allineamento verticale centrato delle voci e uniformità pulsanti (44x44px)
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -27,14 +27,25 @@ customStyleTag.innerHTML = `
         text-align: left !important;
         direction: ltr !important;
     }
-    /* Stile pulito per le voci del tree layers senza forzare flex sui gruppi principali */
+    /* Centratura verticale perfetta per le singole voci (checkbox + testo + pallino) */
     .leaflet-control-layers-tree label {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
         cursor: pointer;
         font-size: 12px !important;
-        line-height: 1.5 !important;
+        line-height: 1.4 !important;
     }
     .leaflet-control-layers-selector {
-        margin-right: 6px !important;
+        margin: 0 !important;
+        flex-shrink: 0 !important;
+    }
+    /* Evita che gli span delle icone colore vengano stirati */
+    .leaflet-control-layers-tree label span {
+        width: auto !important;
+        flex-shrink: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
     }
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
     .quartiere-label {
@@ -411,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         container.style.marginTop = '4px';
         container.style.marginRight = '10px';
+        
         container.style.display = 'flex';
         container.style.flexDirection = 'column';
         container.style.background = 'transparent';
@@ -426,9 +438,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = html;
             btn.title = title;
             btn.href = '#';
-            btn.style.width = '44px';
-            btn.style.height = '44px';
-            btn.style.lineHeight = '44px';
+            btn.style.width = '45px';
+            btn.style.height = '45px';
+            btn.style.lineHeight = '45px';
             btn.style.textAlign = 'center';
             btn.style.display = 'flex';
             btn.style.alignItems = 'center';
