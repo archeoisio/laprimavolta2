@@ -451,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
                             </label>
                             <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
-                                <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Sat
+                                <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Sat
                             </label>
                         </div>
                     </div>
