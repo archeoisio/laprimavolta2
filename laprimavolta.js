@@ -1,7 +1,7 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS avanzati per azzerare completamente il margine sinistro del Tree Layers
+// Iniezione di stili CSS puliti per il pannello layer nativo
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
@@ -11,7 +11,7 @@ customStyleTag.innerHTML = `
     .leaflet-control-layers-expanded {
         min-width: 240px !important;
         max-width: 270px !important;
-        padding: 8px 10px !important;
+        padding: 10px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
         border-radius: 10px;
@@ -21,27 +21,7 @@ customStyleTag.innerHTML = `
         font-size: 12px !important;
     }
     
-    /* AZZERAMENTO DELLE LISTE DEL TREE SENZA TOCCARE LE ICONE */
-    .leaflet-control-layers-list, 
-    .leaflet-control-layers-base, 
-    .leaflet-control-layers-overlays,
-    .leaflet-control-layers-tree,
-    .leaflet-control-layers-tree ul,
-    .leaflet-control-layers-tree li {
-        margin-left: 0 !important;
-        padding-left: 0 !important;
-        text-align: left !important;
-        list-style: none !important;
-    }
-
-    /* Rimuove l'indentazione forzata dei rami figli generata dal plugin */
-    .leaflet-control-layers-tree ul {
-        padding-left: 0 !important;
-        margin-left: 0 !important;
-    }
-
-    /* Allineamento rigido a sinistra delle singole righe */
-    .leaflet-control-layers-tree label {
+    .leaflet-control-layers label {
         display: flex !important;
         align-items: center !important;
         justify-content: flex-start !important;
@@ -49,24 +29,12 @@ customStyleTag.innerHTML = `
         cursor: pointer;
         font-size: 12px !important;
         line-height: 1.4 !important;
-        margin: 2px 0 !important;
-        padding-left: 0 !important;
-        margin-left: 0 !important;
-        width: 100% !important;
+        margin: 4px 0 !important;
     }
 
     .leaflet-control-layers-selector {
         margin: 0 4px 0 0 !important;
         flex-shrink: 0 !important;
-    }
-
-    /* ISOLAMENTO DELLE ICONE: Impedisce a qualsiasi span di stirarsi o allargarsi */
-    .leaflet-control-layers-tree label span {
-        width: auto !important;
-        max-width: none !important;
-        flex-shrink: 0 !important;
-        display: inline-flex !important;
-        align-items: center !important;
     }
 
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
@@ -245,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28 });
     map.addLayer(layer_OpenStreetMap_4);
 
-    // --- 3. COSTRUZIONE ALBERO CATEGORIE ---
+    // --- 3. COSTRUZIONE ELEMENTI PER IL PANNELLO NATIVO ---
     const atlasCategories = {};
 
     function registerItem(feature, layer) {
@@ -276,7 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
     map.createPane('pane_puntiprimavolta_5');
     map.getPane('pane_puntiprimavolta_5').style.zIndex = 405;
 
-    const puntiChildren = [];
+    const overlayMaps = {};
+
     for (const [tavolo, features] of Object.entries(puntiPerTavolo)) {
         const catColor = getTavoloColor(tavolo);
         const layerPuntiTavolo = new L.geoJson({ type: "FeatureCollection", features: features }, {
@@ -304,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         map.addLayer(layerPuntiTavolo);
         
         const iconHtml = '<span style="display:inline-block; width:10px; height:10px; background-color:' + catColor + '; border-radius:50%; margin-right:6px; border:1px solid #333; vertical-align:middle;"></span>';
-        puntiChildren.push({ label: iconHtml + tavolo.toUpperCase(), layer: layerPuntiTavolo });
+        overlayMaps[iconHtml + 'Punti: ' + tavolo.toUpperCase()] = layerPuntiTavolo;
     }
 
     // Poligoni per Tavolo
@@ -318,7 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
     map.createPane('pane_poligoniprimavolta_6');
     map.getPane('pane_poligoniprimavolta_6').style.zIndex = 406;
 
-    const poligoniChildren = [];
     for (const [tavolo, features] of Object.entries(poligoniPerTavolo)) {
         const catColor = getTavoloColor(tavolo);
         const layerPoligoniTavolo = new L.geoJson({ type: "FeatureCollection", features: features }, {
@@ -344,44 +312,24 @@ document.addEventListener('DOMContentLoaded', () => {
         map.addLayer(layerPoligoniTavolo);
         
         const iconHtml = '<span style="display:inline-block; width:10px; height:10px; background-color:' + catColor + '; margin-right:6px; border:1px solid #333; vertical-align:middle;"></span>';
-        poligoniChildren.push({ label: iconHtml + tavolo.toUpperCase(), layer: layerPoligoniTavolo });
+        overlayMaps[iconHtml + 'Aree: ' + tavolo.toUpperCase()] = layerPoligoniTavolo;
     }
 
-    // --- 4. CONTROLLO LAYER ALBERO (ALTO A DESTRA) ---
-    var baseTree = {
-        label: "<b>Mappe Base</b>",
-        children: [
-            { label: "OpenStreetMap", layer: layer_OpenStreetMap_4, radioGroup: 'bm' },
-            { label: "Google Satellite", layer: layer_GoogleSatellite_3, radioGroup: 'bm' }
-        ]
+    // Aggiunta layer di contesto al pannello nativo
+    overlayMaps["Stazioni"] = layer_iconestazioni_2;
+    overlayMaps["Ospedali"] = layer_hospital_1;
+    overlayMaps["Quartieri"] = layer_iconaquartieri_0;
+
+    // Basemaps per il controllo nativo
+    var baseMaps = {
+        "OpenStreetMap": layer_OpenStreetMap_4,
+        "Google Satellite": layer_GoogleSatellite_3
     };
 
-    var overlaysTree = {
-        label: "<b>Layer Tematici</b>",
-        children: [
-            {
-                label: "📍 <b>Punti di interesse</b>",
-                children: puntiChildren
-            },
-            {
-                label: "🗺️ <b>Aree di interesse</b>",
-                children: poligoniChildren
-            },
-            {
-                label: "<b>Contesto</b>",
-                children: [
-                    { label: "Stazioni", layer: layer_iconestazioni_2 },
-                    { label: "Ospedali", layer: layer_hospital_1 },
-                    { label: "Quartieri", layer: layer_iconaquartieri_0 }
-                ]
-            }
-        ]
-    };
-
-    L.control.layers.tree(baseTree, overlaysTree, {
+    // --- 4. CONTROLLO LAYER NATIVO STANDARD ---
+    L.control.layers(baseMaps, overlayMaps, {
         collapsed: true,
-        position: 'topright',
-        sortLayers: false
+        position: 'topright'
     }).addTo(map);
 
     // Photon Search Control
@@ -443,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("Impossibile determinare la posizione: " + e.message);
     });
 
-    // --- 6. PULSANTI IN ALTO A DESTRA (44x44px con margini regolabili) ---
+    // --- 6. PULSANTI IN ALTO A DESTRA ---
     const btnControl = L.control({ position: 'topright' });
     btnControl.onAdd = function(map) {
         const container = L.DomUtil.create('div', 'leaflet-bar');
@@ -600,12 +548,12 @@ document.addEventListener('DOMContentLoaded', () => {
     sideInfoControl.addTo(map);
 });
 
-// --- TUTORIAL (Stile Atlas / La Prima Volta) ---
+// --- TUTORIAL ---
 const tutorialSteps = [
     { 
         id: ".leaflet-control-layers", 
-        titolo: "Layer Tematici e Base", 
-        testo: "Scegli la mappa base (OSM o Satellite) e attiva/disattiva i layer tematici, le aree e il contesto urbano." 
+        titolo: "Layer e Mappe", 
+        testo: "Scegli la mappa base e attiva o disattiva i layer tematici e il contesto urbano." 
     },
     { 
         id: ".btn-tutorial-home", 
@@ -615,7 +563,7 @@ const tutorialSteps = [
     { 
         id: ".btn-tutorial-locate", 
         titolo: "Geolocalizzazione", 
-        testo: "Trova la tua posizione attuale sulla mappa (richiede permessi di localizzazione)." 
+        testo: "Trova la tua posizione attuale sulla mappa." 
     },
     { 
         id: ".btn-tutorial-hearts", 
@@ -625,7 +573,7 @@ const tutorialSteps = [
     { 
         id: "#hearts-list-box", 
         titolo: "Esplora Proposte", 
-        testo: "Elenco delle proposte divise per tavolo. Clicca su 'VOLA' per raggiungere direttamente la destinazione sulla mappa.",
+        testo: "Elenco delle proposte divise per tavolo. Clicca su 'VOLA' per raggiungere direttamente la destinazione.",
         action: "openHearts" 
     }
 ];
