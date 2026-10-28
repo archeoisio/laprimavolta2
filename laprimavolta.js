@@ -409,10 +409,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. LOCATE CONTROL (Istanza per geolocalizzazione) ---
-    const locateControl = L.control.locate({
-        flyTo: { duration: 6 },
-        strings: { title: "Posizione" }
+    // --- 5. GESTIONE EVENTI GEOLOCALIZZAZIONE (Opzionale: feedback visivo sulla posizione trovata) ---
+    map.on('locationfound', function(e) {
+        var radius = e.accuracy / 2;
+        L.marker(e.latlng).addTo(map)
+            .bindPopup("Ti trovi qui (entro " + Math.round(radius) + " metri)").openPopup();
+        L.circle(e.latlng, radius).addTo(map);
+    });
+
+    map.on('locationerror', function(e) {
+        alert("Impossibile determinare la posizione: " + e.message);
     });
 
     // --- 6. PULSANTI IN ALTO A DESTRA (44x44px con margini regolabili) ---
@@ -464,9 +470,9 @@ document.addEventListener('DOMContentLoaded', () => {
             map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
         }, 'btn-tutorial-home');
 
-        // 2. Geolocalizzazione
+        // 2. Geolocalizzazione (Usa map.locate nativo)
         createBtn('📍', "Posizione", () => {
-            locateControl.start();
+            map.locate({setView: true, maxZoom: 16});
         }, 'btn-tutorial-locate');
 
         // 3. Cluster tematici ❤️
