@@ -1,56 +1,14 @@
 let map; 
 let highlightLayer;
 
-// Iniezione di stili CSS corretti per allineare perfettamente a sinistra il pannello layer nativo
+// Iniezione di stili CSS per il pannello layer personalizzato
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle {
         width: 44px !important;
         height: 44px !important;
     }
-    .leaflet-control-layers-expanded {
-        min-width: 250px !important;
-        max-width: 290px !important;
-        padding: 8px 10px !important;
-        background: rgba(255, 255, 255, 0.96) !important;
-        backdrop-filter: blur(6px);
-        border-radius: 10px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-        text-align: left !important;
-        direction: ltr !important;
-        font-size: 12px !important;
-    }
     
-    /* CORREZIONE RADICALE DEL LAYOUT DELLE VOCI NEL PANNELLO NATIVO */
-    .leaflet-control-layers-overlays label,
-    .leaflet-control-layers-base label {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        gap: 6px !important;
-        cursor: pointer;
-        font-size: 12px !important;
-        line-height: 1.3 !important;
-        margin: 3px 0 !important;
-        padding: 0 !important;
-        /* Annulla qualsiasi indentazione o padding ereditato */
-        text-indent: 0 !important;
-    }
-
-    /* Azzeramento dei margini della checkbox nativa */
-    .leaflet-control-layers-selector {
-        margin: 0 !important;
-        position: static !important;
-        flex-shrink: 0 !important;
-    }
-
-    /* Assicura che il testo e il pallino colorato si dispongano subito dopo la checkbox senza spazi */
-    .leaflet-control-layers span {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 4px !important;
-    }
-
     /* Stile etichette quartieri con sfondo bianco e bordo nero sottile */
     .quartiere-label {
         background: rgba(255, 255, 255, 0.9);
@@ -227,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28 });
     map.addLayer(layer_OpenStreetMap_4);
 
-    // --- 3. COSTRUZIONE ELEMENTI PER IL PANNELLO NATIVO ---
+    // --- 3. COSTRUZIONE ELEMENTI E RACCOLTA DATI ---
     const atlasCategories = {};
 
     function registerItem(feature, layer) {
@@ -258,8 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.createPane('pane_puntiprimavolta_5');
     map.getPane('pane_puntiprimavolta_5').style.zIndex = 405;
 
-    const overlayMaps = {};
-
+    const puntiLayersGroup = [];
     for (const [tavolo, features] of Object.entries(puntiPerTavolo)) {
         const catColor = getTavoloColor(tavolo);
         const layerPuntiTavolo = new L.geoJson({ type: "FeatureCollection", features: features }, {
@@ -285,9 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPuntiTavolo);
-        
-        const iconHtml = '<span style="display:inline-block; width:10px; height:10px; background-color:' + catColor + '; border-radius:50%; margin-right:6px; border:1px solid #333; vertical-align:middle;"></span>';
-        overlayMaps[iconHtml + 'Punti: ' + tavolo.toUpperCase()] = layerPuntiTavolo;
+        puntiLayersGroup.push({ name: 'Punti: ' + tavolo.toUpperCase(), color: catColor, layer: layerPuntiTavolo });
     }
 
     // Poligoni per Tavolo
@@ -301,6 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.createPane('pane_poligoniprimavolta_6');
     map.getPane('pane_poligoniprimavolta_6').style.zIndex = 406;
 
+    const areeLayersGroup = [];
     for (const [tavolo, features] of Object.entries(poligoniPerTavolo)) {
         const catColor = getTavoloColor(tavolo);
         const layerPoligoniTavolo = new L.geoJson({ type: "FeatureCollection", features: features }, {
@@ -324,30 +280,174 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         map.addLayer(layerPoligoniTavolo);
-        
-        const iconHtml = '<span style="display:inline-block; width:10px; height:10px; background-color:' + catColor + '; margin-right:6px; border:1px solid #333; vertical-align:middle;"></span>';
-        overlayMaps[iconHtml + 'Aree: ' + tavolo.toUpperCase()] = layerPoligoniTavolo;
+        areeLayersGroup.push({ name: 'Aree: ' + tavolo.toUpperCase(), color: catColor, layer: layerPoligoniTavolo });
     }
 
-    // Aggiunta layer di contesto al pannello nativo
-    overlayMaps["Stazioni"] = layer_iconestazioni_2;
-    overlayMaps["Ospedali"] = layer_hospital_1;
-    overlayMaps["Quartieri"] = layer_iconaquartieri_0;
+    // --- 4. CREAZIONE PANNELLO LAYER CUSTOM (HTML PURO) ---
+    const customLayersControl = L.control({ position: 'topright' });
+    customLayersControl.onAdd = function(map) {
+        const container = L.DomUtil.create('div', 'leaflet-bar');
+        container.style.backgroundColor = 'transparent';
+        container.style.border = 'none';
+        container.style.marginTop = '4px';
+        container.style.marginRight = '10px';
 
-    // Basemaps per il controllo nativo
-    var baseMaps = {
-        "OpenStreetMap": layer_OpenStreetMap_4,
-        "Google Satellite": layer_GoogleSatellite_3
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(container, 'mousewheel', L.DomEvent.stopPropagation);
+        L.DomEvent.on(container, 'touchstart', L.DomEvent.stopPropagation);
+        L.DomEvent.on(container, 'pointerdown', L.DomEvent.stopPropagation);
+
+        // Bottone principale con icona layer
+        const toggleBtn = L.DomUtil.create('a', '', container);
+        toggleBtn.innerHTML = '🗂️';
+        toggleBtn.title = 'Seleziona Layer';
+        toggleBtn.href = '#';
+        toggleBtn.style.width = '44px';
+        toggleBtn.style.height = '44px';
+        toggleBtn.style.lineHeight = '44px';
+        toggleBtn.style.textAlign = 'center';
+        toggleBtn.style.display = 'flex';
+        toggleBtn.style.alignItems = 'center';
+        toggleBtn.style.justifyContent = 'center';
+        toggleBtn.style.fontSize = '18px';
+        toggleBtn.style.backgroundColor = 'white';
+        toggleBtn.style.color = '#333';
+        toggleBtn.style.borderRadius = '4px';
+        toggleBtn.style.textDecoration = 'none';
+        toggleBtn.style.boxShadow = '0 1px 5px rgba(0,0,0,0.4)';
+
+        // Box a comparsa dei layer
+        const panelBox = L.DomUtil.create('div', '', container);
+        panelBox.id = 'custom-layers-panel';
+        panelBox.style.display = 'none';
+        panelBox.style.position = 'absolute';
+        panelBox.style.right = '0px';
+        panelBox.style.top = '48px';
+        panelBox.style.minWidth = '240px';
+        panelBox.style.backgroundColor = 'rgba(255, 255, 255, 0.96)';
+        panelBox.style.backdropFilter = 'blur(6px)';
+        panelBox.style.padding = '10px';
+        panelBox.style.borderRadius = '10px';
+        panelBox.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)';
+        panelBox.style.textAlign = 'left';
+        panelBox.style.fontSize = '12px';
+        panelBox.style.zIndex = '1000';
+        panelBox.style.color = '#333';
+
+        L.DomEvent.disableScrollPropagation(panelBox);
+
+        // Funzione per costruire l'HTML interno del pannello
+        function renderPanelContent() {
+            let html = '<div style="font-weight:bold; margin-bottom:6px; border-bottom:1px solid #ddd; padding-bottom:4px;">Mappe Base</div>';
+            
+            // Radio Base Maps
+            html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
+                <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OpenStreetMap
+            </label>`;
+            html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
+                <input type="radio" name="baseMapChoice" value="sat" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Google Satellite
+            </label>`;
+
+            html += '<div style="font-weight:bold; margin:10px 0 6px 0; border-bottom:1px solid #ddd; padding-bottom:4px;">Layer Tematici</div>';
+
+            // Punti
+            puntiLayersGroup.forEach((item, idx) => {
+                const isChecked = map.hasLayer(item.layer);
+                html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
+                    <input type="checkbox" class="custom-layer-chk" data-type="punti" data-index="${idx}" ${isChecked ? 'checked' : ''}>
+                    <span style="display:inline-block; width:10px; height:10px; background-color:${item.color}; border-radius:50%; border:1px solid #333; flex-shrink:0;"></span>
+                    ${item.name}
+                </label>`;
+            });
+
+            // Aree
+            areeLayersGroup.forEach((item, idx) => {
+                const isChecked = map.hasLayer(item.layer);
+                html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
+                    <input type="checkbox" class="custom-layer-chk" data-type="aree" data-index="${idx}" ${isChecked ? 'checked' : ''}>
+                    <span style="display:inline-block; width:10px; height:10px; background-color:${item.color}; border:1px solid #333; flex-shrink:0;"></span>
+                    ${item.name}
+                </label>`;
+            });
+
+            html += '<div style="font-weight:bold; margin:10px 0 6px 0; border-bottom:1px solid #ddd; padding-bottom:4px;">Contesto</div>';
+            
+            const contextLayers = [
+                { name: 'Stazioni', layer: layer_iconestazioni_2 },
+                { name: 'Ospedali', layer: layer_hospital_1 },
+                { name: 'Quartieri', layer: layer_iconaquartieri_0 }
+            ];
+
+            contextLayers.forEach((ctx, idx) => {
+                const isChecked = map.hasLayer(ctx.layer);
+                html += `<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
+                    <input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}>
+                    ${ctx.name}
+                </label>`;
+            });
+
+            panelBox.innerHTML = html;
+
+            // Collegamento eventi sui nuovi elementi generati
+            panelBox.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
+                radio.onchange = (e) => {
+                    if (e.target.value === 'osm') {
+                        map.addLayer(layer_OpenStreetMap_4);
+                        map.removeLayer(layer_GoogleSatellite_3);
+                    } else {
+                        map.addLayer(layer_GoogleSatellite_3);
+                        map.removeLayer(layer_OpenStreetMap_4);
+                    }
+                };
+            });
+
+            panelBox.querySelectorAll('.custom-layer-chk').forEach(chk => {
+                chk.onchange = (e) => {
+                    const type = e.target.getAttribute('data-type');
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    const targetLayer = (type === 'punti') ? puntiLayersGroup[index].layer : areeLayersGroup[index].layer;
+                    if (e.target.checked) {
+                        map.addLayer(targetLayer);
+                    } else {
+                        map.removeLayer(targetLayer);
+                    }
+                };
+            });
+
+            panelBox.querySelectorAll('.custom-context-chk').forEach(chk => {
+                chk.onchange = (e) => {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    const targetLayer = [layer_iconestazioni_2, layer_hospital_1, layer_iconaquartieri_0][index];
+                    if (e.target.checked) {
+                        map.addLayer(targetLayer);
+                    } else {
+                        map.removeLayer(targetLayer);
+                    }
+                };
+            });
+        }
+
+        toggleBtn.onclick = (e) => {
+            L.DomEvent.stopPropagation(e);
+            L.DomEvent.preventDefault(e);
+            const isHidden = panelBox.style.display === 'none';
+            if (isHidden) {
+                renderPanelContent();
+                panelBox.style.display = 'block';
+            } else {
+                panelBox.style.display = 'none';
+            }
+        };
+
+        // Chiude il pannello se si clicca fuori
+        map.on('click', () => {
+            panelBox.style.display = 'none';
+        });
+
+        container.appendChild(panelBox);
+        return container;
     };
-
-    // --- 4. CONTROLLO LAYER NATIVO STANDARD ---
-    const layersControl = L.control.layers(baseMaps, overlayMaps, {
-        collapsed: true,
-        position: 'topright'
-    }).addTo(map);
-
-    const layersContainer = layersControl.getContainer();
-    layersContainer.style.marginRight = '2px';
+    customLayersControl.addTo(map);
 
     // Photon Search Control
     const photonUrl = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&"};
@@ -568,9 +668,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- TUTORIAL ---
 const tutorialSteps = [
     { 
-        id: ".leaflet-control-layers", 
+        id: "#custom-layers-panel", 
         titolo: "Layer e Mappe", 
-        testo: "Scegli la mappa base e attiva o disattiva i layer tematici e il contesto urbano." 
+        testo: "Scegli la mappa base e attiva o disattiva i layer tematici e il contesto urbano.",
+        action: "openLayers" 
     },
     { 
         id: ".btn-tutorial-home", 
@@ -620,20 +721,28 @@ function startTutorial() {
 
 function showStep() {
     const step = tutorialSteps[currentStep];
-    const target = document.querySelector(step.id);
-    const isLast = currentStep === tutorialSteps.length - 1;
     const isHeartBox = step.id === "#hearts-list-box";
+    const isLayersBox = step.id === "#custom-layers-panel";
 
     if (step.action === "openHearts") {
         const hb = document.getElementById('hearts-list-box');
         if (hb) hb.style.display = 'block';
     }
+    if (step.action === "openLayers") {
+        const lb = document.getElementById('custom-layers-panel');
+        if (lb) lb.style.display = 'block';
+    }
+
+    const target = document.querySelector(step.id);
+    const isLast = currentStep === tutorialSteps.length - 1;
 
     let popupPoint;
     if (target) {
         const rect = target.getBoundingClientRect();
         if (isHeartBox) {
             popupPoint = map.containerPointToLayerPoint([rect.left + 120, rect.top - 10]);
+        } else if (isLayersBox) {
+            popupPoint = map.containerPointToLayerPoint([rect.left - 130, rect.top + 50]);
         } else {
             popupPoint = map.containerPointToLayerPoint([rect.left - 130, rect.top + (rect.height / 2)]);
         }
@@ -682,5 +791,7 @@ window.nextTutorialStep = function() {
         map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
         const hb = document.getElementById('hearts-list-box');
         if (hb) hb.style.display = 'none';
+        const lb = document.getElementById('custom-layers-panel');
+        if (lb) lb.style.display = 'none';
     }
 }
