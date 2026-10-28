@@ -250,18 +250,6 @@ function resetFeatureStyle(e) {
     }
 }
 
-// --- FUNZIONI DI SUPPORTO PER IL TUTORIAL ---
-window.closeModal = function() {
-    const modal = document.getElementById('welcome-modal');
-    if (modal) modal.style.display = 'none';
-};
-
-window.nextTutorialStep = function() {
-    if (typeof map !== 'undefined') {
-        map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
-    }
-};
-
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. INIZIALIZZAZIONE MAPPA E VIEWPORT ---
     map = L.map('map', {
@@ -353,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.addLayer(layer_OpenStreetMap_4);
 
     // --- 3. COSTRUZIONE ELEMENTI E RACCOLTA DATI PER I TAVOLI ---
-    const atlasCategories = {};
+    window.atlasCategories = {};
 
     function registerItem(feature, layer) {
         const tavolo = feature.properties['Tavolo'] || feature.properties['Tavolo di '] || feature.properties['Tavolo di'] || 'Altro';
@@ -449,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bottomPanel.id = 'custom-bottom-panel';
     document.body.appendChild(bottomPanel);
 
-    function renderPanelContent() {
+    window.renderPanelContent = function() {
         let html = `
             <!-- Intestazione principale fissa -->
             <div class="panel-main-header">
@@ -494,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         html += `</div></div>`; // Chiusura left-column
 
-        // COLONNA DI DESTRA: Cluster Tematici (Tab fisse, Conteggio fisso, Griglia scorrevole)
+        // COLONNA DI DESTRA: Cluster Tematici
         html += `
             <div class="right-column">
                 <div class="sub-section-title">Cluster Tematici</div>
@@ -526,10 +514,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const catColor = getTavoloColor(tavolo);
             html += `
                 <div id="tab-${cleanKey}" class="sidebar-tab-content ${firstTab ? 'active' : ''}">
-                    <!-- Conteggio proposte FISSO (fuori dall'area di scorrimento) -->
+                    <!-- Conteggio proposte FISSO -->
                     <div class="cluster-counter-fixed">Proposte registrate: <b>${items.length}</b></div>
                     
-                    <!-- Area SCORREVOLE limitata unicamente alla griglia delle feature -->
+                    <!-- Area SCORREVOLE -->
                     <div class="panel-scrollable-grid">
                         <div class="features-grid-3col">
             `;
@@ -607,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        // Eventi Altri Layer (Contesto)
+        // Eventi Altri Layer
         bottomPanel.querySelectorAll('.custom-context-chk').forEach(chk => {
             chk.onchange = (e) => {
                 const index = parseInt(e.target.getAttribute('data-index'));
@@ -640,7 +628,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         container.style.marginTop = '4px';
         container.style.marginRight = '10px';
-        
         container.style.display = 'flex';
         container.style.flexDirection = 'column';
         container.style.background = 'transparent';
@@ -697,3 +684,140 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     btnControl.addTo(map);
 });
+
+// ==========================================
+// --- SEZIONE TUTORIAL (GESTIONE COMPLETA) ---
+// ==========================================
+
+const tutorialSteps = [
+    { 
+        id: ".btn-tutorial-layers", 
+        titolo: "Centro di Controllo", 
+        testo: "Clicca qui per gestire le mappe base, i layer di contesto e accedere ai cluster tematici." 
+    },
+    { 
+        id: ".btn-tutorial-home", 
+        titolo: "Tasto Home", 
+        testo: "Resetta la mappa alla vista panoramica iniziale di Salerno." 
+    },
+    { 
+        id: ".btn-tutorial-locate", 
+        titolo: "Geolocalizzazione", 
+        testo: "Trova la tua posizione attuale sulla mappa. Necessario attivare il GPS su telefono/PC." 
+    },
+    { 
+        id: "#custom-bottom-panel", 
+        titolo: "Cluster e Proposte", 
+        testo: "Apri il pannello per esplorare le proposte divise per tavoli e volare direttamente sui punti d'interesse.",
+        action: "openPanel"
+    }
+];
+
+let currentStep = 0;
+
+function closeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function startTutorial() {
+    closeModal();
+    currentStep = 0;
+    
+    if (typeof map === 'undefined') {
+        console.error("Mappa non trovata! Assicurati che 'map' sia inizializzata.");
+        return;
+    }
+
+    // BLOCCA INTERAZIONI MAPPA
+    try {
+        map.dragging.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.scrollWheelZoom.disable();
+        if (map.tap) map.tap.disable();
+    } catch (e) { 
+        console.warn("Alcuni controlli non possono essere disabilitati", e); 
+    }
+    
+    setTimeout(showStep, 50);
+}
+
+function showStep() {
+    const step = tutorialSteps[currentStep];
+    const target = document.querySelector(step.id);
+    const isLast = currentStep === tutorialSteps.length - 1;
+    const isPanel = step.id === "#custom-bottom-panel";
+
+    if (step.action === "openPanel") {
+        if (typeof renderPanelContent === 'function') renderPanelContent();
+        const bp = document.getElementById('custom-bottom-panel');
+        if (bp) bp.classList.add('open');
+    }
+
+    let popupPoint;
+    if (target) {
+        const rect = target.getBoundingClientRect();
+        if (isPanel) {
+            popupPoint = map.containerPointToLayerPoint([rect.left + rect.width / 2, rect.top - 20]);
+        } else {
+            popupPoint = map.containerPointToLayerPoint([rect.left - 110, rect.top + 20]);
+        }
+    } else {
+        popupPoint = map.containerPointToLayerPoint([window.innerWidth / 2, window.innerHeight / 3]);
+    }
+
+    const popupLatLng = map.layerPointToLatLng(popupPoint);
+
+    L.popup({ 
+        closeButton: false, 
+        closeOnClick: false,
+        autoPan: false,
+        className: 'tutorial-pointer' + (isPanel ? ' panel-tutorial-popup' : ''),
+        offset: isPanel ? L.point(0, -15) : L.point(-10, 0) 
+    })
+    .setLatLng(popupLatLng)
+    .setContent(`
+    <div style="width: 190px; font-family: sans-serif; display: flex; flex-direction: column; gap: 5px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <b style="color:#3498db; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;">
+                ${step.titolo}
+            </b>
+            <button onclick="nextTutorialStep()" style="background:#3498db; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size: 10px; font-weight: bold; flex-shrink: 0; margin-left: 6px;">
+                ${isLast ? 'INIZIA' : 'AVANTI'}
+            </button>
+        </div>
+        <div style="font-size: 11px; line-height: 1.3; border-top: 1px solid #eee; padding-top: 5px; color: #333;">
+            ${step.testo}
+        </div>
+    </div>
+    `)
+    .openOn(map);
+}
+
+function nextTutorialStep() {
+    currentStep++;
+    
+    if (currentStep < tutorialSteps.length) {
+        showStep();
+    } else {
+        // SBLOCCA LA MAPPA
+        if (typeof map !== 'undefined') {
+            map.dragging.enable();
+            map.touchZoom.enable();
+            map.doubleClickZoom.enable();
+            map.scrollWheelZoom.enable();
+            if (map.tap) map.tap.enable();
+            
+            // Chiudi popup tutorial e pannello
+            map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
+        }
+        const bp = document.getElementById('custom-bottom-panel');
+        if (bp) bp.classList.remove('open');
+    }
+}
+
+// Esposizione funzioni globali per richiamo da HTML
+window.startTutorial = startTutorial;
+window.nextTutorialStep = nextTutorialStep;
+window.closeModal = closeModal;
