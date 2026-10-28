@@ -14,7 +14,7 @@ customStyleTag.innerHTML = `
         position: fixed;
         top: 60px; /* Parte subito sotto i pulsanti in alto a destra */
         right: -280px; /* Nascosta fuori dallo schermo */
-        width: 260px;
+        width: 250px;
         height: calc(100vh - 70px); /* Lascia spazio sopra e sotto */
         background: rgba(255, 255, 255, 0.97);
         backdrop-filter: blur(10px);
