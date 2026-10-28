@@ -6,7 +6,7 @@ const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-expanded {
         min-width: 150px !important;
-        max-width: 270px !important;
+        max-width: 150px !important;
         padding: 10px 12px !important;
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(6px);
