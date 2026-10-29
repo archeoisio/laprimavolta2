@@ -1,6 +1,10 @@
 let map; 
 let highlightLayer;
 let selectedLayer = null;
+let allTavoloLayers = [];
+let layer_iconaquartieri_0;
+
+const MIN_ZOOM_VISIBLE = 13; // Livello di zoom minimo per visualizzare quartieri e elementi tematici
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
@@ -48,7 +52,6 @@ customStyleTag.innerHTML = `
     /* Singola colonna verticale (5 elementi fissi) */
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
-    /* Etichetta quartieri originale */
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
 `;
 document.head.appendChild(customStyleTag);
@@ -86,24 +89,53 @@ function resetFeatureStyle(e) {
     }
 }
 
+// Funzione per gestire la visibilità in base al livello di zoom
+function checkZoomVisibility() {
+    if (!map) return;
+    const currentZoom = map.getZoom();
+    
+    if (currentZoom >= MIN_ZOOM_VISIBLE) {
+        if (layer_iconaquartieri_0 && !map.hasLayer(layer_iconaquartieri_0)) {
+            map.addLayer(layer_iconaquartieri_0);
+        }
+        allTavoloLayers.forEach(l => {
+            if (!map.hasLayer(l)) map.addLayer(l);
+        });
+    } else {
+        if (layer_iconaquartieri_0 && map.hasLayer(layer_iconaquartieri_0)) {
+            map.removeLayer(layer_iconaquartieri_0);
+        }
+        allTavoloLayers.forEach(l => {
+            if (map.hasLayer(l)) map.removeLayer(l);
+        });
+        map.closePopup();
+        if (selectedLayer) {
+            resetFeatureStyle({ target: selectedLayer });
+            selectedLayer = null;
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-   map = L.map('map', { 
+    map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 1, 
-        zoomSnap: 0.25,  // Permette di scattare a intervalli di 0.25 (es. 8, 8.25, 8.5, 8.75, 9)
-        zoomDelta: 0.25  // Regola la velocità/ampiezza dello zoom quando usi i pulsanti
+        zoomSnap: 0.25,  // Permette valori decimali intermedi durante lo zoom (es. 8.25, 8.5)
+        zoomDelta: 0.25  
     }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
+    
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+
+    map.on('zoomend', checkZoomVisibility);
 
     function pop_iconaquartieri_0(feature, layer) {
         var nomeQuartiere = feature.properties['nome'] || '';
         if (nomeQuartiere) { layer.bindTooltip(nomeQuartiere, { permanent: true, direction: 'center', className: 'quartiere-label' }); }
     }
     map.createPane('pane_iconaquartieri_0'); map.getPane('pane_iconaquartieri_0').style.zIndex = 400;
-    var layer_iconaquartieri_0 = new L.geoJson(json_iconaquartieri_0, { interactive: true, pane: 'pane_iconaquartieri_0', onEachFeature: pop_iconaquartieri_0, pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, { radius: 0.1, stroke: false, fill: false, opacity: 0 }); } });
-    map.addLayer(layer_iconaquartieri_0);
+    layer_iconaquartieri_0 = new L.geoJson(json_iconaquartieri_0, { interactive: true, pane: 'pane_iconaquartieri_0', onEachFeature: pop_iconaquartieri_0, pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, { radius: 0.1, stroke: false, fill: false, opacity: 0 }); } });
 
     function pop_hospital_1(feature, layer) {
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
@@ -176,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
             }
         });
-        map.addLayer(layerPuntiTavolo);
+        allTavoloLayers.push(layerPuntiTavolo);
     }
 
     const poligoniPerTavolo = {};
@@ -215,10 +247,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 layer.bindPopup(popupContent, { maxHeight: 400 });
             }
         });
-        map.addLayer(layerPoligoniTavolo);
+        allTavoloLayers.push(layerPoligoniTavolo);
     }
 
-    // Deseleziona quando si clicca sulla mappa vuota
+    checkZoomVisibility();
+
     map.on('click', () => {
         if (selectedLayer) {
             resetFeatureStyle({ target: selectedLayer });
@@ -350,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedLayer = targetItem.layer;
                 map.closePopup();
 
-                // Estrazione sicura della coordinata per punti e poligoni
                 let latlng;
                 const geom = targetItem.layer.feature.geometry;
                 if (geom.type === 'Point') {
@@ -361,7 +393,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (latlng) {
+                    // Imposta lo zoom a 18 e sposta la vista verso il basso di 120px 
+                    // per fare in modo che la feature appaia più in alto e non venga coperta dal pannello
                     map.setView(latlng, 18, { animate: false });
+                    map.panBy([0, 120], { animate: false });
+
                     highlightFeature({ target: targetItem.layer });
                     targetItem.layer.openPopup();
                 }
