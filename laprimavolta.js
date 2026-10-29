@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-      bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 const tavolo = e.target.getAttribute('data-tavolo');
@@ -354,13 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (latlng) {
-                    // Transizione fluida identica al codice di riferimento che funzionava
-                    map.flyTo(latlng, 16, {
-                        animate: true,
-                        duration: 1.5,
-                        easeLinearity: 0.15,
-                        noMoveStart: true
-                    });
+                    // Impostazione immediata e istantanea senza transizioni ritardate
+                    map.setView(latlng, 16, { animate: false });
                     
                     highlightFeature({ target: targetItem.layer });
                     targetItem.layer.openPopup();
