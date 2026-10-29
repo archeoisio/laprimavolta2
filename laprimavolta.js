@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (latlng) {
-                    map.setView(latlng, 16, { animate: false });
+                    map.setView(latlng, 20, { animate: false });
                     highlightFeature({ target: targetItem.layer });
                     targetItem.layer.openPopup();
                 }
