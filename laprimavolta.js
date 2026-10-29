@@ -127,9 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function registerItem(feature, layer) {
         const tavolo = feature.properties['Tavolo'] || feature.properties['Tavolo di '] || feature.properties['Tavolo di'] || 'Altro';
         const name = feature.properties['Nome'] || 'Elemento';
-        let latlng = (feature.geometry.type === 'Point') ? [feature.geometry.coordinates[1], feature.geometry.coordinates[0]] : layer.getBounds().getCenter();
         if (!atlasCategories[tavolo]) { atlasCategories[tavolo] = []; }
-        atlasCategories[tavolo].push({ name, latlng, layer });
+        atlasCategories[tavolo].push({ name, layer });
     }
 
     const puntiPerTavolo = {};
@@ -328,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-     bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 const tavolo = e.target.getAttribute('data-tavolo');
@@ -344,21 +343,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedLayer = targetItem.layer;
                 map.closePopup();
 
-                // LETTURA DIRETTA IN TEMPO REALE DAL LAYER ATTIVO
+                // Estrazione sicura e in tempo reale dal GeoJSON originale o dal layer
                 let latlng;
-                if (typeof targetItem.layer.getLatLng === 'function') {
-                    latlng = targetItem.layer.getLatLng(); // Per i punti
-                } else if (typeof targetItem.layer.getBounds === 'function') {
-                    latlng = targetItem.layer.getBounds().getCenter(); // Per i poligoni
+                const geom = targetItem.layer.feature.geometry;
+                if (geom.type === 'Point') {
+                    latlng = [geom.coordinates[1], geom.coordinates[0]];
+                } else {
+                    latlng = targetItem.layer.getBounds().getCenter();
                 }
 
                 if (latlng) {
+                    map.invalidateSize(); // Forza il ricalcolo dei pixel della mappa
                     map.setView(latlng, 16);
                     highlightFeature({ target: targetItem.layer });
                     targetItem.layer.openPopup();
                 }
             };
         });
+
         bottomPanel.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
             radio.onchange = (e) => {
                 if (e.target.value === 'osm') { map.addLayer(layer_OpenStreetMap_4); map.removeLayer(layer_GoogleSatellite_3); } 
