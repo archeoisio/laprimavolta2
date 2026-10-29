@@ -10,11 +10,11 @@ const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
-    /* Pannello di Controllo - Desktop (Allineato a sinistra, allargato per ospitare 4 colonne) */
+    /* Pannello di Controllo - Desktop (Allineato a sinistra, allargato per 4 colonne) */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed; bottom: 0; left: 10px; transform: none;
-            width: auto; max-width: 1150px; max-height: 330px;
+            width: auto; max-width: 1200px; max-height: 330px;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
             z-index: 2000; padding: 10px 14px; box-sizing: border-box; text-align: left;
@@ -22,9 +22,14 @@ customStyleTag.innerHTML = `
             border-top-left-radius: 14px; border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
         }
-        /* Layout a 3 sezioni principali, con la colonna di destra dimensionata per mostrare 4 colonne di elementi */
+        /* Layout a 3 sezioni: Base map (120px) | Tematiche (160px) | Elenco elementi */
         .panel-three-columns { display: grid; grid-template-columns: 120px 160px 1fr; gap: 12px; flex-grow: 1; overflow: hidden; }
-        .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 135px; flex-shrink: 0; }
+        
+        /* Griglia interna della colonna di destra che scorre orizzontalmente mostrando le colonne multiple */
+        .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
+        
+        /* Larghezza fissa per ciascuna delle colonne verticali degli elementi per garantire le 4 colonne visibili */
+        .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 180px; width: 180px; flex-shrink: 0; }
         
         /* Pannello Dettaglio Feature - Desktop (Laterale) */
         #feature-detail-panel {
@@ -51,6 +56,7 @@ customStyleTag.innerHTML = `
             border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
         }
         .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
+        .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
         .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
 
         /* Pannello Dettaglio Feature - Mobile (Più stretto, corto e con bordo nero marcato) */
@@ -89,9 +95,6 @@ customStyleTag.innerHTML = `
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
-    
-    /* Contenitore con scorrimento orizzontale per le colonne verticali */
-    .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
     
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
 
@@ -424,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div></div>`;
 
-        // COLONNA 3: ELENCO PROPOSTE (4 colonne di elementi affiancati)
+        // COLONNA 3: ELENCO PROPOSTE (griglia a colonne multiple)
         html += `<div class="col-right">`;
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
