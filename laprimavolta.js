@@ -9,6 +9,7 @@ const MIN_ZOOM_VISIBLE = 13; // Livello di zoom minimo per visualizzare quartier
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
+    
     #custom-bottom-panel {
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
         width: 98%; max-width: 1000px; max-height: 310px;
@@ -53,6 +54,74 @@ customStyleTag.innerHTML = `
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
+
+    /* Pannello Dettaglio Feature (Responsive Desktop/Mobile) */
+    #feature-detail-panel {
+        position: fixed;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        z-index: 2100;
+        padding: 12px 16px;
+        box-sizing: border-box;
+        font-family: sans-serif;
+        font-size: 13px;
+        color: #333;
+        display: none;
+        flex-direction: column;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    /* Desktop: Pannello laterale destro */
+    @media (min-width: 768px) {
+        #feature-detail-panel {
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            max-height: calc(100vh - 100px);
+            border-radius: 12px;
+            overflow-y: auto;
+        }
+    }
+
+    /* Mobile: Sovrapposto sopra il Centro di Controllo in basso */
+    @media (max-width: 767px) {
+        #feature-detail-panel {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 98%;
+            max-width: 1000px;
+            max-height: 310px;
+            border-top-left-radius: 14px;
+            border-top-right-radius: 14px;
+            overflow-y: auto;
+        }
+    }
+
+    .feature-detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e1e1e1;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+    }
+
+    .close-feature-btn {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
 `;
 document.head.appendChild(customStyleTag);
 
@@ -89,7 +158,6 @@ function resetFeatureStyle(e) {
     }
 }
 
-// Funzione per gestire la visibilità in base al livello di zoom
 function checkZoomVisibility() {
     if (!map) return;
     const currentZoom = map.getZoom();
@@ -121,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 1, 
-        zoomSnap: 0.25,  // Permette valori decimali intermedi durante lo zoom (es. 8.25, 8.5)
+        zoomSnap: 0.25, 
         zoomDelta: 0.25  
     }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
     
@@ -258,11 +326,25 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedLayer = null;
         }
         map.closePopup();
+        const detailPanel = document.getElementById('feature-detail-panel');
+        if (detailPanel) detailPanel.style.display = 'none';
     });
 
     const bottomPanel = document.createElement('div');
     bottomPanel.id = 'custom-bottom-panel';
     document.body.appendChild(bottomPanel);
+
+    const featureDetailPanel = document.createElement('div');
+    featureDetailPanel.id = 'feature-detail-panel';
+    document.body.appendChild(featureDetailPanel);
+
+    window.closeFeaturePanel = function() {
+        featureDetailPanel.style.display = 'none';
+        if (selectedLayer) {
+            resetFeatureStyle({ target: selectedLayer });
+            selectedLayer = null;
+        }
+    };
 
     window.renderPanelContent = function() {
         const isOpen = bottomPanel.classList.contains('open');
@@ -393,13 +475,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (latlng) {
-                    // Imposta lo zoom a 18 e sposta la vista verso il basso di 120px 
-                    // per fare in modo che la feature appaia più in alto e non venga coperta dal pannello
                     map.setView(latlng, 17.5, { animate: false });
                     map.panBy([0, 120], { animate: false });
 
                     highlightFeature({ target: targetItem.layer });
-                    targetItem.layer.openPopup();
+
+                    const props = targetItem.layer.feature.properties;
+                    let detailHtml = `
+                        <div class="feature-detail-header">
+                            <b style="font-size:14px; color:#2c3e50;">📋 Dettaglio Elemento</b>
+                            <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
+                            <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
+                            <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
+                            <div><b>Stato:</b> ${props['Stato'] || 'N/D'}</div>
+                            <div><b>Tavolo:</b> ${props['Tavolo'] || tavolo}</div>
+                        </div>
+                    `;
+                    featureDetailPanel.innerHTML = detailHtml;
+                    featureDetailPanel.style.display = 'flex';
                 }
             };
         });
