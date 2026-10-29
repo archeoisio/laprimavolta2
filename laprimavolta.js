@@ -10,11 +10,11 @@ const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
-    /* Pannello di Controllo - Desktop (Allineato a sinistra con margine) */
+    /* Pannello di Controllo - Desktop (Allineato a sinistra, allargato per ospitare 4 colonne) */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed; bottom: 0; left: 10px; transform: none;
-            width: auto; max-width: 900px; max-height: 330px;
+            width: auto; max-width: 1150px; max-height: 330px;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
             z-index: 2000; padding: 10px 14px; box-sizing: border-box; text-align: left;
@@ -22,8 +22,9 @@ customStyleTag.innerHTML = `
             border-top-left-radius: 14px; border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
         }
+        /* Layout a 3 sezioni principali, con la colonna di destra dimensionata per mostrare 4 colonne di elementi */
         .panel-three-columns { display: grid; grid-template-columns: 120px 160px 1fr; gap: 12px; flex-grow: 1; overflow: hidden; }
-        .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 130px; flex-shrink: 0; }
+        .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 135px; flex-shrink: 0; }
         
         /* Pannello Dettaglio Feature - Desktop (Laterale) */
         #feature-detail-panel {
@@ -52,7 +53,7 @@ customStyleTag.innerHTML = `
         .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
         .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
 
-        /* Pannello Dettaglio Feature - Mobile (Leggermente più stretto, corto e con bordo nero marcato) */
+        /* Pannello Dettaglio Feature - Mobile (Più stretto, corto e con bordo nero marcato) */
         #feature-detail-panel {
             position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 900px; max-height: 250px;
@@ -61,7 +62,7 @@ customStyleTag.innerHTML = `
             padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
             font-size: 12px; color: #333; display: none; flex-direction: column;
             border-radius: 12px;
-            border: 2px solid #000; /* Bordo nero più spesso e distinto */
+            border: 2px solid #000;
         }
     }
 
@@ -179,6 +180,51 @@ function checkZoomVisibility() {
     }
 }
 
+// Funzione centralizzata per mostrare i dettagli della feature nel pannello dedicato
+function showFeatureDetails(layer, tavoloName) {
+    if (selectedLayer && selectedLayer !== layer) {
+        resetFeatureStyle({ target: selectedLayer });
+    }
+    selectedLayer = layer;
+    map.closePopup();
+
+    let latlng;
+    const geom = layer.feature.geometry;
+    if (geom.type === 'Point') {
+        latlng = [geom.coordinates[1], geom.coordinates[0]];
+    } else {
+        const c = layer.getBounds().getCenter();
+        latlng = [c.lat, c.lng];
+    }
+
+    if (latlng) {
+        map.setView(latlng, 17.5, { animate: false });
+        map.panBy([0, 120], { animate: false });
+
+        highlightFeature({ target: layer });
+
+        const props = layer.feature.properties;
+        const detailPanel = document.getElementById('feature-detail-panel');
+        if (detailPanel) {
+            let detailHtml = `
+                <div class="feature-detail-header">
+                    <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
+                    <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
+                    <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
+                    <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
+                    <div><b>Stato:</b> ${props['Stato'] || 'N/D'}</div>
+                    <div><b>Tavolo:</b> ${props['Tavolo'] || tavoloName}</div>
+                </div>
+            `;
+            detailPanel.innerHTML = detailHtml;
+            detailPanel.style.display = 'flex';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
         zoomControl: false, 
@@ -255,11 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 
                     mouseover: highlightFeature,
                     click: function(e) {
-                        if (selectedLayer && selectedLayer !== layer) {
-                            resetFeatureStyle({ target: selectedLayer });
-                        }
-                        selectedLayer = layer;
-                        highlightFeature(e);
+                        L.DomEvent.stopPropagation(e);
+                        showFeatureDetails(layer, tavolo);
                     }
                 });
             },
@@ -293,11 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 
                     mouseover: highlightFeature,
                     click: function(e) {
-                        if (selectedLayer && selectedLayer !== layer) {
-                            resetFeatureStyle({ target: selectedLayer });
-                        }
-                        selectedLayer = layer;
-                        highlightFeature(e);
+                        L.DomEvent.stopPropagation(e);
+                        showFeatureDetails(layer, tavolo);
                     }
                 });
             }
@@ -384,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div></div>`;
 
-        // COLONNA 3: ELENCO PROPOSTE (5 ELEMENTI FISSI PER COLONNA)
+        // COLONNA 3: ELENCO PROPOSTE (4 colonne di elementi affiancati)
         html += `<div class="col-right">`;
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
@@ -444,46 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetItem = atlasCategories[tavolo][idx];
                 
                 if (!targetItem || !targetItem.layer) return;
-
-                if (selectedLayer && selectedLayer !== targetItem.layer) {
-                    resetFeatureStyle({ target: selectedLayer });
-                }
-                
-                selectedLayer = targetItem.layer;
-                map.closePopup();
-
-                let latlng;
-                const geom = targetItem.layer.feature.geometry;
-                if (geom.type === 'Point') {
-                    latlng = [geom.coordinates[1], geom.coordinates[0]];
-                } else {
-                    const c = targetItem.layer.getBounds().getCenter();
-                    latlng = [c.lat, c.lng];
-                }
-
-                if (latlng) {
-                    map.setView(latlng, 17.5, { animate: false });
-                    map.panBy([0, 120], { animate: false });
-
-                    highlightFeature({ target: targetItem.layer });
-
-                    const props = targetItem.layer.feature.properties;
-                    let detailHtml = `
-                        <div class="feature-detail-header">
-                            <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
-                            <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
-                            <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
-                            <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
-                            <div><b>Stato:</b> ${props['Stato'] || 'N/D'}</div>
-                            <div><b>Tavolo:</b> ${props['Tavolo'] || tavolo}</div>
-                        </div>
-                    `;
-                    featureDetailPanel.innerHTML = detailHtml;
-                    featureDetailPanel.style.display = 'flex';
-                }
+                showFeatureDetails(targetItem.layer, tavolo);
             };
         });
 
