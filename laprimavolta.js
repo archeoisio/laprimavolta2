@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+      bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 const tavolo = e.target.getAttribute('data-tavolo');
@@ -343,18 +343,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedLayer = targetItem.layer;
                 map.closePopup();
 
-                // Estrazione sicura e in tempo reale dal GeoJSON originale o dal layer
+                // Estrazione sicura della coordinata per punti e poligoni
                 let latlng;
                 const geom = targetItem.layer.feature.geometry;
                 if (geom.type === 'Point') {
                     latlng = [geom.coordinates[1], geom.coordinates[0]];
                 } else {
-                    latlng = targetItem.layer.getBounds().getCenter();
+                    const c = targetItem.layer.getBounds().getCenter();
+                    latlng = [c.lat, c.lng];
                 }
 
                 if (latlng) {
-                    map.invalidateSize(); // Forza il ricalcolo dei pixel della mappa
-                    map.setView(latlng, 16);
+                    // Transizione fluida identica al codice di riferimento che funzionava
+                    map.flyTo(latlng, 16, {
+                        animate: true,
+                        duration: 1.5,
+                        easeLinearity: 0.15,
+                        noMoveStart: true
+                    });
+                    
                     highlightFeature({ target: targetItem.layer });
                     targetItem.layer.openPopup();
                 }
