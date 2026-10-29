@@ -10,25 +10,67 @@ const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
-    #custom-bottom-panel {
-        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-        width: 98%; max-width: 1000px; max-height: 310px;
-        background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
-        box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
-        z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
-        font-family: sans-serif; font-size: 12px; color: #333;
-        border-top-left-radius: 14px; border-top-right-radius: 14px;
-        border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
+    /* Pannello di Controllo - Desktop (Allineato a sinistra con margine) */
+    @media (min-width: 768px) {
+        #custom-bottom-panel {
+            position: fixed; bottom: 0; left: 10px; transform: none;
+            width: auto; max-width: 900px; max-height: 330px;
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
+            z-index: 2000; padding: 10px 14px; box-sizing: border-box; text-align: left;
+            font-family: sans-serif; font-size: 13px; color: #333;
+            border-top-left-radius: 14px; border-top-right-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
+        }
+        .panel-three-columns { display: grid; grid-template-columns: 120px 160px 1fr; gap: 12px; flex-grow: 1; overflow: hidden; }
+        .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 130px; flex-shrink: 0; }
+        
+        /* Pannello Dettaglio Feature - Desktop (Laterale) */
+        #feature-detail-panel {
+            position: fixed; top: 20px; right: 20px; width: 350px;
+            max-height: calc(100vh - 100px); border-radius: 12px; overflow-y: auto;
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3); z-index: 2100;
+            padding: 12px 16px; box-sizing: border-box; font-family: sans-serif;
+            font-size: 13px; color: #333; display: none; flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
     }
+
+    /* Pannello di Controllo - Mobile */
+    @media (max-width: 767px) {
+        #custom-bottom-panel {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 98%; max-width: 1000px; max-height: 310px;
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
+            z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
+            font-family: sans-serif; font-size: 12px; color: #333;
+            border-top-left-radius: 14px; border-top-right-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
+        }
+        .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
+        .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
+
+        /* Pannello Dettaglio Feature - Mobile (Leggermente più stretto, corto e con bordo nero marcato) */
+        #feature-detail-panel {
+            position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 900px; max-height: 250px;
+            background: rgba(255, 255, 255, 0.99); backdrop-filter: blur(10px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.4); z-index: 2100;
+            padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
+            font-size: 12px; color: #333; display: none; flex-direction: column;
+            border-radius: 12px;
+            border: 2px solid #000; /* Bordo nero più spesso e distinto */
+        }
+    }
+
     #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
     #custom-bottom-panel:not(.open) { max-height: 44px !important; }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
-    /* Layout Principale a 3 Colonne */
-    .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
-    
     /* Colonna 1: Sinistra (Mappa Base fissa + Altro scrollabile) */
     .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
     .col-left .base-map-vertical { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
@@ -50,54 +92,7 @@ customStyleTag.innerHTML = `
     /* Contenitore con scorrimento orizzontale per le colonne verticali */
     .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
     
-    /* Singola colonna verticale (5 elementi fissi) */
-    .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
-    
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
-
-    /* Pannello Dettaglio Feature (Responsive Desktop/Mobile) */
-    #feature-detail-panel {
-        position: fixed;
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 5px 25px rgba(0,0,0,0.3);
-        z-index: 2100;
-        padding: 12px 16px;
-        box-sizing: border-box;
-        font-family: sans-serif;
-        font-size: 13px;
-        color: #333;
-        display: none;
-        flex-direction: column;
-        border: 1px solid rgba(0,0,0,0.1);
-    }
-
-    /* Desktop: Pannello laterale destro */
-    @media (min-width: 768px) {
-        #feature-detail-panel {
-            top: 20px;
-            right: 20px;
-            width: 350px;
-            max-height: calc(100vh - 100px);
-            border-radius: 12px;
-            overflow-y: auto;
-        }
-    }
-
-    /* Mobile: Sovrapposto sopra il Centro di Controllo in basso */
-    @media (max-width: 767px) {
-        #feature-detail-panel {
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 98%;
-            max-width: 1000px;
-            max-height: 310px;
-            border-top-left-radius: 14px;
-            border-top-right-radius: 14px;
-            overflow-y: auto;
-        }
-    }
 
     .feature-detail-header {
         display: flex;
@@ -256,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     mouseout: function(e) { 
                         if (selectedLayer !== layer) {
                             resetFeatureStyle(e); 
-                            layer.closePopup(); 
                         }
                     }, 
                     mouseover: highlightFeature,
@@ -266,11 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         selectedLayer = layer;
                         highlightFeature(e);
-                        layer.openPopup();
                     }
                 });
-                var popupContent = '<table><tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Stato</th><td>' + (feature.properties['Stato'] !== null ? autolinker.link(String(feature.properties['Stato']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Tavolo</th><td>' + (feature.properties['Tavolo'] !== null ? autolinker.link(String(feature.properties['Tavolo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-                layer.bindPopup(popupContent, { maxHeight: 400 });
             },
             pointToLayer: function (feature, latlng) { 
                 return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
@@ -298,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     mouseout: function(e) { 
                         if (selectedLayer !== layer) {
                             resetFeatureStyle(e); 
-                            layer.closePopup(); 
                         }
                     }, 
                     mouseover: highlightFeature,
@@ -308,11 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         selectedLayer = layer;
                         highlightFeature(e);
-                        layer.openPopup();
                     }
                 });
-                var popupContent = '<table><tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-                layer.bindPopup(popupContent, { maxHeight: 400 });
             }
         });
         allTavoloLayers.push(layerPoligoniTavolo);
@@ -483,10 +470,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const props = targetItem.layer.feature.properties;
                     let detailHtml = `
                         <div class="feature-detail-header">
-                            <b style="font-size:14px; color:#2c3e50;">📋 Dettaglio Elemento</b>
+                            <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
                             <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
                             <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
                             <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
                             <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
