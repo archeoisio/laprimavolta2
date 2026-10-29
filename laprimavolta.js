@@ -343,26 +343,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 selectedLayer = targetItem.layer;
                 map.closePopup();
-                
-                // Estrazione unificata e sicura delle coordinate per punti e poligoni
+
+                // LETTURA DIRETTA IN TEMPO REALE DAL LAYER ATTIVO
                 let latlng;
-                const geom = targetItem.layer.feature.geometry;
-                
-                if (geom.type === 'Point') {
-                    latlng = [geom.coordinates[1], geom.coordinates[0]];
-                } else {
-                    const bounds = targetItem.layer.getBounds();
-                    latlng = bounds.getCenter();
+                if (typeof targetItem.layer.getLatLng === 'function') {
+                    latlng = targetItem.layer.getLatLng(); // Per i punti
+                } else if (typeof targetItem.layer.getBounds === 'function') {
+                    latlng = targetItem.layer.getBounds().getCenter(); // Per i poligoni
                 }
-                
-                // Centratura istantanea
-                map.setView(latlng, 16);
-                
-                highlightFeature({ target: targetItem.layer });
-                targetItem.layer.openPopup();
+
+                if (latlng) {
+                    map.setView(latlng, 16);
+                    highlightFeature({ target: targetItem.layer });
+                    targetItem.layer.openPopup();
+                }
             };
         });
-
         bottomPanel.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
             radio.onchange = (e) => {
                 if (e.target.value === 'osm') { map.addLayer(layer_OpenStreetMap_4); map.removeLayer(layer_GoogleSatellite_3); } 
