@@ -3,6 +3,7 @@ let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
 let layer_iconaquartieri_0;
+let currentActiveTab = null; // Memorizza l'ultima scheda tematica selezionata
 
 const MIN_ZOOM_VISIBLE = 13; // Livello di zoom minimo per visualizzare quartieri e elementi tematici
 
@@ -28,26 +29,26 @@ customStyleTag.innerHTML = `
             transform: none;
         }
         
-        /* Pannello Dettaglio Feature - Desktop (Subito a destra del Centro di Controllo) */
+        /* Pannello Dettaglio Feature - Desktop (Stessa altezza, posizionato a destra del Centro di Controllo) */
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
             max-height: 310px; border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
-            padding: 12px 16px; box-sizing: border-box; font-family: sans-serif;
+            padding: 8px 12px; box-sizing: border-box; font-family: sans-serif;
             font-size: 13px; color: #333; display: none; flex-direction: column;
             border: 1px solid rgba(0,0,0,0.1);
         }
     }
 
-    /* Pannello Dettaglio Feature - Mobile (Meno largo, corto e con bordo nero marcato) */
+    /* Pannello Dettaglio Feature - Mobile */
     @media (max-width: 767px) {
         #feature-detail-panel {
             position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 900px; max-height: 250px;
             background: rgba(255, 255, 255, 0.99); backdrop-filter: blur(10px);
             box-shadow: 0 5px 25px rgba(0,0,0,0.4); z-index: 2100;
-            padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
+            padding: 8px 10px; box-sizing: border-box; font-family: sans-serif;
             font-size: 12px; color: #333; display: none; flex-direction: column;
             border-radius: 12px;
             border: 2px solid #000;
@@ -62,8 +63,8 @@ customStyleTag.innerHTML = `
     #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
     #custom-bottom-panel:not(.open) { max-height: 44px !important; }
     
-    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
-    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; height: 34px; box-sizing: border-box; }
+    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; height: auto; }
 
     /* Layout Principale a 3 Colonne */
     .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
@@ -99,8 +100,10 @@ customStyleTag.innerHTML = `
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #e1e1e1;
-        padding-bottom: 6px;
-        margin-bottom: 8px;
+        padding-bottom: 4px;
+        margin-bottom: 6px;
+        height: 34px;
+        box-sizing: border-box;
     }
 
     .close-feature-btn {
@@ -108,14 +111,14 @@ customStyleTag.innerHTML = `
         color: white;
         border: none;
         border-radius: 50%;
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         font-weight: bold;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;
+        font-size: 11px;
     }
 `;
 document.head.appendChild(customStyleTag);
@@ -400,22 +403,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="sub-section-title">Tematiche</div>
                 <div class="sidebar-tabs-vertical">
         `;
-        let firstTab = true;
-        for (const tavolo of Object.keys(atlasCategories)) {
+
+        const tavoloKeys = Object.keys(atlasCategories);
+        if (!currentActiveTab || !atlasCategories[currentActiveTab]) {
+            currentActiveTab = tavoloKeys[0];
+        }
+
+        tavoloKeys.forEach(tavolo => {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
-            const activeStyle = firstTab ? `background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : '';
-            html += `<button class="sidebar-tab-btn ${firstTab ? 'active' : ''}" data-tab="tab-${cleanKey}" data-color="${catColor}" style="${activeStyle}">${tavolo.toUpperCase()}</button>`;
-            firstTab = false;
-        }
+            const isActive = (tavolo === currentActiveTab);
+            const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : '';
+            
+            html += `<button class="sidebar-tab-btn ${isActive ? 'active' : ''}" data-tab="tab-${cleanKey}" data-tavolo-name="${tavolo}" data-color="${catColor}" style="${activeStyle}">${tavolo.toUpperCase()}</button>`;
+        });
         html += `</div></div>`;
 
         // COLONNA 3: ELENCO PROPOSTE (5 ELEMENTI FISSI PER COLONNA)
         html += `<div class="col-right">`;
-        firstTab = true;
-        for (const [tavolo, items] of Object.entries(atlasCategories)) {
+        tavoloKeys.forEach(tavolo => {
             const cleanKey = tavolo.replace(/\s+/g, '');
-            const catColor = getTavoloColor(tavolo);
+            const items = atlasCategories[tavolo];
+            const isActive = (tavolo === currentActiveTab);
             
             const itemsPerColumn = 5;
             const columns = [];
@@ -424,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             html += `
-                <div id="tab-${cleanKey}" class="sidebar-tab-content ${firstTab ? 'active' : ''}">
+                <div id="tab-${cleanKey}" class="sidebar-tab-content ${isActive ? 'active' : ''}">
                     <div class="cluster-counter-fixed">Elementi mappati: <b>${items.length}</b></div>
                     <div class="panel-scrollable-grid">
             `;
@@ -444,8 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             html += `</div></div>`;
-            firstTab = false;
-        }
+        });
         html += `</div></div>`; bottomPanel.innerHTML = html;
 
         const tabBtns = bottomPanel.querySelectorAll('.sidebar-tab-btn');
@@ -455,6 +463,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 tabBtns.forEach(b => { b.classList.remove('active'); b.style.background = '#f1f2f6'; b.style.color = '#57606f'; b.style.borderColor = '#dcdde1'; });
                 tabContents.forEach(c => c.classList.remove('active'));
                 btn.classList.add('active');
+                
+                currentActiveTab = btn.getAttribute('data-tavolo-name');
+
                 const catColor = btn.getAttribute('data-color');
                 const textColor = ['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white';
                 btn.style.background = catColor; btn.style.color = textColor; btn.style.borderColor = catColor;
