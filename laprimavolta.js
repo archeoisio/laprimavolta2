@@ -48,18 +48,39 @@ customStyleTag.innerHTML = `
     /* Singola colonna verticale (5 elementi fissi) */
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
-    .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
+    /* Etichette quartieri con dimensione base compatta */
+    .quartiere-label { 
+        background: rgba(255, 255, 255, 0.9); 
+        border: 1px solid #000; 
+        padding: 1px 4px; 
+        border-radius: 4px; 
+        font-weight: bold; 
+        font-size: 10px; 
+        color: #000; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+        white-space: nowrap; 
+        transition: font-size 0.15s ease;
+    }
 
-    /* Stili e ridimensionamento dinamico dei popup in base allo zoom */
+    /* Popup compatti di base e pronti alla scala */
     .leaflet-popup-content-wrapper {
-        transition: transform 0.2s ease-in-out;
-        font-size: 11px;
-        padding: 2px;
+        font-size: 10px;
+        padding: 0px;
+        border-radius: 6px;
+        box-shadow: 0 3px 14px rgba(0,0,0,0.2);
         transform-origin: bottom center;
+        transition: transform 0.15s ease-out;
     }
     .leaflet-popup-content {
-        margin: 8px 10px;
-        line-height: 1.4;
+        margin: 5px 8px;
+        line-height: 1.2;
+    }
+    .leaflet-popup-content table {
+        font-size: 10px;
+        width: 100%;
+    }
+    .leaflet-popup-content th, .leaflet-popup-content td {
+        padding: 1px 3px;
     }
 `;
 document.head.appendChild(customStyleTag);
@@ -97,21 +118,26 @@ function resetFeatureStyle(e) {
     }
 }
 
-// Funzione di supporto per applicare la scala al popup attivo in base allo zoom
-function updatePopupScale(currentZoom) {
+// Funzione unificata per ridimensionare popup ed etichette quartieri in base allo zoom
+function updateMapElementsScale(currentZoom) {
+    const baseZoom = 16;
+    // Calcoliamo un fattore di scala controllato (es. da 0.6 a 1.2 massimo)
+    const scale = Math.max(0.6, Math.min(1.2, 1 + (currentZoom - baseZoom) * 0.06));
+
+    // 1. Aggiorna la scala del popup attivo se presente
     const popup = map ? map._popup : null;
     if (popup && popup.getElement()) {
         const contentWrapper = popup.getElement().querySelector('.leaflet-popup-content-wrapper');
         if (contentWrapper) {
-            let scale = 1;
-            if (currentZoom < 16) {
-                scale = Math.max(0.7, 1 - (16 - currentZoom) * 0.05);
-            } else if (currentZoom > 16) {
-                scale = Math.min(1.2, 1 + (currentZoom - 16) * 0.03);
-            }
             contentWrapper.style.transform = `scale(${scale})`;
         }
     }
+
+    // 2. Aggiorna la dimensione del testo delle etichette dei quartieri
+    const baseFontSize = 10; // px di partenza
+    document.querySelectorAll('.quartiere-label').forEach(label => {
+        label.style.fontSize = `${Math.max(7, Math.min(14, baseFontSize * scale))}px`;
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -119,14 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
-    // Gestione dinamica della scala del popup durante lo zoom
+    // Gestione dinamica coordinata a ogni zoom o apertura popup
     map.on('zoomend', () => {
-        updatePopupScale(map.getZoom());
+        updateMapElementsScale(map.getZoom());
     });
 
-    // Aggiorna la scala anche appena si apre un popup
     map.on('popupopen', () => {
-        updatePopupScale(map.getZoom());
+        updateMapElementsScale(map.getZoom());
     });
 
     function pop_iconaquartieri_0(feature, layer) {
