@@ -10,26 +10,23 @@ const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
-    /* Pannello di Controllo - Desktop (Allineato a sinistra, allargato per 4 colonne) */
+    #custom-bottom-panel {
+        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+        width: 98%; max-width: 1000px; max-height: 310px;
+        background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+        box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
+        z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
+        font-family: sans-serif; font-size: 12px; color: #333;
+        border-top-left-radius: 14px; border-top-right-radius: 14px;
+        border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
+    }
+
+    /* Allineamento a sinistra del Centro di Controllo su Desktop */
     @media (min-width: 768px) {
         #custom-bottom-panel {
-            position: fixed; bottom: 0; left: 10px; transform: none;
-            width: auto; max-width: 1200px; max-height: 330px;
-            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
-            z-index: 2000; padding: 10px 14px; box-sizing: border-box; text-align: left;
-            font-family: sans-serif; font-size: 13px; color: #333;
-            border-top-left-radius: 14px; border-top-right-radius: 14px;
-            border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
+            left: 10px;
+            transform: none;
         }
-        /* Layout a 3 sezioni: Base map (120px) | Tematiche (160px) | Elenco elementi */
-        .panel-three-columns { display: grid; grid-template-columns: 120px 160px 1fr; gap: 12px; flex-grow: 1; overflow: hidden; }
-        
-        /* Griglia interna della colonna di destra che scorre orizzontalmente mostrando le colonne multiple */
-        .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
-        
-        /* Larghezza fissa per ciascuna delle colonne verticali degli elementi per garantire le 4 colonne visibili */
-        .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 180px; width: 180px; flex-shrink: 0; }
         
         /* Pannello Dettaglio Feature - Desktop (Laterale) */
         #feature-detail-panel {
@@ -43,23 +40,8 @@ customStyleTag.innerHTML = `
         }
     }
 
-    /* Pannello di Controllo - Mobile */
+    /* Pannello Dettaglio Feature - Mobile (Meno largo, corto e con bordo nero marcato) */
     @media (max-width: 767px) {
-        #custom-bottom-panel {
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 98%; max-width: 1000px; max-height: 310px;
-            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
-            z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
-            font-family: sans-serif; font-size: 12px; color: #333;
-            border-top-left-radius: 14px; border-top-right-radius: 14px;
-            border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
-        }
-        .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
-        .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
-        .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
-
-        /* Pannello Dettaglio Feature - Mobile (Più stretto, corto e con bordo nero marcato) */
         #feature-detail-panel {
             position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 900px; max-height: 250px;
@@ -78,6 +60,9 @@ customStyleTag.innerHTML = `
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
+    /* Layout Principale a 3 Colonne */
+    .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
+    
     /* Colonna 1: Sinistra (Mappa Base fissa + Altro scrollabile) */
     .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
     .col-left .base-map-vertical { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
@@ -95,6 +80,12 @@ customStyleTag.innerHTML = `
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
+    
+    /* Contenitore con scorrimento orizzontale per le colonne verticali */
+    .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
+    
+    /* Singola colonna verticale (5 elementi fissi) */
+    .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
 
@@ -157,6 +148,7 @@ function resetFeatureStyle(e) {
     }
 }
 
+// Funzione per gestire la visibilità in base al livello di zoom
 function checkZoomVisibility() {
     if (!map) return;
     const currentZoom = map.getZoom();
@@ -183,48 +175,34 @@ function checkZoomVisibility() {
     }
 }
 
-// Funzione centralizzata per mostrare i dettagli della feature nel pannello dedicato
-function showFeatureDetails(layer, tavoloName) {
+// Funzione per mostrare i dettagli al click diretto sulla mappa (SENZA spostare la mappa)
+function showFeatureDetailsOnly(layer, tavoloName) {
     if (selectedLayer && selectedLayer !== layer) {
         resetFeatureStyle({ target: selectedLayer });
     }
     selectedLayer = layer;
     map.closePopup();
 
-    let latlng;
-    const geom = layer.feature.geometry;
-    if (geom.type === 'Point') {
-        latlng = [geom.coordinates[1], geom.coordinates[0]];
-    } else {
-        const c = layer.getBounds().getCenter();
-        latlng = [c.lat, c.lng];
-    }
+    highlightFeature({ target: layer });
 
-    if (latlng) {
-        map.setView(latlng, 17.5, { animate: false });
-        map.panBy([0, 120], { animate: false });
-
-        highlightFeature({ target: layer });
-
-        const props = layer.feature.properties;
-        const detailPanel = document.getElementById('feature-detail-panel');
-        if (detailPanel) {
-            let detailHtml = `
-                <div class="feature-detail-header">
-                    <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
-                    <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
-                    <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
-                    <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
-                    <div><b>Stato:</b> ${props['Stato'] || 'N/D'}</div>
-                    <div><b>Tavolo:</b> ${props['Tavolo'] || tavoloName}</div>
-                </div>
-            `;
-            detailPanel.innerHTML = detailHtml;
-            detailPanel.style.display = 'flex';
-        }
+    const props = layer.feature.properties;
+    const detailPanel = document.getElementById('feature-detail-panel');
+    if (detailPanel) {
+        let detailHtml = `
+            <div class="feature-detail-header">
+                <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
+                <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
+                <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
+                <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
+                <div><b>Stato:</b> ${props['Stato'] || 'N/D'}</div>
+                <div><b>Tavolo:</b> ${props['Tavolo'] || tavoloName}</div>
+            </div>
+        `;
+        detailPanel.innerHTML = detailHtml;
+        detailPanel.style.display = 'flex';
     }
 }
 
@@ -233,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 1, 
-        zoomSnap: 0.25, 
+        zoomSnap: 0.25,  // Permette valori decimali intermedi durante lo zoom (es. 8.25, 8.5)
         zoomDelta: 0.25  
     }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
     
@@ -305,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mouseover: highlightFeature,
                     click: function(e) {
                         L.DomEvent.stopPropagation(e);
-                        showFeatureDetails(layer, tavolo);
+                        showFeatureDetailsOnly(layer, tavolo);
                     }
                 });
             },
@@ -340,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mouseover: highlightFeature,
                     click: function(e) {
                         L.DomEvent.stopPropagation(e);
-                        showFeatureDetails(layer, tavolo);
+                        showFeatureDetailsOnly(layer, tavolo);
                     }
                 });
             }
@@ -427,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += `</div></div>`;
 
-        // COLONNA 3: ELENCO PROPOSTE (griglia a colonne multiple)
+        // COLONNA 3: ELENCO PROPOSTE (5 ELEMENTI FISSI PER COLONNA)
         html += `<div class="col-right">`;
         firstTab = true;
         for (const [tavolo, items] of Object.entries(atlasCategories)) {
@@ -479,6 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
+        // Pulsante lente di ingrandimento: apre il pannello E SPOSTA/ZOOMA LA MAPPA
         bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
@@ -487,7 +466,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetItem = atlasCategories[tavolo][idx];
                 
                 if (!targetItem || !targetItem.layer) return;
-                showFeatureDetails(targetItem.layer, tavolo);
+
+                if (selectedLayer && selectedLayer !== targetItem.layer) {
+                    resetFeatureStyle({ target: selectedLayer });
+                }
+                selectedLayer = targetItem.layer;
+                map.closePopup();
+
+                let latlng;
+                const geom = targetItem.layer.feature.geometry;
+                if (geom.type === 'Point') {
+                    latlng = [geom.coordinates[1], geom.coordinates[0]];
+                } else {
+                    const c = targetItem.layer.getBounds().getCenter();
+                    latlng = [c.lat, c.lng];
+                }
+
+                if (latlng) {
+                    map.setView(latlng, 17.5, { animate: false });
+                    map.panBy([0, 120], { animate: false });
+
+                    highlightFeature({ target: targetItem.layer });
+
+                    const props = targetItem.layer.feature.properties;
+                    const detailPanel = document.getElementById('feature-detail-panel');
+                    if (detailPanel) {
+                        let detailHtml = `
+                            <div class="feature-detail-header">
+                                <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
+                                <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
+                                <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
+                                <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
+                                <div><b>Stato:</b> ${props['Stato'] || 'N/D'}</div>
+                                <div><b>Tavolo:</b> ${props['Tavolo'] || tavolo}</div>
+                            </div>
+                        `;
+                        detailPanel.innerHTML = detailHtml;
+                        detailPanel.style.display = 'flex';
+                    }
+                }
             };
         });
 
