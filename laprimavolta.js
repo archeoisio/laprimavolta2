@@ -49,6 +49,18 @@ customStyleTag.innerHTML = `
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
+
+    /* Stili e ridimensionamento dinamico dei popup in base allo zoom */
+    .leaflet-popup-content-wrapper {
+        transition: transform 0.2s ease-in-out;
+        font-size: 11px;
+        padding: 2px;
+        transform-origin: bottom center;
+    }
+    .leaflet-popup-content {
+        margin: 8px 10px;
+        line-height: 1.4;
+    }
 `;
 document.head.appendChild(customStyleTag);
 
@@ -85,10 +97,37 @@ function resetFeatureStyle(e) {
     }
 }
 
+// Funzione di supporto per applicare la scala al popup attivo in base allo zoom
+function updatePopupScale(currentZoom) {
+    const popup = map ? map._popup : null;
+    if (popup && popup.getElement()) {
+        const contentWrapper = popup.getElement().querySelector('.leaflet-popup-content-wrapper');
+        if (contentWrapper) {
+            let scale = 1;
+            if (currentZoom < 16) {
+                scale = Math.max(0.7, 1 - (16 - currentZoom) * 0.05);
+            } else if (currentZoom > 16) {
+                scale = Math.min(1.2, 1 + (currentZoom - 16) * 0.03);
+            }
+            contentWrapper.style.transform = `scale(${scale})`;
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { zoomControl: false, maxZoom: 28, minZoom: 1 }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+
+    // Gestione dinamica della scala del popup durante lo zoom
+    map.on('zoomend', () => {
+        updatePopupScale(map.getZoom());
+    });
+
+    // Aggiorna la scala anche appena si apre un popup
+    map.on('popupopen', () => {
+        updatePopupScale(map.getZoom());
+    });
 
     function pop_iconaquartieri_0(feature, layer) {
         var nomeQuartiere = feature.properties['nome'] || '';
@@ -354,9 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (latlng) {
-                    // Impostazione immediata e istantanea senza transizioni ritardate
                     map.setView(latlng, 16, { animate: false });
-                    
                     highlightFeature({ target: targetItem.layer });
                     targetItem.layer.openPopup();
                 }
