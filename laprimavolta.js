@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+     bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 const tavolo = e.target.getAttribute('data-tavolo');
@@ -344,8 +344,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedLayer = targetItem.layer;
                 map.closePopup();
                 
-                // Centratura precisa sul punto registrato
-                map.setView(targetItem.latlng, 16);
+                // Ricaviamo la coordinata reale direttamente dalla geometria del layer
+                let latlng;
+                const geom = targetItem.layer.feature.geometry;
+                if (geom.type === 'Point') {
+                    // Coordinate GeoJSON: [lng, lat] -> Convertiamo in Leaflet [lat, lng]
+                    latlng = [geom.coordinates[1], geom.coordinates[0]];
+                } else {
+                    // Per i poligoni prendiamo il centro geometrico esatto
+                    latlng = targetItem.layer.getBounds().getCenter();
+                }
+                
+                // Centratura istantanea e impeccabile
+                map.setView(latlng, 16);
                 
                 const fakeEvent = { target: targetItem.layer };
                 highlightFeature(fakeEvent);
