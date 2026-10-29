@@ -3,7 +3,7 @@ let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
 let layer_iconaquartieri_0;
-let currentActiveTab = null; // Memorizza l'ultima scheda tematica selezionata
+let currentActiveTab = null; // Memorizza l'ultima scheda tematica selezionata (sia desktop che mobile)
 
 const MIN_ZOOM_VISIBLE = 13; // Livello di zoom minimo per visualizzare quartieri e elementi tematici
 
@@ -13,23 +13,29 @@ customStyleTag.innerHTML = `
     
     #custom-bottom-panel {
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-        width: max-content; min-width: 220px; max-width: 1000px; max-height: 310px;
+        width: 98%; max-width: 1000px; max-height: 310px;
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
-        z-index: 2000; padding: 8px 12px; box-sizing: border-box; text-align: left;
+        z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
         font-family: sans-serif; font-size: 12px; color: #333;
         border-top-left-radius: 14px; border-top-right-radius: 14px;
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
     }
 
-    /* Allineamento a sinistra del Centro di Controllo su Desktop */
+    /* Modifiche specifiche solo per DESKTOP */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             left: 10px;
             transform: none;
+            width: max-content;
+            min-width: 220px;
+            padding: 8px 12px;
         }
         
-        /* Pannello Dettaglio Feature - Desktop (Stessa altezza, posizionato a destra del Centro di Controllo) */
+        #custom-bottom-panel.open {
+            width: 1000px !important;
+        }
+
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
             max-height: 310px; border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
@@ -41,30 +47,25 @@ customStyleTag.innerHTML = `
         }
     }
 
-    /* Pannello Dettaglio Feature - Mobile */
+    /* Pannello Dettaglio Feature - MOBILE */
     @media (max-width: 767px) {
         #feature-detail-panel {
             position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 900px; max-height: 250px;
             background: rgba(255, 255, 255, 0.99); backdrop-filter: blur(10px);
             box-shadow: 0 5px 25px rgba(0,0,0,0.4); z-index: 2100;
-            padding: 8px 10px; box-sizing: border-box; font-family: sans-serif;
+            padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
             font-size: 12px; color: #333; display: none; flex-direction: column;
             border-radius: 12px;
             border: 2px solid #000;
         }
     }
 
-    /* Quando è aperto su desktop, diamo la larghezza corretta per le 3 colonne, mentre chiuso resta a misura di titolo */
-    #custom-bottom-panel.open {
-        width: 1000px !important;
-    }
-
     #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
     #custom-bottom-panel:not(.open) { max-height: 44px !important; }
     
-    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; height: 34px; box-sizing: border-box; }
-    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; height: auto; }
+    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
+    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     /* Layout Principale a 3 Colonne */
     .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
@@ -100,10 +101,8 @@ customStyleTag.innerHTML = `
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #e1e1e1;
-        padding-bottom: 4px;
-        margin-bottom: 6px;
-        height: 34px;
-        box-sizing: border-box;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
     }
 
     .close-feature-btn {
@@ -111,14 +110,14 @@ customStyleTag.innerHTML = `
         color: white;
         border: none;
         border-radius: 50%;
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
         font-weight: bold;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 11px;
+        font-size: 12px;
     }
 `;
 document.head.appendChild(customStyleTag);
@@ -219,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 1, 
-        zoomSnap: 0.25,  // Permette valori decimali intermedi durante lo zoom (es. 8.25, 8.5)
+        zoomSnap: 0.25, 
         zoomDelta: 0.25  
     }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
     
