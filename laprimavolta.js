@@ -339,22 +339,37 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+      bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 const tavolo = e.target.getAttribute('data-tavolo');
                 const idx = parseInt(e.target.getAttribute('data-index'));
                 const targetItem = atlasCategories[tavolo][idx];
                 
+                if (!targetItem || !targetItem.layer) return;
+
                 if (selectedLayer && selectedLayer !== targetItem.layer) {
                     resetFeatureStyle({ target: selectedLayer });
                 }
                 
                 selectedLayer = targetItem.layer;
                 map.closePopup();
+
+                // Estraiamo la coordinata in modo sicuro a seconda che sia un punto o un poligono
+                let centerLatLng;
+                const geom = targetItem.layer.feature.geometry;
                 
-                // Spostamento istantaneo e preciso senza ritardi
-                map.setView(targetItem.latlng, 16);
+                if (geom.type === 'Point') {
+                    // In GeoJSON le coordinate sono [lng, lat]
+                    centerLatLng = [geom.coordinates[1], geom.coordinates[0]];
+                } else {
+                    // Per i poligoni usiamo il centro esatto calcolato dal layer Leaflet
+                    const bounds = targetItem.layer.getBounds();
+                    centerLatLng = bounds.getCenter();
+                }
+                
+                // Spostamento istantaneo e preciso sul punto
+                map.setView(centerLatLng, 16);
                 
                 const fakeEvent = { target: targetItem.layer };
                 highlightFeature(fakeEvent);
