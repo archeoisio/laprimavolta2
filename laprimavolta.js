@@ -344,22 +344,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedLayer = targetItem.layer;
                 map.closePopup();
                 
-                // Ricaviamo la coordinata reale direttamente dalla geometria del layer
+                // Estrazione unificata e sicura delle coordinate per punti e poligoni
                 let latlng;
                 const geom = targetItem.layer.feature.geometry;
+                
                 if (geom.type === 'Point') {
-                    // Coordinate GeoJSON: [lng, lat] -> Convertiamo in Leaflet [lat, lng]
                     latlng = [geom.coordinates[1], geom.coordinates[0]];
                 } else {
-                    // Per i poligoni prendiamo il centro geometrico esatto
-                    latlng = targetItem.layer.getBounds().getCenter();
+                    const bounds = targetItem.layer.getBounds();
+                    latlng = bounds.getCenter();
                 }
                 
-                // Centratura istantanea e impeccabile
+                // Centratura istantanea
                 map.setView(latlng, 16);
                 
-                const fakeEvent = { target: targetItem.layer };
-                highlightFeature(fakeEvent);
+                highlightFeature({ target: targetItem.layer });
                 targetItem.layer.openPopup();
             };
         });
