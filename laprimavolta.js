@@ -84,7 +84,6 @@ function resetFeatureStyle(e) {
 
 document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { zoomControl: false, maxZoom: 28, minZoom: 1 }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
-    var hash = new L.Hash(map);
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
