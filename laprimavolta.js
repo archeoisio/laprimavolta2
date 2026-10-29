@@ -90,17 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
-    function removeEmptyRowsFromPopupContent(content, feature) {
-         var tempDiv = document.createElement('div'); tempDiv.innerHTML = content;
-         var rows = tempDiv.querySelectorAll('tr');
-         for (var i = 0; i < rows.length; i++) {
-             var td = rows[i].querySelector('td.visible-with-data');
-             var key = td ? td.id : '';
-             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) { rows[i].parentNode.removeChild(rows[i]); }
-         }
-         return tempDiv.innerHTML;
-    }
-
     function pop_iconaquartieri_0(feature, layer) {
         var nomeQuartiere = feature.properties['nome'] || '';
         if (nomeQuartiere) { layer.bindTooltip(nomeQuartiere, { permanent: true, direction: 'center', className: 'quartiere-label' }); }
