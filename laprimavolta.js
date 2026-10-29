@@ -12,10 +12,10 @@ customStyleTag.innerHTML = `
     
     #custom-bottom-panel {
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-        width: 98%; max-width: 1000px; max-height: 310px;
+        width: max-content; min-width: 220px; max-width: 1000px; max-height: 310px;
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
-        z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
+        z-index: 2000; padding: 8px 12px; box-sizing: border-box; text-align: left;
         font-family: sans-serif; font-size: 12px; color: #333;
         border-top-left-radius: 14px; border-top-right-radius: 14px;
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
@@ -54,10 +54,15 @@ customStyleTag.innerHTML = `
         }
     }
 
+    /* Quando è aperto su desktop, diamo la larghezza corretta per le 3 colonne, mentre chiuso resta a misura di titolo */
+    #custom-bottom-panel.open {
+        width: 1000px !important;
+    }
+
     #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
     #custom-bottom-panel:not(.open) { max-height: 44px !important; }
     
-    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
+    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     /* Layout Principale a 3 Colonne */
