@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function pop_hospital_1(feature, layer) {
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-       layer.bindPopup(popupContent, { maxHeight: 400 });
+        layer.bindPopup(popupContent, { maxHeight: 400 });
     }
     map.createPane('pane_hospital_1'); map.getPane('pane_hospital_1').style.zIndex = 401;
     var layer_hospital_1 = new L.geoJson(json_hospital_1, { interactive: false, pane: 'pane_hospital_1', onEachFeature: pop_hospital_1, pointToLayer: function (feature, latlng) { return L.marker(latlng, { icon: L.icon({ iconUrl: 'markers/hospital_1.svg', iconSize: [16.72, 16.72] }) }); } });
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 var popupContent = '<table><tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Stato</th><td>' + (feature.properties['Stato'] !== null ? autolinker.link(String(feature.properties['Stato']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Tavolo</th><td>' + (feature.properties['Tavolo'] !== null ? autolinker.link(String(feature.properties['Tavolo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-                layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
+                layer.bindPopup(popupContent, { maxHeight: 400 });
             },
             pointToLayer: function (feature, latlng) { 
                 return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 var popupContent = '<table><tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-                layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
+                layer.bindPopup(popupContent, { maxHeight: 400 });
             }
         });
         map.addLayer(layerPoligoniTavolo);
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-      bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 const tavolo = e.target.getAttribute('data-tavolo');
@@ -343,22 +343,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 selectedLayer = targetItem.layer;
                 map.closePopup();
-
-                // Estraiamo la coordinata in modo sicuro a seconda che sia un punto o un poligono
-                let centerLatLng;
-                const geom = targetItem.layer.feature.geometry;
                 
-                if (geom.type === 'Point') {
-                    // In GeoJSON le coordinate sono [lng, lat]
-                    centerLatLng = [geom.coordinates[1], geom.coordinates[0]];
-                } else {
-                    // Per i poligoni usiamo il centro esatto calcolato dal layer Leaflet
-                    const bounds = targetItem.layer.getBounds();
-                    centerLatLng = bounds.getCenter();
-                }
-                
-                // Spostamento istantaneo e preciso sul punto
-                map.setView(centerLatLng, 16);
+                // Centratura precisa sul punto registrato
+                map.setView(targetItem.latlng, 16);
                 
                 const fakeEvent = { target: targetItem.layer };
                 highlightFeature(fakeEvent);
@@ -414,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnControl.addTo(map);
 });
 
-// Funzioni di sicurezza per evitare errori se richiamate da elementi HTML orfani
+// Funzioni di sicurezza
 function closeModal() {
     const modal = document.getElementById('welcome-modal');
     if (modal) modal.style.display = 'none';
