@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (latlng) {
                     // Imposta lo zoom a 18 e sposta la vista verso il basso di 120px 
                     // per fare in modo che la feature appaia più in alto e non venga coperta dal pannello
-                    map.setView(latlng, 18, { animate: false });
+                    map.setView(latlng, 17,5, { animate: false });
                     map.panBy([0, 120], { animate: false });
 
                     highlightFeature({ target: targetItem.layer });
