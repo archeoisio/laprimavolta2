@@ -87,7 +87,13 @@ function resetFeatureStyle(e) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    map = L.map('map', { zoomControl: false, maxZoom: 28, minZoom: 1 }).fitBounds([[40.6566229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
+   map = L.map('map', { 
+        zoomControl: false, 
+        maxZoom: 28, 
+        minZoom: 1, 
+        zoomSnap: 0.25,  // Permette di scattare a intervalli di 0.25 (es. 8, 8.25, 8.5, 8.75, 9)
+        zoomDelta: 0.25  // Regola la velocità/ampiezza dello zoom quando usi i pulsanti
+    }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
