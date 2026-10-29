@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function pop_hospital_1(feature, layer) {
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-        layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
+       layer.bindPopup(popupContent, { maxHeight: 400 });
     }
     map.createPane('pane_hospital_1'); map.getPane('pane_hospital_1').style.zIndex = 401;
     var layer_hospital_1 = new L.geoJson(json_hospital_1, { interactive: false, pane: 'pane_hospital_1', onEachFeature: pop_hospital_1, pointToLayer: function (feature, latlng) { return L.marker(latlng, { icon: L.icon({ iconUrl: 'markers/hospital_1.svg', iconSize: [16.72, 16.72] }) }); } });
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function pop_iconestazioni_2(feature, layer) {
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-        layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
+        layer.bindPopup(popupContent, { maxHeight: 400 });
     }
     map.createPane('pane_iconestazioni_2'); map.getPane('pane_iconestazioni_2').style.zIndex = 402;
     var layer_iconestazioni_2 = new L.geoJson(json_iconestazioni_2, { interactive: true, pane: 'pane_iconestazioni_2', onEachFeature: pop_iconestazioni_2, pointToLayer: function (feature, latlng) { return L.marker(latlng, { icon: L.icon({ iconUrl: 'markers/iconestazioni_2.svg', iconSize: [22.0, 22.0], iconAnchor: [11, 11] }) }); } });
