@@ -409,3 +409,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     btnControl.addTo(map);
 });
+
+// Funzioni di sicurezza per evitare errori se richiamate da elementi HTML orfani
+function closeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) modal.style.display = 'none';
+}
+function startTutorial() { closeModal(); }
+function nextTutorialStep() {}
+
+window.closeModal = closeModal;
+window.startTutorial = startTutorial;
+window.nextTutorialStep = nextTutorialStep;
