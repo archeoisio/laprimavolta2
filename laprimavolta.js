@@ -1,6 +1,6 @@
 let map; 
 let highlightLayer;
-let selectedLayer = null; // Traccia l'elemento attualmente selezionato
+let selectedLayer = null;
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
@@ -66,17 +66,20 @@ function getTavoloColor(tavoloName) {
 
 function highlightFeature(e) {
     var layer = e.target;
-    layer.setStyle({ fillColor: '#ffff00', color: '#ff0000', fillOpacity: 0.9, weight: 2 });
-    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) { layer.bringToFront(); }
+    if (layer.setStyle) {
+        layer.setStyle({ fillColor: '#ffff00', color: '#ff0000', fillOpacity: 0.9, weight: 2 });
+    }
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge && layer.bringToFront) { layer.bringToFront(); }
 }
 
 function resetFeatureStyle(e) {
     var layer = e.target;
+    if (!layer.feature) return;
     const prop = layer.feature.properties;
     const tavolo = prop['Tavolo'] || prop['Tavolo di '] || prop['Tavolo di'] || 'Altro';
     const catColor = getTavoloColor(tavolo);
     if (layer.feature.geometry.type === 'Point') {
-        layer.setStyle({ radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
+        layer.setStyle({ radius: 25, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
     } else {
         layer.setStyle({ opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: catColor });
     }
@@ -174,7 +177,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 var popupContent = '<table><tr><th scope="row">Nome</th><td>' + (feature.properties['Nome'] !== null ? autolinker.link(String(feature.properties['Nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Criticità</th><td>' + (feature.properties['Criticità'] !== null ? autolinker.link(String(feature.properties['Criticità']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Proposta</th><td>' + (feature.properties['Proposta'] !== null ? autolinker.link(String(feature.properties['Proposta']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Stato</th><td>' + (feature.properties['Stato'] !== null ? autolinker.link(String(feature.properties['Stato']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr><tr><th scope="row">Tavolo</th><td>' + (feature.properties['Tavolo'] !== null ? autolinker.link(String(feature.properties['Tavolo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
                 layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
             },
-            pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); }
+            pointToLayer: function (feature, latlng) { 
+                // Usiamo L.circle con raggio in metri (es. 25 metri) così cresce/decresce con lo zoom
+                return L.circle(latlng, { radius: 25, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
+            }
         });
         map.addLayer(layerPuntiTavolo);
     }
@@ -217,6 +223,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         map.addLayer(layerPoligoniTavolo);
     }
+
+    // Gestione zoom dinamicamente le etichette dei quartieri
+    map.on('zoomend', () => {
+        const currentZoom = map.getZoom();
+        const labels = document.querySelectorAll('.quartiere-label');
+        let newSize = 11 + (currentZoom - 13) * 0.8;
+        if (newSize < 9) newSize = 9;
+        if (newSize > 18) newSize = 18;
+        labels.forEach(lbl => {
+            lbl.style.fontSize = newSize + 'px';
+        });
+    });
 
     // Deseleziona quando si clicca sulla mappa vuota
     map.on('click', () => {
@@ -347,7 +365,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 selectedLayer = targetItem.layer;
                 map.closePopup();
-                map.flyTo(targetItem.latlng, 16, { animate: true, duration: 2 });
+                
+                // Spostamento istantaneo e preciso senza ritardi o distorsioni di zoom
+                map.setView(targetItem.latlng, 16);
                 
                 const fakeEvent = { target: targetItem.layer };
                 highlightFeature(fakeEvent);
@@ -402,136 +422,3 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     btnControl.addTo(map);
 });
-
-// ==========================================
-// --- SEZIONE TUTORIAL (GESTIONE COMPLETA) ---
-// ==========================================
-
-const tutorialSteps = [
-    { 
-        id: "#custom-bottom-panel", 
-        titolo: "Centro di Controllo", 
-        testo: "Clicca qui in basso per aprire il pannello e gestire mappe base, layer e cluster tematici.",
-        action: "openPanel"
-    },
-    { 
-        id: ".btn-tutorial-home", 
-        titolo: "Tasto Home", 
-        testo: "Resetta la mappa alla vista panoramica iniziale di Salerno." 
-    },
-    { 
-        id: ".btn-tutorial-locate", 
-        titolo: "Geolocalizzazione", 
-        testo: "Trova la tua posizione attuale sulla mappa. Necessario attivare il GPS su telefono/PC." 
-    }
-];
-
-let currentStep = 0;
-
-function closeModal() {
-    const modal = document.getElementById('welcome-modal');
-    if (modal) modal.style.display = 'none';
-}
-
-function startTutorial() {
-    closeModal();
-    currentStep = 0;
-    
-    if (typeof map === 'undefined') {
-        console.error("Mappa non trovata!");
-        return;
-    }
-
-    try {
-        map.dragging.disable();
-        map.touchZoom.disable();
-        map.doubleClickZoom.disable();
-        map.scrollWheelZoom.disable();
-        if (map.tap) map.tap.disable();
-    } catch (e) { 
-        console.warn("Alcuni controlli non possono essere disabilitati", e); 
-    }
-    
-    setTimeout(showStep, 50);
-}
-
-function showStep() {
-    const step = tutorialSteps[currentStep];
-    const target = document.querySelector(step.id);
-    const isLast = currentStep === tutorialSteps.length - 1;
-    const isPanel = step.id === "#custom-bottom-panel";
-
-    if (step.action === "openPanel") {
-        const bp = document.getElementById('custom-bottom-panel');
-        if (bp) {
-            bp.classList.add('open');
-            if (typeof renderPanelContent === 'function') renderPanelContent();
-        }
-    }
-
-    let popupPoint;
-    if (target) {
-        const rect = target.getBoundingClientRect();
-        if (isPanel) {
-            popupPoint = map.containerPointToLayerPoint([rect.left + rect.width / 2, rect.top - 20]);
-        } else {
-            popupPoint = map.containerPointToLayerPoint([rect.left - 110, rect.top + 20]);
-        }
-    } else {
-        popupPoint = map.containerPointToLayerPoint([window.innerWidth / 2, window.innerHeight / 3]);
-    }
-
-    const popupLatLng = map.layerPointToLatLng(popupPoint);
-
-    L.popup({ 
-        closeButton: false, 
-        closeOnClick: false,
-        autoPan: false,
-        className: 'tutorial-pointer' + (isPanel ? ' panel-tutorial-popup' : ''),
-        offset: isPanel ? L.point(0, -15) : L.point(-10, 0) 
-    })
-    .setLatLng(popupLatLng)
-    .setContent(`
-    <div style="width: 190px; font-family: sans-serif; display: flex; flex-direction: column; gap: 5px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <b style="color:#3498db; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;">
-                ${step.titolo}
-            </b>
-            <button onclick="nextTutorialStep()" style="background:#3498db; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size: 10px; font-weight: bold; flex-shrink: 0; margin-left: 6px;">
-                ${isLast ? 'INIZIA' : 'AVANTI'}
-            </button>
-        </div>
-        <div style="font-size: 11px; line-height: 1.3; border-top: 1px solid #eee; padding-top: 5px; color: #333;">
-            ${step.testo}
-        </div>
-    </div>
-    `)
-    .openOn(map);
-}
-
-function nextTutorialStep() {
-    currentStep++;
-    
-    if (currentStep < tutorialSteps.length) {
-        showStep();
-    } else {
-        if (typeof map !== 'undefined') {
-            map.dragging.enable();
-            map.touchZoom.enable();
-            map.doubleClickZoom.enable();
-            map.scrollWheelZoom.enable();
-            if (map.tap) map.tap.enable();
-            
-            map.eachLayer(l => { if (l instanceof L.Popup) map.removeLayer(l); });
-        }
-        const bp = document.getElementById('custom-bottom-panel');
-        if (bp) {
-            bp.classList.remove('open');
-            renderPanelContent();
-        }
-    }
-}
-
-window.startTutorial = startTutorial;
-window.nextTutorialStep = nextTutorialStep;
-window.closeModal = closeModal;
