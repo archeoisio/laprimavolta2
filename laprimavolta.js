@@ -79,7 +79,7 @@ function resetFeatureStyle(e) {
     const tavolo = prop['Tavolo'] || prop['Tavolo di '] || prop['Tavolo di'] || 'Altro';
     const catColor = getTavoloColor(tavolo);
     if (layer.feature.geometry.type === 'Point') {
-        layer.setStyle({ radius: 25, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
+        layer.setStyle({ radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
     } else {
         layer.setStyle({ opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: catColor });
     }
@@ -178,8 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 layer.bindPopup(removeEmptyRowsFromPopupContent(popupContent, feature), { maxHeight: 400 });
             },
             pointToLayer: function (feature, latlng) { 
-                // Usiamo L.circle con raggio in metri (es. 25 metri) così cresce/decresce con lo zoom
-                return L.circle(latlng, { radius: 25, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
+                return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
             }
         });
         map.addLayer(layerPuntiTavolo);
@@ -223,18 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         map.addLayer(layerPoligoniTavolo);
     }
-
-    // Gestione zoom dinamicamente le etichette dei quartieri
-    map.on('zoomend', () => {
-        const currentZoom = map.getZoom();
-        const labels = document.querySelectorAll('.quartiere-label');
-        let newSize = 11 + (currentZoom - 13) * 0.8;
-        if (newSize < 9) newSize = 9;
-        if (newSize > 18) newSize = 18;
-        labels.forEach(lbl => {
-            lbl.style.fontSize = newSize + 'px';
-        });
-    });
 
     // Deseleziona quando si clicca sulla mappa vuota
     map.on('click', () => {
@@ -366,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedLayer = targetItem.layer;
                 map.closePopup();
                 
-                // Spostamento istantaneo e preciso senza ritardi o distorsioni di zoom
+                // Spostamento istantaneo e preciso senza ritardi
                 map.setView(targetItem.latlng, 16);
                 
                 const fakeEvent = { target: targetItem.layer };
