@@ -340,10 +340,12 @@ window.renderDetailSlide = function() {
         return height;
     };
 
-    let tempFields = [];
+   let tempFields = [];
     for (let i = 0; i < allFields.length; i++) {
         tempFields.push(allFields[i]);
-        if (testFieldsHeight(tempFields) > 145 || tempFields.length >= 5) {
+        
+        // Sfruttiamo tutto lo spazio alzando la soglia a 175px e rimuovendo il limite fisso dei 5 campi
+        if (testFieldsHeight(tempFields) > 175) {
             if (tempFields.length > 1) {
                 const lastItem = tempFields.pop();
                 slides.push([...tempFields]);
@@ -609,8 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cleanKey = tavolo.replace(/\s+/g, '');
             const catColor = getTavoloColor(tavolo);
             const isActive = (tavolo === currentActiveTab);
-            const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : '';
-            
+         const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : '';
             html += `<button class="sidebar-tab-btn ${isActive ? 'active' : ''}" data-tab="tab-${cleanKey}" data-tavolo-name="${tavolo}" data-color="${catColor}" style="${activeStyle}">${tavolo.toUpperCase()}</button>`;
         });
         html += `</div></div>`;
@@ -663,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentActiveTab = btn.getAttribute('data-tavolo-name');
 
                 const catColor = btn.getAttribute('data-color');
-                const textColor = ['#f1c40f', '#2ecc71'].includes(catColor) ? '#333' : 'white';
+                const textColor = ['#f1c40f'].includes(catColor) ? '#333' : 'white';
                 btn.style.background = catColor; btn.style.color = textColor; btn.style.borderColor = catColor;
                 bottomPanel.querySelector(`#${btn.getAttribute('data-tab')}`).classList.add('active');
             };
