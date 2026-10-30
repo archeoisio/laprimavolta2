@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     style: function(feature) {
         return { 
             color: '#636e72',      // Colore del bordo (grigio scuro definito)
-            weight: 10,           // Spessore del bordo
+            weight: 5,           // Spessore del bordo
             fill: true,            
             fillColor: '#b2bec3',  
             fillOpacity: 0.0       // <-- Messo a 0 per renderlo totalmente trasparente dentro!
