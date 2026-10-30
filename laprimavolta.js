@@ -415,17 +415,10 @@ const initialBounds = [
     [40.626, 14.771],
     [40.726, 14.873]
 ];
-document.addEventListener('DOMContentLoaded', () => {
-    map = L.map('map', { 
-        zoomControl: false, 
-        maxZoom: 28, 
-        minZoom: 13, 
-        zoomSnap: 0.25,  
-        zoomDelta: 0.25,
-        wheelPxPerZoomLevel: 120, // <-- Aggiungilo qui (regola la velocità/sensibilità dello scroll)
-   maxBounds: initialBounds,   // 2. Blocca i confini di navigazione usando la costante
-        maxBoundsViscosity: 0.25     // Rende il blocco rigido ai bordi
-    }).fitBounds(initialBounds);
+const navigationBounds = [
+    [40.600, 14.740], // Sud-Ovest esteso
+    [40.750, 14.900]  // Nord-Est esteso
+];
     
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
