@@ -21,7 +21,7 @@ customStyleTag.innerHTML = `
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
         z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
-        font-family: sans-serif; font-size: 12px; color: #333;
+        font-family: sans-serif; font-size: 13px; color: #333;
         border-top-left-radius: 14px; border-top-right-radius: 14px;
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
     }
@@ -38,16 +38,16 @@ customStyleTag.innerHTML = `
         
         #custom-bottom-panel.open {
             width: 1000px !important;
-            height: 310px !important;
+            height: 220px !important;
         }
 
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
-            height: 310px;
+            height: 220px;
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
-            padding: 8px 12px; box-sizing: border-box; font-family: sans-serif;
+            padding: 8px 10px; box-sizing: border-box; font-family: sans-serif;
             font-size: 13px; color: #333; display: none; flex-direction: column;
             border: 1px solid rgba(0,0,0,0.1);
         }
