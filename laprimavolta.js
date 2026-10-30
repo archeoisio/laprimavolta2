@@ -76,12 +76,13 @@ customStyleTag.innerHTML = `
         }
 
         #feature-detail-panel {
-            position: fixed; bottom: 0; left: 1025px; width: 320px;
+            position: fixed; bottom: 0; left: 1025px; width: 500px;
             height: 220px;
+            max-height: 220px !important;
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
-            padding: 8px 12px; box-sizing: border-box; font-family: sans-serif;
+            padding: 8px 8px; box-sizing: border-box; font-family: sans-serif;
             font-size: 13px; color: #333; display: none; flex-direction: column;
             border: 1px solid rgba(0,0,0,0.1);
         }
@@ -144,8 +145,8 @@ customStyleTag.innerHTML = `
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 2px solid #3498db;
-        padding-bottom: 6px;
+        border-bottom: 1px solid #e1e1e1; /* Stile grigio identico al Centro di Controllo */
+        padding-bottom: 4px;
         margin-bottom: 4px;
     }
 
@@ -291,40 +292,99 @@ window.renderDetailSlide = function() {
     if (!detailPanel) return;
 
     const { props, tavoloName } = window.currentDetailTableData;
-    const totalPages = window.currentDetailExtraFields.length > 0 ? 2 : 1;
-    const slide = window.currentDetailSlide;
 
-    let contentHtml = '';
+    // 1. Raccogliamo TUTTI i campi validi dell'elemento
+    const allFields = [];
+    const mainKeys = ['Nome', 'Criticità', 'Proposta', 'Stato'];
+    
+    mainKeys.forEach(k => {
+        if (props[k]) allFields.push({ key: k, value: props[k] });
+    });
 
-    if (slide === 1) {
-        contentHtml = `
-            <table class="detail-table">
-                <tr><th>Nome</th><td>${props['Nome'] || 'N/D'}</td></tr>
-                <tr><th>Criticità</th><td>${props['Criticità'] || 'N/D'}</td></tr>
-                <tr><th>Proposta</th><td>${props['Proposta'] || 'N/D'}</td></tr>
-                <tr><th>Stato</th><td>${props['Stato'] || 'N/D'}</td></tr>
-                <tr><th>Tavolo</th><td>${props['Tavolo'] || tavoloName}</td></tr>
-            </table>
-        `;
-    } else {
-        contentHtml = `<table class="detail-table">`;
-        window.currentDetailExtraFields.forEach(item => {
-            contentHtml += `<tr><th>${item.key}</th><td>${item.value}</td></tr>`;
-        });
-        contentHtml += `</table>`;
+    const tavoloVal = props['Tavolo'] || props['Tavolo di '] || props['Tavolo di'] || tavoloName;
+    if (tavoloVal) allFields.push({ key: 'Tavolo', value: tavoloVal });
+
+    const excludedKeys = [...mainKeys, 'Tavolo', 'Tavolo di', 'Tavolo di '];
+    for (const [key, value] of Object.entries(props)) {
+        if (!excludedKeys.includes(key) && value !== null && value !== '') {
+            allFields.push({ key, value });
+        }
     }
 
+    // Se non ci sono campi, usciamo
+    if (allFields.length === 0) return;
+
+    // 2. Suddividiamo dinamicamente i campi in slide basandoci sullo spazio disponibile (stimato a ~140px netti per il contenuto)
+    // Creiamo un contenitore invisibile di prova per misurare l'altezza reale dei testi a capo
+    const slides = [];
+    let currentSlideFields = [];
+    
+    // Funzione di supporto per testare l'altezza di un blocco di campi
+    const testFieldsHeight = (fields) => {
+        let testHtml = `<table class="detail-table" style="width:100%;">`;
+        fields.forEach(item => {
+            testHtml += `<tr><th style="width:30%;">${item.key}</th><td style="width:70%; word-break:break-word;">${item.value}</td></tr>`;
+        });
+        testHtml += `</table>`;
+        
+        // Misuriamo in un div temporaneo fuori schermo
+        const measureDiv = document.createElement('div');
+        measureDiv.style.cssText = 'position:absolute; visibility:hidden; width:296px; font-family:sans-serif; font-size:13px; box-sizing:border-box;';
+        measureDiv.innerHTML = testHtml;
+        document.body.appendChild(measureDiv);
+        const height = measureDiv.offsetHeight;
+        document.body.removeChild(measureDiv);
+        
+        // I 220px totali tolta l'intestazione (~30px) e i controlli di paginazione (~25px) lasciano circa 150-160px sicuri
+        return height;
+    };
+
+    // Raggruppiamo i campi slide per slide misurando l'ingombro reale
+    let tempFields = [];
+    for (let i = 0; i < allFields.length; i++) {
+        tempFields.push(allFields[i]);
+        // Se superiamo i 145px stimati o se abbiamo già messo 5 campi, chiudiamo la slide corrente
+        if (testFieldsHeight(tempFields) > 145 || tempFields.length >= 5) {
+            // Se il blocco supera l'altezza con un solo campo lunghissimo, lo teniamo comunque per non bloccare il loop
+            if (tempFields.length > 1) {
+                const lastItem = tempFields.pop();
+                slides.push([...tempFields]);
+                tempFields = [lastItem];
+            } else {
+                slides.push([...tempFields]);
+                tempFields = [];
+            }
+        }
+    }
+    if (tempFields.length > 0) {
+        slides.push(tempFields);
+    }
+
+    const totalPages = slides.length;
+    if (!window.currentDetailSlide || window.currentDetailSlide > totalPages) {
+        window.currentDetailSlide = 1;
+    }
+    const slide = window.currentDetailSlide;
+    const activeSlideFields = slides[slide - 1] || slides[0];
+
+    // 3. Costruiamo la tabella per la slide attiva
+    let contentHtml = `<table class="detail-table">`;
+    activeSlideFields.forEach(item => {
+        contentHtml += `<tr><th>${item.key}</th><td>${item.value}</td></tr>`;
+    });
+    contentHtml += `</table>`;
+
+    // 4. Configurazione frecce di navigazione
     let leftArrowStyle = (slide > 1) ? "cursor:pointer; opacity:1;" : "cursor:default; opacity:0.3;";
     let rightArrowStyle = (slide < totalPages) ? "cursor:pointer; opacity:1;" : "cursor:default; opacity:0.3;";
     
     let leftAction = (slide > 1) ? `onclick="window.changeDetailSlide(${slide - 1})"` : "";
     let rightAction = (slide < totalPages) ? `onclick="window.changeDetailSlide(${slide + 1})"` : "";
 
-    // Controlli di paginazione posizionati al centro in basso (mostrati solo se ci sono più pagine)
     let navControls = '';
     if (totalPages > 1) {
         navControls = `
-            <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:auto; padding-top:6px;">
+            <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:auto; padding-top:2px;">
                 <span ${leftAction} title="Pagina precedente" style="${leftArrowStyle} font-size:12px;">⬅️</span>
                 <span style="font-size:11px; color:#666; font-weight:normal;">${slide}/${totalPages}</span>
                 <span ${rightAction} title="Pagina successiva" style="${rightArrowStyle} font-size:12px;">➡️</span>
@@ -332,19 +392,20 @@ window.renderDetailSlide = function() {
         `;
     }
 
-    // Struttura finale: Header pulito senza frecce, tabella al centro, paginazione in basso
-    let detailHtml = `
+    // 5. Output finale nel pannello
+    detailPanel.innerHTML = `
         <div class="feature-detail-header">
             <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
             <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
         </div>
-        ${contentHtml}
+        <div style="flex-grow:1; overflow:hidden;">
+            ${contentHtml}
+        </div>
         ${navControls}
     `;
-
-    detailPanel.innerHTML = detailHtml;
     detailPanel.style.display = 'flex';
 };
+
 window.changeDetailSlide = function(targetSlide) {
     window.currentDetailSlide = targetSlide;
     renderDetailSlide();
