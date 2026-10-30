@@ -15,26 +15,15 @@ customStyleTag.innerHTML = `
 
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
-   #custom-bottom-panel {
-        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-        width: 98%; max-width: 1000px; max-height: 310px;
-        background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
-        box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
-        z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
-        font-family: sans-serif; font-size: 12px; color: #333;
-        border-top-left-radius: 14px; border-top-right-radius: 14px;
-        border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
-    }
-
-    /* Modifiche specifiche solo per DESKTOP */
-@media (min-width: 768px) {
-        /* CONTENITORE PRINCIPALE */
+  @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
             bottom: 0;
             left: 10px;
+            transform: none;
             width: max-content;
             min-width: 220px;
+            padding: 8px 12px;
             display: flex;
             flex-direction: column;
             z-index: 2000;
@@ -45,43 +34,19 @@ customStyleTag.innerHTML = `
             border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
-            height: auto; /* Da chiuso mostra solo la linguetta */
-            transition: all 0.25s ease-in-out;
+            transition: width 0.25s ease-in-out;
         }
         
-        /* QUANDO APERTO: si espande esattamente a 176px di altezza totale e 1000px di larghezza */
         #custom-bottom-panel.open {
             width: 1000px !important;
-            height: 176px !important; 
         }
 
-        /* LINGUETTA / INTESTAZIONE */
-        #custom-bottom-panel .panel-main-header {
-            width: 100% !important;
-            box-sizing: border-box;
-            z-index: 2002;
-        }
-
-        /* CORPO DEI CONTENUTI INTERNO (Nascosto da chiuso) */
         #custom-bottom-panel .panel-three-columns {
-            max-height: 0px !important;
-            height: 0px !important;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.20s ease-in-out;
-            display: none !important;
-        }
-
-        /* QUANDO APERTO: il corpo dei contenuti compare e occupa lo spazio esatto */
-        #custom-bottom-panel.open .panel-three-columns {
-            display: grid !important;
-            height: calc(176px - var(--header-height, 44px)) !important;
-            max-height: 132px !important;
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
-            opacity: 1;
+            display: grid !important;
+            width: 100%;
             box-sizing: border-box;
-            padding-top: 4px;
         }
 
         #feature-detail-panel {
