@@ -28,64 +28,67 @@ customStyleTag.innerHTML = `
 
     /* Modifiche specifiche solo per DESKTOP */
 @media (min-width: 768px) {
-        /* CONTENITORE PRINCIPALE: da chiuso sta in basso a sinistra (visibile) */
+        /* 1. LA LINGUETTA (Desktop): da chiusa sta in basso a sinistra */
         #custom-bottom-panel {
             position: fixed;
-            bottom: 0;
+            bottom: 0px;
             left: 10px;
-            transform: none;
-            width: max-content;
-            min-width: 220px;
-            padding: 8px 12px;
-            display: flex;
-            flex-direction: column;
-            z-index: 2000;
+            z-index: 2002;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
             border-top-left-radius: 14px;
             border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
+            padding: 8px 12px;
             box-sizing: border-box;
-            height: auto;
-            transition: all 0.25s ease-in-out;
+            transition: bottom 0.25s ease-in-out;
         }
         
-        /* QUANDO APERTO: il box si espande in larghezza e altezza totale */
+        /* QUANDO APERTA (Desktop): la linguetta sale con bordo inferiore a 176px */
         #custom-bottom-panel.open {
-            bottom: 0 !important;
-            width: 1000px !important;
-            height: 220px !important; 
+            bottom: 176px !important;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
         }
 
-        /* LINGUETTA DA CHIUSA: visibile in basso a sinistra nel flusso normale */
-        #custom-bottom-panel .panel-main-header {
-            position: relative;
-            width: max-content !important;
-            min-width: 180px;
-            z-index: 2002;
-            margin: 0;
-            transition: transform 0.25s ease-in-out;
-        }
-
-        /* QUANDO APERTO: la linguetta si sposta in alto portando il suo bordo inferiore esattamente a 176px */
-        #custom-bottom-panel.open .panel-main-header {
-            transform: translateY(-176px);
-        }
-
-        /* IL CORPO DEL PANNELLO INTERNO: si sviluppa nei 176px sottostanti */
-        #custom-bottom-panel.open .panel-three-columns {
-            position: absolute;
+        /* 2. IL BOX CENTRO DI CONTROLLO (Desktop): pannello contenuti senza intestazione */
+        #control-center-content-box {
+            position: fixed;
             bottom: 0;
-            left: 12px;
-            right: 12px;
+            left: 10px;
+            width: 1000px;
+            height: 0px; /* Chiuso di default */
+            overflow: hidden;
+            z-index: 2000;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+            border-top-right-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-top: none;
+            box-sizing: border-box;
+            transition: height 0.25s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px;
+        }
+
+        /* QUANDO APERTO (Desktop): il box si apre a comparsa nello spazio dei 176px */
+        #custom-bottom-panel.open ~ #control-center-content-box {
             height: 176px !important;
-            max-height: 176px !important;
+            padding: 8px 12px;
+        }
+
+        /* GRIGLIA INTERNA DEI CONTENUTI (Desktop) */
+        #control-center-content-box .panel-three-columns {
+            height: 100% !important;
+            max-height: 100% !important;
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
             display: grid !important;
+            width: 100%;
             box-sizing: border-box;
-            padding-top: 8px;
         }
 
         #feature-detail-panel {
