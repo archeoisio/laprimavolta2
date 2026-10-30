@@ -416,8 +416,8 @@ const initialBounds = [
     [40.726, 14.873]
 ];
 const navigationBounds = [
-    [40.600, 14.740], // Sud-Ovest esteso
-    [40.750, 14.900]  // Nord-Est esteso
+    [40.580, 14.680], // Sud-Ovest molto più esteso a sinistra
+    [40.760, 14.920]  // Nord-Est esteso
 ];
     document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
