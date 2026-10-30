@@ -28,71 +28,60 @@ customStyleTag.innerHTML = `
 
     /* Modifiche specifiche solo per DESKTOP */
 @media (min-width: 768px) {
-        /* CONTENITORE PRINCIPALE UNICO */
+        /* CONTENITORE PRINCIPALE */
         #custom-bottom-panel {
             position: fixed;
             bottom: 0;
             left: 10px;
             width: max-content;
+            min-width: 220px;
             display: flex;
-            flex-direction: column-reverse; /* Inverte l'ordine: la linguetta sta in basso, il box sale sopra quando aperto */
+            flex-direction: column;
             z-index: 2000;
-            background: transparent;
-            box-sizing: border-box;
-            transition: all 0.25s ease-in-out;
-        }
-
-        /* QUANDO APERTO: si allarga alla misura desktop e definisce l'ingombro totale */
-        #custom-bottom-panel.open {
-            width: 1000px !important;
-        }
-
-        /* LA LINGUETTA (Testata del pannello) */
-        #custom-bottom-panel .panel-main-header {
-            position: relative;
-            width: max-content !important;
-            min-width: 180px;
-            z-index: 2002;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
             border-top-left-radius: 14px;
             border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
-            padding: 8px 12px;
             box-sizing: border-box;
+            height: auto; /* Da chiuso mostra solo la linguetta */
+            transition: all 0.25s ease-in-out;
+        }
+        
+        /* QUANDO APERTO: si espande esattamente a 176px di altezza totale e 1000px di larghezza */
+        #custom-bottom-panel.open {
+            width: 1000px !important;
+            height: 176px !important; 
         }
 
-        /* QUANDO APERTO: la linguetta si trova in cima al box aperto (grazie a column-reverse) */
-        #custom-bottom-panel.open .panel-main-header {
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
+        /* LINGUETTA / INTESTAZIONE */
+        #custom-bottom-panel .panel-main-header {
+            width: 100% !important;
+            box-sizing: border-box;
+            z-index: 2002;
         }
 
-        /* IL CORPO DEI CONTENUTI (inizialmente chiuso a 0) */
+        /* CORPO DEI CONTENUTI INTERNO (Nascosto da chiuso) */
         #custom-bottom-panel .panel-three-columns {
             max-height: 0px !important;
             height: 0px !important;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
-            border-top-left-radius: 14px;
-            border-top-right-radius: 14px;
-            border: 1px solid rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            transition: max-height 0.25s ease-in-out, height 0.25s ease-in-out;
-            display: grid !important;
-            grid-template-columns: 180px 120px 1fr !important;
-            padding: 0 12px;
+            opacity: 0;
+            transition: opacity 0.20s ease-in-out;
+            display: none !important;
         }
 
-        /* QUANDO APERTO: il corpo si espande esattamente a 176px */
+        /* QUANDO APERTO: il corpo dei contenuti compare e occupa lo spazio esatto */
         #custom-bottom-panel.open .panel-three-columns {
-            height: 176px !important;
-            max-height: 176px !important;
-            padding: 8px 12px;
+            display: grid !important;
+            height: calc(176px - var(--header-height, 44px)) !important;
+            max-height: 132px !important;
+            grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
+            opacity: 1;
+            box-sizing: border-box;
+            padding-top: 4px;
         }
 
         #feature-detail-panel {
