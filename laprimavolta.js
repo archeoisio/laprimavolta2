@@ -38,7 +38,8 @@ customStyleTag.innerHTML = `
             padding: 8px 12px;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease-in-out;
+            justify-content: flex-end;
+            align-items: flex-start;
             z-index: 2000;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
@@ -46,38 +47,38 @@ customStyleTag.innerHTML = `
             border-top-left-radius: 14px;
             border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            transition: all 0.3s ease-in-out;
         }
         
-        /* QUANDO È APERTO: il pannello si solleva dal fondo e raggiunge l'altezza totale di 220px */
+        /* QUANDO APERTO: il pannello si espande e gestisce lo spostamento */
         #custom-bottom-panel.open {
             bottom: 0 !important;
             width: 1000px !important;
-            height: 220px !important;
+            height: 220px !important; /* Altezza totale che accoglie la linguetta sollevata e il corpo sotto */
         }
 
-        /* LINGUETTA DESKTOP: quando aperto, si posiziona in cima al blocco (esattamente a 220px dal basso) */
+        /* LINGUETTA: quando aperto, si sposta/posiziona in alto all'interno del box dei 220px */
         #custom-bottom-panel.open .panel-main-header {
-            position: absolute;
-            top: 8px; /* Rimane ancorata in alto nel box dei 220px */
-            left: 12px;
+            position: relative;
+            transform: translateY(-176px); /* Sposta la linguetta verso l'alto della quota esatta */
+            transition: transform 0.3s ease-in-out;
             width: max-content !important;
             min-width: 180px;
             margin: 0;
             z-index: 2002;
         }
 
-        /* CORPO DEL PANNELLO: si sviluppa sotto la linguetta con altezza 176px */
+        /* IL CORPO DEL PANNELLO: si apre nello spazio sottostante (176px) */
         #custom-bottom-panel.open .panel-three-columns {
-            position: absolute;
-            bottom: 8px;
-            left: 12px;
-            right: 12px;
             height: 176px !important;
             max-height: 176px !important;
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
             display: grid !important;
+            width: 100%;
             box-sizing: border-box;
+            margin-top: -44px; /* Compensa lo spazio della linguetta sollevata */
         }
 
         #feature-detail-panel {
