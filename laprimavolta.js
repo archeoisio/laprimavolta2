@@ -496,7 +496,7 @@ atlasCategories[tematica].push({ name, layer });
                 });
             },
             pointToLayer: function (feature, latlng) { 
-                return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
+                return L.circleMarker(latlng, { radius: 9.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
             }
         });
        allTavoloLayers.push(layerPuntiTavolo);
