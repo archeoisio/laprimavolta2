@@ -48,7 +48,7 @@ customStyleTag.innerHTML = `
         
         #custom-bottom-panel.open {
             width: 1000px !important;
-            height: 220px !important;
+            height: 230px !important;
         }
 #custom-bottom-panel .panel-main-header b {
             font-size: 14px !important; 
@@ -77,7 +77,7 @@ customStyleTag.innerHTML = `
 
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 500px;
-            height: 220px;
+            height: 230px;
             max-height: 220px !important;
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
