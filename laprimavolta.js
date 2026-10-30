@@ -200,7 +200,7 @@ customStyleTag.innerHTML = `
 `;
 document.head.appendChild(customStyleTag);
 
-const tematicaColors = { 
+const tavoloColors = { 
     'ambiente': '#2ecc71', 
     'cultura': '#e67e22', 
     'sociale': '#3498db', 
