@@ -2,7 +2,6 @@ let map;
 let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
-let layer_iconaquartieri_0;
 let currentActiveTab = null;
 
 const MIN_ZOOM_VISIBLE = 13;
@@ -251,16 +250,10 @@ function checkZoomVisibility() {
     const currentZoom = map.getZoom();
     
     if (currentZoom >= MIN_ZOOM_VISIBLE) {
-        if (layer_iconaquartieri_0 && !map.hasLayer(layer_iconaquartieri_0)) {
-            map.addLayer(layer_iconaquartieri_0);
-        }
         allTavoloLayers.forEach(l => {
             if (!map.hasLayer(l)) map.addLayer(l);
         });
     } else {
-        if (layer_iconaquartieri_0 && map.hasLayer(layer_iconaquartieri_0)) {
-            map.removeLayer(layer_iconaquartieri_0);
-        }
         allTavoloLayers.forEach(l => {
             if (map.hasLayer(l)) map.removeLayer(l);
         });
@@ -435,48 +428,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     map.on('zoomend', checkZoomVisibility);
 
-    function pop_iconaquartieri_0(feature, layer) {
-        var nomeQuartiere = feature.properties['nome'] || '';
-        if (nomeQuartiere) { layer.bindTooltip(nomeQuartiere, { permanent: true, direction: 'center', className: 'quartiere-label' }); }
-    }
-    map.createPane('pane_iconaquartieri_0'); map.getPane('pane_iconaquartieri_0').style.zIndex = 400;
-    layer_iconaquartieri_0 = new L.geoJson(json_iconaquartieri_0, { interactive: true, pane: 'pane_iconaquartieri_0', onEachFeature: pop_iconaquartieri_0, pointToLayer: function (feature, latlng) { return L.circleMarker(latlng, { radius: 0.1, stroke: false, fill: false, opacity: 0 }); } });
-
-    function pop_hospital_1(feature, layer) {
-        layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
-        var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-        layer.bindPopup(popupContent, { maxHeight: 400 });
-    }
-    map.createPane('pane_hospital_1'); map.getPane('pane_hospital_1').style.zIndex = 401;
-    var layer_hospital_1 = new L.geoJson(json_hospital_1, { interactive: false, pane: 'pane_hospital_1', onEachFeature: pop_hospital_1, pointToLayer: function (feature, latlng) { return L.marker(latlng, { icon: L.icon({ iconUrl: 'markers/hospital_1.svg', iconSize: [16.72, 16.72] }) }); } });
-    map.addLayer(layer_hospital_1);
-
   map.createPane('pane_confini_amministrativi');
    map.getPane('pane_confini_amministrativi').style.zIndex = 400;
 
    var layer_confini_amministrativi = L.geoJson(null, {
-       interactive: false,
-       pane: 'pane_confini_amministrativi',
-       style: function(feature) {
-           return { color: '#636e72', weight: 1.5, fill: true, fillColor: '#b2bec3', fillOpacity: 0.05 };
-       }
-   });
-
+    interactive: false,
+    pane: 'pane_confini_amministrativi',
+    style: function(feature) {
+        return { 
+            color: '#636e72',      // Colore del bordo (grigio scuro definito)
+            weight: 1.5,           // Spessore del bordo
+            fill: true,            
+            fillColor: '#b2bec3',  
+            fillOpacity: 0.0       // <-- Messo a 0 per renderlo totalmente trasparente dentro!
+        };
+    }
+});
    fetch('data/confiniamministrativi.geojson')
        .then(response => response.json())
        .then(data => {
            layer_confini_amministrativi.addData(data);
            map.addLayer(layer_confini_amministrativi); // <-- Attiva il layer sulla mappa appena i dati sono pronti
        });
-   
-    function pop_iconestazioni_2(feature, layer) {
-        layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
-        var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
-        layer.bindPopup(popupContent, { maxHeight: 400 });
-    }
-    map.createPane('pane_iconestazioni_2'); map.getPane('pane_iconestazioni_2').style.zIndex = 402;
-    var layer_iconestazioni_2 = new L.geoJson(json_iconestazioni_2, { interactive: true, pane: 'pane_iconestazioni_2', onEachFeature: pop_iconestazioni_2, pointToLayer: function (feature, latlng) { return L.marker(latlng, { icon: L.icon({ iconUrl: 'markers/iconestazioni_2.svg', iconSize: [22.0, 22.0], iconAnchor: [11, 11] }) }); } });
-    map.addLayer(layer_iconestazioni_2);
 
     map.createPane('pane_GoogleSatellite_3'); map.getPane('pane_GoogleSatellite_3').style.zIndex = 403;
     var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28, keepBuffer: 6 });
@@ -616,7 +589,7 @@ atlasCategories[tematica].push({ name, layer });
                         <div class="sub-section-title">Altro</div>
                         <div class="desktop-grid-altro" style="display:flex; flex-direction:column; gap:2px;">
         `;
-        const contextLayers = [{ name: 'Stazioni', layer: layer_iconestazioni_2 }, { name: 'Ospedali', layer: layer_hospital_1 }, { name: 'Quartieri', layer: layer_iconaquartieri_0 }, { name: 'Confini', layer: layer_confini_amministrativi }];
+        const contextLayers = [{ { name: 'Confini', layer: layer_confini_amministrativi }];
         contextLayers.forEach((ctx, idx) => {
             const isChecked = map.hasLayer(ctx.layer);
             html += `<label style="display:flex; align-items:center; gap:4px; margin:2px 0; cursor:pointer;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
@@ -739,14 +712,14 @@ atlasCategories[tematica].push({ name, layer });
             };
         });
 
-        bottomPanel.querySelectorAll('.custom-context-chk').forEach(chk => {
-            chk.onchange = (e) => {
-                const index = parseInt(e.target.getAttribute('data-index'));
-                const targetLayer = [layer_iconestazioni_2, layer_hospital_1, layer_iconaquartieri_0][index];
-                if (e.target.checked) { map.addLayer(targetLayer); } else { map.removeLayer(targetLayer); }
-            };
-        });
-    }
+         bottomPanel.querySelectorAll('.custom-context-chk').forEach(chk => {
+         chk.onchange = (e) => {
+         const index = parseInt(e.target.getAttribute('data-index'));
+         const targetLayer = [layer_confini_amministrativi][index];
+         if (e.target.checked) { map.addLayer(targetLayer); } else { map.removeLayer(targetLayer); }
+         };
+         });
+        }
 
     renderPanelContent();
 
