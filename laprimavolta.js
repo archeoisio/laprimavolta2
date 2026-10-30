@@ -68,7 +68,7 @@ customStyleTag.innerHTML = `
             font-size: 14px !important; /* Aumenta il nome delle proposte/features */
         }
         #custom-bottom-panel .panel-three-columns {
-            grid-template-columns: 180px 120px 1fr !important;
+            grid-template-columns: 180px 160px 1fr !important;
             overflow-y: auto;
             display: grid !important;
             width: 100%;
