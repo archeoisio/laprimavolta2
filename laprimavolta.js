@@ -53,12 +53,20 @@ customStyleTag.innerHTML = `
 #custom-bottom-panel .panel-main-header b {
             font-size: 14px !important; 
         }
+/* 1. Titoli delle sezioni ("Base map", "Altro", "Tematiche", "Elementi mappati...") */
         #custom-bottom-panel .sub-section-title {
-    font-size: 13px !important; /* Modifica qui la dimensione dei titoli di sezione */
-}
-#custom-bottom-panel .sidebar-tab-btn {
-    font-size: 13px !important; /* Modifica qui se vuoi ingrandire o rimpicciolire i pulsanti */
-}
+            font-size: 14px !important; /* Aumenta la dimensione dei titoli di sezione su desktop */
+        }
+
+        /* 2. Etichette delle opzioni (OSM, Satellite, Stazioni, Ospedali, Quartieri) */
+        #custom-bottom-panel .col-left label {
+            font-size: 14px !important; /* Aumenta il testo delle voci spuntabili */
+        }
+
+        /* 3. Testo dei singoli elementi mappati nella griglia di destra */
+        #custom-bottom-panel .col-right span[style*="font-size"] {
+            font-size: 14px !important; /* Aumenta il nome delle proposte/features */
+        }
         #custom-bottom-panel .panel-three-columns {
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
