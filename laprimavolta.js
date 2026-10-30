@@ -206,7 +206,8 @@ function getTavoloColor(tavoloName) {
 function highlightFeature(e) {
     var layer = e.target;
     if (layer.setStyle) {
-        layer.setStyle({ fillColor: '#ffff00', color: '#ff0000', fillOpacity: 0.9, weight: 2 });
+        // Mantiene il riempimento originale e applica solo il bordo rosso
+        layer.setStyle({ color: '#ff0000', weight: 2 });
     }
     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge && layer.bringToFront) { layer.bringToFront(); }
 }
