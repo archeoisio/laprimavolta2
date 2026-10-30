@@ -3,13 +3,12 @@ let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
 let layer_iconaquartieri_0;
-let currentActiveTab = null; // Memorizza l'ultima scheda tematica selezionata
+let currentActiveTab = null;
 
-const MIN_ZOOM_VISIBLE = 13; // Livello di zoom minimo per visualizzare quartieri e elementi tematici
+const MIN_ZOOM_VISIBLE = 13;
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
-    /* Impedisce lo zoom automatico da doppio tap su mobile */
     * {
         touch-action: manipulation;
     }
@@ -39,18 +38,30 @@ customStyleTag.innerHTML = `
         
         #custom-bottom-panel.open {
             width: 1000px !important;
-            height: 220px !important; /* Forza l'altezza identica al pannello dettagli */
+            height: 310px !important;
         }
 
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
-            height: 220px; /* Altezza fissa identica al Centro di Controllo aperto */
+            height: 310px;
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
-            padding: 8px 10px; box-sizing: border-box; font-family: sans-serif;
+            padding: 8px 12px; box-sizing: border-box; font-family: sans-serif;
             font-size: 13px; color: #333; display: none; flex-direction: column;
             border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* --- NUOVO: Aggiungiamo le due colonne interne per Desktop nella prima colonna --- */
+        .col-left .base-map-vertical {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+        .col-left .desktop-grid-altro {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
         }
     }
 
@@ -75,18 +86,15 @@ customStyleTag.innerHTML = `
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     /* Layout Principale a 3 Colonne */
-    .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
+    .panel-three-columns { display: grid; grid-template-columns: 140px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
     
-    /* Colonna 1: Sinistra (Mappa Base fissa + Altro scrollabile) */
     .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
     .col-left .base-map-vertical { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
     .col-left-scrollable { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex-grow: 1; border-top: 1px solid #e1e1e1; padding-top: 4px; }
     
-    /* Colonna 2: Centrale (Pulsanti Cluster con scorrimento proprio) */
     .col-middle { display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow-y: auto; }
     .sidebar-tabs-vertical { display: flex; flex-direction: column; gap: 4px; }
     
-    /* Colonna 3: Destra (Contenuto Cluster Selezionato con scorrimento proprio) */
     .col-right { display: flex; flex-direction: column; overflow: hidden; }
     
     .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -95,10 +103,7 @@ customStyleTag.innerHTML = `
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
     
-    /* Contenitore con scorrimento orizzontale per le colonne verticali */
     .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
-    
-    /* Singola colonna verticale (5 elementi fissi) */
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
     .quartiere-label { background: rgba(255, 255, 255, 0.9); border: 1px solid #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.2); white-space: nowrap; }
@@ -107,9 +112,9 @@ customStyleTag.innerHTML = `
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #e1e1e1;
-        padding-bottom: 4px;
-        margin-bottom: 6px;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 6px;
+        margin-bottom: 4px;
     }
 
     .close-feature-btn {
@@ -125,6 +130,39 @@ customStyleTag.innerHTML = `
         align-items: center;
         justify-content: center;
         font-size: 11px;
+    }
+
+    .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 2px;
+    }
+
+    .detail-table tr {
+        border-bottom: 1px solid #e1e1e1;
+    }
+
+    .detail-table tr:last-child {
+        border-bottom: none;
+    }
+
+    .detail-table th, .detail-table td {
+        padding: 5px 4px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .detail-table th {
+        width: 30%;
+        color: #555;
+        font-weight: 600;
+        background-color: #f8f9fa;
+        border-right: 1px solid #e1e1e1;
+    }
+
+    .detail-table td {
+        width: 70%;
+        color: #2c3e50;
     }
 `;
 document.head.appendChild(customStyleTag);
@@ -162,7 +200,6 @@ function resetFeatureStyle(e) {
     }
 }
 
-// Funzione per gestire la visibilità in base al livello di zoom
 function checkZoomVisibility() {
     if (!map) return;
     const currentZoom = map.getZoom();
@@ -189,7 +226,6 @@ function checkZoomVisibility() {
     }
 }
 
-// Funzione per mostrare i dettagli al click diretto sulla mappa (SENZA spostare la mappa)
 function showFeatureDetailsOnly(layer, tavoloName) {
     if (selectedLayer && selectedLayer !== layer) {
         resetFeatureStyle({ target: selectedLayer });
@@ -207,13 +243,13 @@ function showFeatureDetailsOnly(layer, tavoloName) {
                 <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
                 <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-                <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
-                <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
-                <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
-                <div><b>Stato:</b> ${props['Stato'] || 'N/D'}</div>
-                <div><b>Tavolo:</b> ${props['Tavolo'] || tavoloName}</div>
-            </div>
+            <table class="detail-table">
+                <tr><th>Nome</th><td>${props['Nome'] || 'N/D'}</td></tr>
+                <tr><th>Criticità</th><td>${props['Criticità'] || 'N/D'}</td></tr>
+                <tr><th>Proposta</th><td>${props['Proposta'] || 'N/D'}</td></tr>
+                <tr><th>Stato</th><td>${props['Stato'] || 'N/D'}</td></tr>
+                <tr><th>Tavolo</th><td>${props['Tavolo'] || tavoloName}</td></tr>
+            </table>
         `;
         detailPanel.innerHTML = detailHtml;
         detailPanel.style.display = 'flex';
@@ -395,13 +431,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="col-left-scrollable">
                         <div class="sub-section-title">Altro</div>
+                        <div class="desktop-grid-altro" style="display:flex; flex-direction:column; gap:2px;">
         `;
         const contextLayers = [{ name: 'Stazioni', layer: layer_iconestazioni_2 }, { name: 'Ospedali', layer: layer_hospital_1 }, { name: 'Quartieri', layer: layer_iconaquartieri_0 }];
         contextLayers.forEach((ctx, idx) => {
             const isChecked = map.hasLayer(ctx.layer);
             html += `<label style="display:flex; align-items:center; gap:4px; margin:2px 0; cursor:pointer;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
         });
-        html += `</div></div>`;
+        html += `</div></div></div>`;
 
         // COLONNA 2: CLUSTER TEMATICI
         html += `
@@ -479,7 +516,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        // Pulsante lente di ingrandimento: apre il pannello E SPOSTA/ZOOMA LA MAPPA
         bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
@@ -518,13 +554,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
                                 <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                <div><b>Nome:</b> ${props['Nome'] || 'N/D'}</div>
-                                <div><b>Criticità:</b> ${props['Criticità'] || 'N/D'}</div>
-                                <div><b>Proposta:</b> ${props['Proposta'] || 'N/D'}</div>
-                                <div><b>Stato:</b> ${props['Stato'] || 'N/D'}</div>
-                                <div><b>Tavolo:</b> ${props['Tavolo'] || tavolo}</div>
-                            </div>
+                            <table class="detail-table">
+                                <tr><th>Nome</th><td>${props['Nome'] || 'N/D'}</td></tr>
+                                <tr><th>Criticità</th><td>${props['Criticità'] || 'N/D'}</td></tr>
+                                <tr><th>Proposta</th><td>${props['Proposta'] || 'N/D'}</td></tr>
+                                <tr><th>Stato</th><td>${props['Stato'] || 'N/D'}</td></tr>
+                                <tr><th>Tavolo</th><td>${props['Tavolo'] || tavolo}</td></tr>
+                            </table>
                         `;
                         detailPanel.innerHTML = detailHtml;
                         detailPanel.style.display = 'flex';
@@ -551,7 +587,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderPanelContent();
 
-    // --- CORREZIONE BARRA NERA MOBILE (Viewport dinamico) ---
     function setVh() {
         const mapEl = document.getElementById('map');
         if (!mapEl || !map) return;
@@ -599,7 +634,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnControl.addTo(map);
 });
 
-// Funzioni di sicurezza
 function closeModal() {
     const modal = document.getElementById('welcome-modal');
     if (modal) modal.style.display = 'none';
