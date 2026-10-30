@@ -305,7 +305,7 @@ window.renderDetailSlide = function() {
 
     // 1. Raccogliamo TUTTI i campi possibili (inclusi quelli vuoti/non compilati)
     const allFields = [];
-    const mainKeys = ['Nome', 'Criticità', 'Proposta', 'Stato'];
+    const mainKeys = ['Nome', 'Criticità', 'Proposta', 'Stato proposta'];
     
     // Inseriamo prima i principali nell'ordine desiderato (mostrandoli anche se vuoti)
     mainKeys.forEach(k => {
@@ -449,16 +449,23 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_hospital_1 = new L.geoJson(json_hospital_1, { interactive: false, pane: 'pane_hospital_1', onEachFeature: pop_hospital_1, pointToLayer: function (feature, latlng) { return L.marker(latlng, { icon: L.icon({ iconUrl: 'markers/hospital_1.svg', iconSize: [16.72, 16.72] }) }); } });
     map.addLayer(layer_hospital_1);
 
-   map.createPane('pane_confini_amministrativi'); 
-    map.getPane('pane_confini_amministrativi').style.zIndex = 400; // Sotto agli ospedali (401) e alle stazioni (402)
-    var layer_confini_amministrativi = new L.geoJson(json_confini_amministrativi, {
-        interactive: false, 
-        pane: 'pane_confini_amministrativi',
-        style: function(feature) {
-            return { color: '#636e72', weight: 1.5, fill: true, fillColor: '#b2bec3', fillOpacity: 0.05 };
-        }
-    });
-    // map.addLayer(layer_confini_amministrativi);
+  map.createPane('pane_confini_amministrativi');
+   map.getPane('pane_confini_amministrativi').style.zIndex = 400;
+
+   var layer_confini_amministrativi = L.geoJson(null, {
+       interactive: false,
+       pane: 'pane_confini_amministrativi',
+       style: function(feature) {
+           return { color: '#636e72', weight: 1.5, fill: true, fillColor: '#b2bec3', fillOpacity: 0.05 };
+       }
+   });
+
+   fetch('data/confiniamministrativi.geojson')
+       .then(response => response.json())
+       .then(data => {
+           layer_confini_amministrativi.addData(data);
+           map.addLayer(layer_confini_amministrativi); // <-- Attiva il layer sulla mappa appena i dati sono pronti
+       });
    
     function pop_iconestazioni_2(feature, layer) {
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
