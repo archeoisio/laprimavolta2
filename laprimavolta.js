@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
-        minZoom: 12.5, 
+        minZoom: 13, 
         zoomSnap: 0.25,  
         zoomDelta: 0.25,
         wheelPxPerZoomLevel: 120, // <-- Aggiungilo qui (regola la velocità/sensibilità dello scroll)
