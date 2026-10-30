@@ -27,51 +27,57 @@ customStyleTag.innerHTML = `
     }
 
     /* Modifiche specifiche solo per DESKTOP */
-   @media (min-width: 768px) {
+   @@media (min-width: 768px) {
         #custom-bottom-panel {
+            position: fixed;
+            bottom: 0;
             left: 10px;
             transform: none;
             width: max-content;
             min-width: 220px;
             padding: 8px 12px;
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: flex-end;
-            height: 44px; /* Da chiuso mostra solo l'altezza della linguetta */
-            overflow: hidden;
+            flex-direction: column-reverse; /* Inverte il flusso così la linguetta sta sopra o sotto a seconda delle necessità */
+            justify-content: flex-start;
+            transition: all 0.3s ease-in-out;
+            z-index: 2000;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+            border-top-left-radius: 14px;
+            border-top-right-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.1);
         }
         
         #custom-bottom-panel.open {
             width: 1000px !important;
-            height: 220px !important;
-            justify-content: flex-start !important; /* Fa partire gli elementi dall'alto verso il basso sotto la linguetta */
-            align-items: flex-start !important;
+            height: 176px !important; /* Altezza del corpo pannello aperto */
         }
 
-        /* LINGUETTA DESKTOP: resta fissa in alto a sinistra a misura di testo */
+        /* LINGUETTA DESKTOP: si posiziona a 220px di altezza nella pagina */
         #custom-bottom-panel .panel-main-header {
             width: max-content !important;
             min-width: 180px;
-            align-self: flex-start;
-            margin-bottom: 6px;
-            flex-shrink: 0;
+            margin: 0;
+        }
+
+        /* Il contenuto interno si sviluppa nei 176px */
+        #custom-bottom-panel.open .panel-three-columns {
+            height: 176px !important;
+            max-height: 176px !important;
+            grid-template-columns: 180px 120px 1fr !important;
+            overflow-y: auto;
         }
 
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
-            height: 220px;
+            height: 220px; /* Alto 220px, quindi il suo bordo superiore è a 220px dalla pagina */
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
             padding: 8px 12px; box-sizing: border-box; font-family: sans-serif;
             font-size: 13px; color: #333; display: none; flex-direction: column;
             border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .panel-three-columns {
-            grid-template-columns: 180px 120px 1fr !important;
-            width: 100%; /* Si adatta alla larghezza del contenitore aperto di 1000px */
         }
 
         .col-left .base-map-vertical {
