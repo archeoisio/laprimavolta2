@@ -27,7 +27,7 @@ customStyleTag.innerHTML = `
     }
 
     /* Modifiche specifiche solo per DESKTOP */
-    @media (min-width: 768px) {
+   @media (min-width: 768px) {
         #custom-bottom-panel {
             left: 10px;
             transform: none;
@@ -37,12 +37,16 @@ customStyleTag.innerHTML = `
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            justify-content: flex-end;
+            height: 44px; /* Da chiuso mostra solo l'altezza della linguetta */
+            overflow: hidden;
         }
         
         #custom-bottom-panel.open {
             width: 1000px !important;
             height: 220px !important;
-            align-items: stretch; /* Quando è aperto si espande sotto la linguetta per tutta la larghezza */
+            justify-content: flex-start !important; /* Fa partire gli elementi dall'alto verso il basso sotto la linguetta */
+            align-items: flex-start !important;
         }
 
         /* LINGUETTA DESKTOP: resta fissa in alto a sinistra a misura di testo */
@@ -51,6 +55,7 @@ customStyleTag.innerHTML = `
             min-width: 180px;
             align-self: flex-start;
             margin-bottom: 6px;
+            flex-shrink: 0;
         }
 
         #feature-detail-panel {
@@ -66,6 +71,7 @@ customStyleTag.innerHTML = `
 
         .panel-three-columns {
             grid-template-columns: 180px 120px 1fr !important;
+            width: 100%; /* Si adatta alla larghezza del contenitore aperto di 1000px */
         }
 
         .col-left .base-map-vertical {
