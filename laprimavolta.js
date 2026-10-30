@@ -311,27 +311,31 @@ window.renderDetailSlide = function() {
     let leftAction = (slide > 1) ? `onclick="window.changeDetailSlide(${slide - 1})"` : "";
     let rightAction = (slide < totalPages) ? `onclick="window.changeDetailSlide(${slide + 1})"` : "";
 
-    let navControls = `
-        <div style="display:flex; align-items:center; gap:6px; font-weight:bold;">
-            <span ${leftAction} title="Pagina precedente" style="${leftArrowStyle} font-size:12px;">⬅️</span>
-            <span style="font-size:11px; color:#666; font-weight:normal;">${slide}/${totalPages}</span>
-            <span ${rightAction} title="Pagina successiva" style="${rightArrowStyle} font-size:12px;">➡️</span>
-        </div>
-    `;
+    // Controlli di paginazione posizionati al centro in basso (mostrati solo se ci sono più pagine)
+    let navControls = '';
+    if (totalPages > 1) {
+        navControls = `
+            <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:auto; padding-top:6px;">
+                <span ${leftAction} title="Pagina precedente" style="${leftArrowStyle} font-size:12px;">⬅️</span>
+                <span style="font-size:11px; color:#666; font-weight:normal;">${slide}/${totalPages}</span>
+                <span ${rightAction} title="Pagina successiva" style="${rightArrowStyle} font-size:12px;">➡️</span>
+            </div>
+        `;
+    }
 
+    // Struttura finale: Header pulito senza frecce, tabella al centro, paginazione in basso
     let detailHtml = `
         <div class="feature-detail-header">
             <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
-            ${navControls}
             <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
         </div>
         ${contentHtml}
+        ${navControls}
     `;
 
     detailPanel.innerHTML = detailHtml;
     detailPanel.style.display = 'flex';
 };
-
 window.changeDetailSlide = function(targetSlide) {
     window.currentDetailSlide = targetSlide;
     renderDetailSlide();
