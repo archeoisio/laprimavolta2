@@ -21,7 +21,7 @@ customStyleTag.innerHTML = `
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out;
         z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left;
-        font-family: sans-serif; font-size: 13px; color: #333;
+        font-family: sans-serif; font-size: 12px; color: #333;
         border-top-left-radius: 14px; border-top-right-radius: 14px;
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column;
     }
@@ -41,18 +41,27 @@ customStyleTag.innerHTML = `
             height: 220px !important;
         }
 
+        /* Linguetta stretta a misura di testo SOLO su desktop, anche quando aperto */
+        #custom-bottom-panel .panel-main-header {
+            width: max-content;
+            min-width: 180px;
+        }
+
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
             height: 220px;
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
-            padding: 8px 10px; box-sizing: border-box; font-family: sans-serif;
+            padding: 8px 12px; box-sizing: border-box; font-family: sans-serif;
             font-size: 13px; color: #333; display: none; flex-direction: column;
             border: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* --- NUOVO: Aggiungiamo le due colonne interne per Desktop nella prima colonna --- */
+        .panel-three-columns {
+            grid-template-columns: 180px 120px 1fr !important;
+        }
+
         .col-left .base-map-vertical {
             display: grid !important;
             grid-template-columns: 1fr 1fr;
@@ -83,10 +92,10 @@ customStyleTag.innerHTML = `
     #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
-    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; width: 100% !important; }
 
-    /* Layout Principale a 3 Colonne */
-    .panel-three-columns { display: grid; grid-template-columns: 140px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
+    /* Layout Principale a 3 Colonne (Mobile: larghezza originale prima colonna 90px) */
+    .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
     
     .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
     .col-left .base-map-vertical { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
