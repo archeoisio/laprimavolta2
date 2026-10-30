@@ -295,17 +295,17 @@ window.renderDetailSlide = function() {
         contentHtml += `</table>`;
     }
 
-    let leftArrowStyle = (slide > 1) ? "cursor:pointer; color:#3498db;" : "cursor:default; color:#ccc;";
-    let rightArrowStyle = (slide < totalPages) ? "cursor:pointer; color:#3498db;" : "cursor:default; color:#ccc;";
+    let leftArrowStyle = (slide > 1) ? "cursor:pointer; opacity:1;" : "cursor:default; opacity:0.3;";
+    let rightArrowStyle = (slide < totalPages) ? "cursor:pointer; opacity:1;" : "cursor:default; opacity:0.3;";
     
     let leftAction = (slide > 1) ? `onclick="window.changeDetailSlide(${slide - 1})"` : "";
     let rightAction = (slide < totalPages) ? `onclick="window.changeDetailSlide(${slide + 1})"` : "";
 
     let navControls = `
         <div style="display:flex; align-items:center; gap:6px; font-weight:bold;">
-            <span ${leftAction} title="Pagina precedente" style="${leftArrowStyle} font-size:12px;">⬅</span>
+            <span ${leftAction} title="Pagina precedente" style="${leftArrowStyle} font-size:12px;">⬅️</span>
             <span style="font-size:11px; color:#666; font-weight:normal;">${slide}/${totalPages}</span>
-            <span ${rightAction} title="Pagina successiva" style="${rightArrowStyle} font-size:12px;">➔</span>
+            <span ${rightAction} title="Pagina successiva" style="${rightArrowStyle} font-size:12px;">➡️</span>
         </div>
     `;
 
