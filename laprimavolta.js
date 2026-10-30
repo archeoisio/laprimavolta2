@@ -9,6 +9,11 @@ const MIN_ZOOM_VISIBLE = 13; // Livello di zoom minimo per visualizzare quartier
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
+    /* Impedisce lo zoom automatico da doppio tap su mobile */
+    * {
+        touch-action: manipulation;
+    }
+
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
     #custom-bottom-panel {
@@ -85,7 +90,7 @@ customStyleTag.innerHTML = `
     .col-right { display: flex; flex-direction: column; overflow: hidden; }
     
     .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 4px 6px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; }
+    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 6px 8px; font-size: 13px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
@@ -545,6 +550,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderPanelContent();
+
+    // --- CORREZIONE BARRA NERA MOBILE (Viewport dinamico) ---
+    function setVh() {
+        const mapEl = document.getElementById('map');
+        if (!mapEl || !map) return;
+        const runResize = () => {
+            mapEl.style.left = "0px";
+            mapEl.style.top = "0px";
+            mapEl.style.width = window.innerWidth + 'px';
+            mapEl.style.height = window.innerHeight + 'px';
+            map.invalidateSize({ animate: false });
+        };
+        runResize();
+        setTimeout(runResize, 100);
+        setTimeout(runResize, 500);
+    }
+    setVh();
+    window.addEventListener('resize', setVh);
 
     map.on('locationfound', function(e) {
         var radius = e.accuracy / 2;
