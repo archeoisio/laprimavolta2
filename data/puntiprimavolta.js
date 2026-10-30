@@ -1,4 +1,4 @@
-{
+var json_puntiprimavolta_5 = {
 "type": "FeatureCollection",
 "name": "puntiprimavolta",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
@@ -11,4 +11,4 @@
 { "type": "Feature", "properties": { "Nome": "Stazione Mercatello", "Criticità": "Assenza collegamenti autobus", "Proposta": "Creare rete di trasporto circolare di collegamento", "Stato proposta": null, "Tematica": "Servizi urbani", "ID": 12, "Data immissione": null }, "geometry": { "type": "Point", "coordinates": [ 14.804713951542766, 40.658824063788664 ] } },
 { "type": "Feature", "properties": { "Nome": "Stazione Arbostella", "Criticità": "Assenza collegamenti autobus", "Proposta": "Creare rete di trasporto circolare di collegamento", "Stato proposta": null, "Tematica": "Servizi urbani", "ID": 12, "Data immissione": null }, "geometry": { "type": "Point", "coordinates": [ 14.813104777722272, 40.651705979175738 ] } }
 ]
-}
+};
