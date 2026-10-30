@@ -200,8 +200,18 @@ customStyleTag.innerHTML = `
 `;
 document.head.appendChild(customStyleTag);
 
-const tavoloColors = { 'ambiente': '#2ecc71', 'cultura': '#e67e22', 'sociale': '#3498db', 'urbanistica': '#9b59b6', 'economia': '#f1c40f', 'mobilità': '#e74c3c', 'altro': '#1abc9c' };
-
+const tematicaColors = { 
+    'ambiente': '#2ecc71', 
+    'cultura': '#e67e22', 
+    'sociale': '#3498db', 
+    'urbanistica': '#9b59b6', 
+    'economia': '#f1c40f', 
+    'mobilità': '#e74c3c', 
+    'spazi pubblici': '#00b894', // Colore per Spazi pubblici
+    'salute': '#d63031',        // Colore per Salute
+    'servizi urbani': '#0984e3', // Colore per Servizi urbani
+    'altro': '#1abc9c' 
+};
 function getTavoloColor(tavoloName) {
     if (!tavoloName) return '#3b71e6';
     const key = tavoloName.toLowerCase().trim();
@@ -225,8 +235,8 @@ function resetFeatureStyle(e) {
     var layer = e.target;
     if (!layer.feature) return;
     const prop = layer.feature.properties;
-    const tavolo = prop['Tavolo'] || prop['Tavolo di '] || prop['Tavolo di'] || 'Altro';
-    const catColor = getTavoloColor(tavolo);
+  const tematica = prop['Tematica'] || 'Altro';
+const catColor = getTavoloColor(tematica);
     if (layer.feature.geometry.type === 'Point') {
         layer.setStyle({ radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
     } else {
@@ -269,8 +279,8 @@ function showFeatureDetailsOnly(layer, tavoloName) {
 
     highlightFeature({ target: layer });
 
-    const props = layer.feature.properties;
-    const standardKeys = ['Nome', 'Criticità', 'Proposta', 'Stato', 'Tavolo', 'Tavolo di', 'Tavolo di '];
+   const props = layer.feature.properties;
+    const standardKeys = ['Nome', 'Criticità', 'Proposta', 'Stato proposta', 'Tematica'];
     
     const extraFields = [];
     for (const [key, value] of Object.entries(props)) {
@@ -302,15 +312,13 @@ window.renderDetailSlide = function() {
         const val = props[k];
         allFields.push({ key: k, value: (val !== null && val !== undefined && val !== '') ? val : 'N/D' });
     });
-
-    const tavoloVal = props['Tavolo'] || props['Tavolo di '] || props['Tavolo di'] || tavoloName;
-    allFields.push({ key: 'Tavolo', value: (tavoloVal !== null && tavoloVal !== undefined && tavoloVal !== '') ? tavoloVal : 'N/D' });
-
+const tematicaVal = props['Tematica'] || tavoloName;
+    allFields.push({ key: 'Tematica', value: (tematicaVal !== null && tematicaVal !== undefined && tematicaVal !== '') ? tematicaVal : 'N/D' });
     // Aggiungiamo anche tutti gli altri campi presenti nell'oggetto (sia compilati che vuoti, escludendo i duplicati già gestiti)
-    const excludedKeys = [...mainKeys, 'Tavolo', 'Tavolo di', 'Tavolo di '];
+   const excludedKeys = [...mainKeys, 'Tematica'];
     for (const [key, value] of Object.entries(props)) {
         if (!excludedKeys.includes(key)) {
-            allFields.push({ 
+            allFields.push({
                 key: key, 
                 value: (value !== null && value !== undefined && value !== '') ? value : 'N/D' 
             });
@@ -441,6 +449,17 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_hospital_1 = new L.geoJson(json_hospital_1, { interactive: false, pane: 'pane_hospital_1', onEachFeature: pop_hospital_1, pointToLayer: function (feature, latlng) { return L.marker(latlng, { icon: L.icon({ iconUrl: 'markers/hospital_1.svg', iconSize: [16.72, 16.72] }) }); } });
     map.addLayer(layer_hospital_1);
 
+   map.createPane('pane_confini_amministrativi'); 
+    map.getPane('pane_confini_amministrativi').style.zIndex = 400; // Sotto agli ospedali (401) e alle stazioni (402)
+    var layer_confini_amministrativi = new L.geoJson(json_confini_amministrativi, {
+        interactive: false, 
+        pane: 'pane_confini_amministrativi',
+        style: function(feature) {
+            return { color: '#636e72', weight: 1.5, fill: true, fillColor: '#b2bec3', fillOpacity: 0.05 };
+        }
+    });
+    // map.addLayer(layer_confini_amministrativi);
+   
     function pop_iconestazioni_2(feature, layer) {
         layer.on({ mouseout: function(e) { layer.closePopup(); }, mouseover: highlightFeature });
         var popupContent = '<table><tr><td colspan="2">' + (feature.properties['nome'] !== null ? autolinker.link(String(feature.properties['nome']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr></table>';
@@ -459,16 +478,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.atlasCategories = {};
     function registerItem(feature, layer) {
-        const tavolo = feature.properties['Tavolo'] || feature.properties['Tavolo di '] || feature.properties['Tavolo di'] || 'Altro';
-        const name = feature.properties['Nome'] || 'Elemento';
-        if (!atlasCategories[tavolo]) { atlasCategories[tavolo] = []; }
-        atlasCategories[tavolo].push({ name, layer });
+        const tematica = feature.properties['Tematica'] || 'Altro';
+const name = feature.properties['Nome'] || 'Elemento';
+if (!atlasCategories[tematica]) { atlasCategories[tematica] = []; }
+atlasCategories[tematica].push({ name, layer });
     }
 
     const puntiPerTavolo = {};
     json_puntiprimavolta_5.features.forEach(f => {
-        const t = f.properties['Tavolo'] || f.properties['Tavolo di '] || f.properties['Tavolo di'] || 'Altro';
-        if (!puntiPerTavolo[t]) puntiPerTavolo[t] = [];
+    const t = f.properties['Tematica'] || 'Altro';
+       if (!puntiPerTavolo[t]) puntiPerTavolo[t] = [];
         puntiPerTavolo[t].push(f);
     });
 
@@ -496,12 +515,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return L.circleMarker(latlng, { radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
             }
         });
-        allTavoloLayers.push(layerPuntiTavolo);
+       allTavoloLayers.push(layerPuntiTavolo);
     }
 
     const poligoniPerTavolo = {};
     json_poligoniprimavolta_6.features.forEach(f => {
-        const t = f.properties['Tavolo'] || f.properties['Tavolo di '] || f.properties['Tavolo di'] || 'Altro';
+        const t = f.properties['Tematica'] || 'Altro';
         if (!poligoniPerTavolo[t]) poligoniPerTavolo[t] = [];
         poligoniPerTavolo[t].push(f);
     });
@@ -588,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="sub-section-title">Altro</div>
                         <div class="desktop-grid-altro" style="display:flex; flex-direction:column; gap:2px;">
         `;
-        const contextLayers = [{ name: 'Stazioni', layer: layer_iconestazioni_2 }, { name: 'Ospedali', layer: layer_hospital_1 }, { name: 'Quartieri', layer: layer_iconaquartieri_0 }];
+        const contextLayers = [{ name: 'Stazioni', layer: layer_iconestazioni_2 }, { name: 'Ospedali', layer: layer_hospital_1 }, { name: 'Quartieri', layer: layer_iconaquartieri_0 }, { name: 'Confini', layer: layer_confini_amministrativi }];
         contextLayers.forEach((ctx, idx) => {
             const isChecked = map.hasLayer(ctx.layer);
             html += `<label style="display:flex; align-items:center; gap:4px; margin:2px 0; cursor:pointer;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
