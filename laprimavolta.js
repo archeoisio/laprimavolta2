@@ -27,7 +27,7 @@ customStyleTag.innerHTML = `
     }
 
     /* Modifiche specifiche solo per DESKTOP */
-   @media (min-width: 768px) {
+ @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
             bottom: 0;
@@ -37,7 +37,7 @@ customStyleTag.innerHTML = `
             min-width: 220px;
             padding: 8px 12px;
             display: flex;
-            flex-direction: column-reverse; /* Inverte il flusso così la linguetta sta sopra o sotto a seconda delle necessità */
+            flex-direction: column-reverse; /* Mette la linguetta in alto rispetto al corpo quando aperto, o viceversa */
             justify-content: flex-start;
             transition: all 0.3s ease-in-out;
             z-index: 2000;
@@ -50,18 +50,19 @@ customStyleTag.innerHTML = `
         }
         
         #custom-bottom-panel.open {
+            bottom: 44px; /* Solleva l'intero blocco dal fondo per posizionare la linguetta alla quota desiderata */
             width: 1000px !important;
-            height: 176px !important; /* Altezza del corpo pannello aperto */
+            height: 176px !important; /* Altezza massima del corpo del pannello */
         }
 
-        /* LINGUETTA DESKTOP: si posiziona a 220px di altezza nella pagina */
+        /* LINGUETTA DESKTOP: resta visibile come testata */
         #custom-bottom-panel .panel-main-header {
             width: max-content !important;
             min-width: 180px;
             margin: 0;
         }
 
-        /* Il contenuto interno si sviluppa nei 176px */
+        /* Il contenuto interno si adatta ai 176px con scorrimento pulito */
         #custom-bottom-panel.open .panel-three-columns {
             height: 176px !important;
             max-height: 176px !important;
@@ -71,7 +72,7 @@ customStyleTag.innerHTML = `
 
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
-            height: 220px; /* Alto 220px, quindi il suo bordo superiore è a 220px dalla pagina */
+            height: 220px;
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
