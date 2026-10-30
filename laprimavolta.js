@@ -411,19 +411,21 @@ window.changeDetailSlide = function(targetSlide) {
     window.currentDetailSlide = targetSlide;
     renderDetailSlide();
 };
-
+const initialBounds = [
+    [40.626, 14.771],
+    [40.726, 14.873]
+];
 document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
-        minZoom: 1, 
+        minZoom: 12.5, 
         zoomSnap: 0.25,  
         zoomDelta: 0.25,
-        wheelPxPerZoomLevel: 120 // <-- Aggiungilo qui (regola la velocità/sensibilità dello scroll)
-    }).fitBounds([
-       [40.626, 14.771],
-       [40.726, 14.873]
-       ]);
+        wheelPxPerZoomLevel: 120, // <-- Aggiungilo qui (regola la velocità/sensibilità dello scroll)
+   maxBounds: initialBounds,   // 2. Blocca i confini di navigazione usando la costante
+        maxBoundsViscosity: 1.0     // Rende il blocco rigido ai bordi
+    }).fitBounds(initialBounds);
     
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
