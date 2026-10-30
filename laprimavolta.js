@@ -427,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('zoomend', checkZoomVisibility);
 
   map.createPane('pane_confini_amministrativi');
-   map.getPane('pane_confini_amministrativi').style.zIndex = 400;
+   map.getPane('pane_confini_amministrativi').style.zIndex = 5000;
 
    var layer_confini_amministrativi = L.geoJson(null, {
     interactive: false,
