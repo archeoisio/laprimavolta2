@@ -41,7 +41,6 @@ customStyleTag.innerHTML = `
             height: 220px !important;
         }
 
-        /* Linguetta stretta a misura di testo SOLO su desktop, anche quando aperto */
         #custom-bottom-panel .panel-main-header {
             width: max-content;
             min-width: 180px;
@@ -94,7 +93,6 @@ customStyleTag.innerHTML = `
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; width: 100% !important; }
 
-    /* Layout Principale a 3 Colonne (Mobile: larghezza originale prima colonna 90px) */
     .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
     
     .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
@@ -235,6 +233,7 @@ function checkZoomVisibility() {
     }
 }
 
+// Funzione unificata per mostrare il dettaglio con supporto alle slide di pagine
 function showFeatureDetailsOnly(layer, tavoloName) {
     if (selectedLayer && selectedLayer !== layer) {
         resetFeatureStyle({ target: selectedLayer });
@@ -245,13 +244,41 @@ function showFeatureDetailsOnly(layer, tavoloName) {
     highlightFeature({ target: layer });
 
     const props = layer.feature.properties;
+    
+    // Raggruppiamo i campi standard nella Pagina 1
+    const standardKeys = ['Nome', 'Criticità', 'Proposta', 'Stato', 'Tavolo', 'Tavolo di', 'Tavolo di '];
+    
+    // Troviamo eventuali campi extra presenti nel dataset
+    const extraFields = [];
+    for (const [key, value] of Object.entries(props)) {
+        if (!standardKeys.includes(key) && value !== null && value !== '') {
+            extraFields.push({ key, value });
+        }
+    }
+
+    // Se ci sono campi extra, avremo 2 pagine, altrimenti 1 sola pagina predisposta
+    const totalPages = extraFields.length > 0 ? 2 : 1;
+    window.currentDetailSlide = 1;
+    window.currentDetailExtraFields = extraFields;
+    window.currentDetailTableData = { props, tavoloName };
+
+    renderDetailSlide();
+}
+
+// Funzione che disegna la slide corrente (Pagina 1 o Pagina 2)
+window.renderDetailSlide = function() {
     const detailPanel = document.getElementById('feature-detail-panel');
-    if (detailPanel) {
-        let detailHtml = `
-            <div class="feature-detail-header">
-                <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
-                <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
-            </div>
+    if (!detailPanel) return;
+
+    const { props, tavoloName } = window.currentDetailTableData;
+    const totalPages = window.currentDetailExtraFields.length > 0 ? 2 : 1;
+    const slide = window.currentDetailSlide;
+
+    let contentHtml = '';
+
+    if (slide === 1) {
+        // PAGINA 1: Campi principali
+        contentHtml = `
             <table class="detail-table">
                 <tr><th>Nome</th><td>${props['Nome'] || 'N/D'}</td></tr>
                 <tr><th>Criticità</th><td>${props['Criticità'] || 'N/D'}</td></tr>
@@ -260,10 +287,49 @@ function showFeatureDetailsOnly(layer, tavoloName) {
                 <tr><th>Tavolo</th><td>${props['Tavolo'] || tavoloName}</td></tr>
             </table>
         `;
-        detailPanel.innerHTML = detailHtml;
-        detailPanel.style.display = 'flex';
+    } else {
+        // PAGINA 2: Eventuali campi extra
+        contentHtml = `<table class="detail-table">`;
+        window.currentDetailExtraFields.forEach(item => {
+            contentHtml += `<tr><th>${item.key}</th><td>${item.value}</td></tr>`;
+        });
+        contentHtml += `</table>`;
     }
-}
+
+    // Costruiamo i controlli di navigazione (frecce e indicatore es. 1/1 o 1/2)
+    let navControls = '';
+    if (totalPages > 1) {
+        if (slide === 1) {
+            navControls = `<button onclick="window.changeDetailSlide(2)" title="Pagina successiva" style="background:none; border:none; cursor:pointer; font-size:12px; color:#3498db; padding:0; font-weight:bold;">➔</button> <span style="font-size:11px; color:#666;">${slide}/${totalPages}</span>`;
+        } else {
+            navControls = `<button onclick="window.changeDetailSlide(1)" title="Pagina precedente" style="background:none; border:none; cursor:pointer; font-size:12px; color:#3498db; padding:0; font-weight:bold;">⬅</button> <span style="font-size:11px; color:#666;">${slide}/${totalPages}</span>`;
+        }
+    } else {
+        // Anche se c'è una sola pagina, mostriamo l'indicatore fisso predisposto (es. 1/1) e la freccetta disattivata o pronta
+        navControls = `<span style="font-size:11px; color:#aaa; cursor:default;" title="Nessun campo ulteriore">➔</span> <span style="font-size:11px; color:#888;">1/1</span>`;
+    }
+
+    let detailHtml = `
+        <div class="feature-detail-header">
+            <div style="display:flex; align-items:center; gap:6px;">
+                <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
+                <div style="display:flex; align-items:center; gap:4px; margin-left: 6px;">
+                    ${navControls}
+                </div>
+            </div>
+            <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
+        </div>
+        ${contentHtml}
+    `;
+
+    detailPanel.innerHTML = detailHtml;
+    detailPanel.style.display = 'flex';
+};
+
+window.changeDetailSlide = function(targetSlide) {
+    window.currentDetailSlide = targetSlide;
+    renderDetailSlide();
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
@@ -554,26 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     map.panBy([0, 120], { animate: false });
 
                     highlightFeature({ target: targetItem.layer });
-
-                    const props = targetItem.layer.feature.properties;
-                    const detailPanel = document.getElementById('feature-detail-panel');
-                    if (detailPanel) {
-                        let detailHtml = `
-                            <div class="feature-detail-header">
-                                <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
-                                <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
-                            </div>
-                            <table class="detail-table">
-                                <tr><th>Nome</th><td>${props['Nome'] || 'N/D'}</td></tr>
-                                <tr><th>Criticità</th><td>${props['Criticità'] || 'N/D'}</td></tr>
-                                <tr><th>Proposta</th><td>${props['Proposta'] || 'N/D'}</td></tr>
-                                <tr><th>Stato</th><td>${props['Stato'] || 'N/D'}</td></tr>
-                                <tr><th>Tavolo</th><td>${props['Tavolo'] || tavolo}</td></tr>
-                            </table>
-                        `;
-                        detailPanel.innerHTML = detailHtml;
-                        detailPanel.style.display = 'flex';
-                    }
+                    showFeatureDetailsOnly(targetItem.layer, tavolo);
                 }
             };
         });
