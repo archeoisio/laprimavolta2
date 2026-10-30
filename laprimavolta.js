@@ -417,8 +417,9 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 1, 
-        zoomSnap: 0.25, 
-        zoomDelta: 0.25  
+        zoomSnap: 0.25,  
+        zoomDelta: 0.25,
+        wheelPxPerZoomLevel: 120 // <-- Aggiungilo qui (regola la velocità/sensibilità dello scroll)
     }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
     
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
