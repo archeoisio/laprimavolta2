@@ -3,7 +3,7 @@ let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
 let layer_iconaquartieri_0;
-let currentActiveTab = null; // Memorizza l'ultima scheda tematica selezionata (sia desktop che mobile)
+let currentActiveTab = null; // Memorizza l'ultima scheda tematica selezionata
 
 const MIN_ZOOM_VISIBLE = 13; // Livello di zoom minimo per visualizzare quartieri e elementi tematici
 
@@ -34,11 +34,13 @@ customStyleTag.innerHTML = `
         
         #custom-bottom-panel.open {
             width: 1000px !important;
+            height: 310px !important; /* Forza l'altezza identica al pannello dettagli */
         }
 
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
-            max-height: 310px; border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
+            height: 310px; /* Altezza fissa identica al Centro di Controllo aperto */
+            border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
             padding: 8px 12px; box-sizing: border-box; font-family: sans-serif;
@@ -62,13 +64,13 @@ customStyleTag.innerHTML = `
     }
 
     #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
-    #custom-bottom-panel:not(.open) { max-height: 44px !important; }
+    #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     /* Layout Principale a 3 Colonne */
-    .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; }
+    .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
     
     /* Colonna 1: Sinistra (Mappa Base fissa + Altro scrollabile) */
     .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
@@ -101,8 +103,8 @@ customStyleTag.innerHTML = `
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #e1e1e1;
-        padding-bottom: 6px;
-        margin-bottom: 8px;
+        padding-bottom: 4px;
+        margin-bottom: 6px;
     }
 
     .close-feature-btn {
@@ -110,14 +112,14 @@ customStyleTag.innerHTML = `
         color: white;
         border: none;
         border-radius: 50%;
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         font-weight: bold;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;
+        font-size: 11px;
     }
 `;
 document.head.appendChild(customStyleTag);
