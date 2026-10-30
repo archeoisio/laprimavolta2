@@ -27,7 +27,7 @@ customStyleTag.innerHTML = `
     }
 
     /* Modifiche specifiche solo per DESKTOP */
- @media (min-width: 768px) {
+@media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
             bottom: 0;
@@ -37,8 +37,7 @@ customStyleTag.innerHTML = `
             min-width: 220px;
             padding: 8px 12px;
             display: flex;
-            flex-direction: column-reverse; /* Mette la linguetta in alto rispetto al corpo quando aperto, o viceversa */
-            justify-content: flex-start;
+            flex-direction: column;
             transition: all 0.3s ease-in-out;
             z-index: 2000;
             background: rgba(255, 255, 255, 0.98);
@@ -49,25 +48,36 @@ customStyleTag.innerHTML = `
             border: 1px solid rgba(0,0,0,0.1);
         }
         
+        /* QUANDO È APERTO: il pannello si solleva dal fondo e raggiunge l'altezza totale di 220px */
         #custom-bottom-panel.open {
-            bottom: 44px; /* Solleva l'intero blocco dal fondo per posizionare la linguetta alla quota desiderata */
+            bottom: 0 !important;
             width: 1000px !important;
-            height: 176px !important; /* Altezza massima del corpo del pannello */
+            height: 220px !important;
         }
 
-        /* LINGUETTA DESKTOP: resta visibile come testata */
-        #custom-bottom-panel .panel-main-header {
+        /* LINGUETTA DESKTOP: quando aperto, si posiziona in cima al blocco (esattamente a 220px dal basso) */
+        #custom-bottom-panel.open .panel-main-header {
+            position: absolute;
+            top: 8px; /* Rimane ancorata in alto nel box dei 220px */
+            left: 12px;
             width: max-content !important;
             min-width: 180px;
             margin: 0;
+            z-index: 2002;
         }
 
-        /* Il contenuto interno si adatta ai 176px con scorrimento pulito */
+        /* CORPO DEL PANNELLO: si sviluppa sotto la linguetta con altezza 176px */
         #custom-bottom-panel.open .panel-three-columns {
+            position: absolute;
+            bottom: 8px;
+            left: 12px;
+            right: 12px;
             height: 176px !important;
             max-height: 176px !important;
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
+            display: grid !important;
+            box-sizing: border-box;
         }
 
         #feature-detail-panel {
