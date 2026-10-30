@@ -38,7 +38,7 @@ customStyleTag.innerHTML = `
         
         #custom-bottom-panel.open {
             width: 1000px !important;
-            height: 310px !important;
+            height: 220px !important;
         }
 
         /* LINGUETTA DESKTOP: resta stretta a misura di testo anche quando aperto */
@@ -49,7 +49,7 @@ customStyleTag.innerHTML = `
 
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
-            height: 310px;
+            height: 220px;
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
