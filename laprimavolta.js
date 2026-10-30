@@ -688,22 +688,27 @@ atlasCategories[tematica].push({ name, layer });
                 selectedLayer = targetItem.layer;
                 map.closePopup();
 
-                let latlng;
-                const geom = targetItem.layer.feature.geometry;
-                if (geom.type === 'Point') {
-                    latlng = [geom.coordinates[1], geom.coordinates[0]];
-                } else {
-                    const c = targetItem.layer.getBounds().getCenter();
-                    latlng = [c.lat, c.lng];
-                }
+                const layer = targetItem.layer;
+                const geom = layer.feature.geometry;
 
-                if (latlng) {
+                if (geom.type === 'Point') {
+                    // Zoom fisso e ravvicinato per i punti, compensando il pannello inferiore
+                    const latlng = [geom.coordinates[1], geom.coordinates[0]];
                     map.setView(latlng, 17.5, { animate: false });
                     map.panBy([0, 120], { animate: false });
-
-                    highlightFeature({ target: targetItem.layer });
-                    showFeatureDetailsOnly(targetItem.layer, tavolo);
+                } else {
+                    // Zoom proporzionale dinamico per i poligoni basato sui loro confini
+                    const bounds = layer.getBounds();
+                    map.fitBounds(bounds, {
+                        paddingTopLeft: [50, 50],
+                        paddingBottomRight: [50, 250], // Lascia lo spazio visivo libero sopra il pannello inferiore
+                        maxZoom: 18,
+                        animate: false
+                    });
                 }
+
+                highlightFeature({ target: layer });
+                showFeatureDetailsOnly(layer, tavolo);
             };
         });
 
