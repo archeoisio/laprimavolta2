@@ -587,7 +587,7 @@ atlasCategories[tematica].push({ name, layer });
                         <div class="sub-section-title">Altro</div>
                         <div class="desktop-grid-altro" style="display:flex; flex-direction:column; gap:2px;">
         `;
-        const contextLayers = [{ { name: 'Confini', layer: layer_confini_amministrativi }];
+        const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }];
         contextLayers.forEach((ctx, idx) => {
             const isChecked = map.hasLayer(ctx.layer);
             html += `<label style="display:flex; align-items:center; gap:4px; margin:2px 0; cursor:pointer;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
