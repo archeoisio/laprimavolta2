@@ -14,7 +14,8 @@ customStyleTag.innerHTML = `
     }
 
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
- #custom-bottom-panel { 
+    
+    #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); 
@@ -24,7 +25,8 @@ customStyleTag.innerHTML = `
         border-top-left-radius: 14px; border-top-right-radius: 14px; 
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
     }
-  @media (min-width: 768px) {
+
+    @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
             bottom: 0;
@@ -50,23 +52,23 @@ customStyleTag.innerHTML = `
             width: 1000px !important;
             height: 230px !important;
         }
-#custom-bottom-panel .panel-main-header b {
+
+        #custom-bottom-panel .panel-main-header b {
             font-size: 14px !important; 
         }
-/* 1. Titoli delle sezioni ("Base map", "Altro", "Tematiche", "Elementi mappati...") */
+
         #custom-bottom-panel .sub-section-title {
-            font-size: 14px !important; /* Aumenta la dimensione dei titoli di sezione su desktop */
+            font-size: 14px !important;
         }
 
-        /* 2. Etichette delle opzioni (OSM, Satellite, Stazioni, Ospedali, Quartieri) */
         #custom-bottom-panel .col-left label {
-            font-size: 14px !important; /* Aumenta il testo delle voci spuntabili */
+            font-size: 14px !important;
         }
 
-        /* 3. Testo dei singoli elementi mappati nella griglia di destra */
         #custom-bottom-panel .col-right span[style*="font-size"] {
-            font-size: 14px !important; /* Aumenta il nome delle proposte/features */
+            font-size: 14px !important;
         }
+
         #custom-bottom-panel .panel-three-columns {
             grid-template-columns: 180px 160px 1fr !important;
             overflow-y: auto;
@@ -74,10 +76,11 @@ customStyleTag.innerHTML = `
             width: 100%;
             box-sizing: border-box;
         }
-       #custom-bottom-panel .sidebar-tab-btn {
-        font-size: 13px !important; 
-    }
-}
+
+        #custom-bottom-panel .sidebar-tab-btn {
+            font-size: 13px !important; 
+        }
+
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 500px;
             height: 230px;
@@ -90,6 +93,7 @@ customStyleTag.innerHTML = `
             border: 1px solid rgba(0,0,0,0.1);
         }
 
+        /* Spostate qui dentro per agire SOLO su desktop */
         .col-left .base-map-vertical {
             display: grid !important;
             grid-template-columns: 1fr 1fr;
@@ -101,7 +105,7 @@ customStyleTag.innerHTML = `
             gap: 4px;
         }
     }
-  /* Pannello Dettaglio Feature - MOBILE (altezza fissa 310px, pari al Centro di Controllo) */
+
     @media (max-width: 767px) {
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -148,7 +152,7 @@ customStyleTag.innerHTML = `
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #e1e1e1; /* Stile grigio identico al Centro di Controllo */
+        border-bottom: 1px solid #e1e1e1;
         padding-bottom: 4px;
         margin-bottom: 4px;
     }
