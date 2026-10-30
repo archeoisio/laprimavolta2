@@ -293,33 +293,36 @@ window.renderDetailSlide = function() {
 
     const { props, tavoloName } = window.currentDetailTableData;
 
-    // 1. Raccogliamo TUTTI i campi validi dell'elemento
+    // 1. Raccogliamo TUTTI i campi possibili (inclusi quelli vuoti/non compilati)
     const allFields = [];
     const mainKeys = ['Nome', 'Criticità', 'Proposta', 'Stato'];
     
+    // Inseriamo prima i principali nell'ordine desiderato (mostrandoli anche se vuoti)
     mainKeys.forEach(k => {
-        if (props[k]) allFields.push({ key: k, value: props[k] });
+        const val = props[k];
+        allFields.push({ key: k, value: (val !== null && val !== undefined && val !== '') ? val : 'N/D' });
     });
 
     const tavoloVal = props['Tavolo'] || props['Tavolo di '] || props['Tavolo di'] || tavoloName;
-    if (tavoloVal) allFields.push({ key: 'Tavolo', value: tavoloVal });
+    allFields.push({ key: 'Tavolo', value: (tavoloVal !== null && tavoloVal !== undefined && tavoloVal !== '') ? tavoloVal : 'N/D' });
 
+    // Aggiungiamo anche tutti gli altri campi presenti nell'oggetto (sia compilati che vuoti, escludendo i duplicati già gestiti)
     const excludedKeys = [...mainKeys, 'Tavolo', 'Tavolo di', 'Tavolo di '];
     for (const [key, value] of Object.entries(props)) {
-        if (!excludedKeys.includes(key) && value !== null && value !== '') {
-            allFields.push({ key, value });
+        if (!excludedKeys.includes(key)) {
+            allFields.push({ 
+                key: key, 
+                value: (value !== null && value !== undefined && value !== '') ? value : 'N/D' 
+            });
         }
     }
 
-    // Se non ci sono campi, usciamo
     if (allFields.length === 0) return;
 
-    // 2. Suddividiamo dinamicamente i campi in slide basandoci sullo spazio disponibile (stimato a ~140px netti per il contenuto)
-    // Creiamo un contenitore invisibile di prova per misurare l'altezza reale dei testi a capo
+    // 2. Suddividiamo dinamicamente i campi in slide basandoci sullo spazio disponibile (~145px netti)
     const slides = [];
     let currentSlideFields = [];
     
-    // Funzione di supporto per testare l'altezza di un blocco di campi
     const testFieldsHeight = (fields) => {
         let testHtml = `<table class="detail-table" style="width:100%;">`;
         fields.forEach(item => {
@@ -327,7 +330,6 @@ window.renderDetailSlide = function() {
         });
         testHtml += `</table>`;
         
-        // Misuriamo in un div temporaneo fuori schermo
         const measureDiv = document.createElement('div');
         measureDiv.style.cssText = 'position:absolute; visibility:hidden; width:296px; font-family:sans-serif; font-size:13px; box-sizing:border-box;';
         measureDiv.innerHTML = testHtml;
@@ -335,17 +337,13 @@ window.renderDetailSlide = function() {
         const height = measureDiv.offsetHeight;
         document.body.removeChild(measureDiv);
         
-        // I 220px totali tolta l'intestazione (~30px) e i controlli di paginazione (~25px) lasciano circa 150-160px sicuri
         return height;
     };
 
-    // Raggruppiamo i campi slide per slide misurando l'ingombro reale
     let tempFields = [];
     for (let i = 0; i < allFields.length; i++) {
         tempFields.push(allFields[i]);
-        // Se superiamo i 145px stimati o se abbiamo già messo 5 campi, chiudiamo la slide corrente
         if (testFieldsHeight(tempFields) > 145 || tempFields.length >= 5) {
-            // Se il blocco supera l'altezza con un solo campo lunghissimo, lo teniamo comunque per non bloccare il loop
             if (tempFields.length > 1) {
                 const lastItem = tempFields.pop();
                 slides.push([...tempFields]);
