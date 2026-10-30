@@ -50,7 +50,9 @@ customStyleTag.innerHTML = `
             width: 1000px !important;
             height: 220px !important;
         }
-
+#custom-bottom-panel .panel-main-header b {
+            font-size: 14px !important; 
+        }
         #custom-bottom-panel .panel-three-columns {
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
