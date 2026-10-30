@@ -38,17 +38,18 @@ customStyleTag.innerHTML = `
         
         #custom-bottom-panel.open {
             width: 1000px !important;
-            height: 220px !important;
+            height: 310px !important;
         }
 
+        /* LINGUETTA DESKTOP: resta stretta a misura di testo anche quando aperto */
         #custom-bottom-panel .panel-main-header {
-            width: max-content;
+            width: max-content !important;
             min-width: 180px;
         }
 
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 320px;
-            height: 220px;
+            height: 310px;
             border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
@@ -90,8 +91,8 @@ customStyleTag.innerHTML = `
     #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
     #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
     
-    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; }
-    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; width: 100% !important; }
+    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; width: 100%; }
+    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     .panel-three-columns { display: grid; grid-template-columns: 90px 120px 1fr; gap: 8px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
     
@@ -233,7 +234,6 @@ function checkZoomVisibility() {
     }
 }
 
-// Funzione unificata per mostrare il dettaglio con supporto alle slide di pagine
 function showFeatureDetailsOnly(layer, tavoloName) {
     if (selectedLayer && selectedLayer !== layer) {
         resetFeatureStyle({ target: selectedLayer });
@@ -244,11 +244,8 @@ function showFeatureDetailsOnly(layer, tavoloName) {
     highlightFeature({ target: layer });
 
     const props = layer.feature.properties;
-    
-    // Raggruppiamo i campi standard nella Pagina 1
     const standardKeys = ['Nome', 'Criticità', 'Proposta', 'Stato', 'Tavolo', 'Tavolo di', 'Tavolo di '];
     
-    // Troviamo eventuali campi extra presenti nel dataset
     const extraFields = [];
     for (const [key, value] of Object.entries(props)) {
         if (!standardKeys.includes(key) && value !== null && value !== '') {
@@ -256,7 +253,6 @@ function showFeatureDetailsOnly(layer, tavoloName) {
         }
     }
 
-    // Se ci sono campi extra, avremo 2 pagine, altrimenti 1 sola pagina predisposta
     const totalPages = extraFields.length > 0 ? 2 : 1;
     window.currentDetailSlide = 1;
     window.currentDetailExtraFields = extraFields;
@@ -265,7 +261,6 @@ function showFeatureDetailsOnly(layer, tavoloName) {
     renderDetailSlide();
 }
 
-// Funzione che disegna la slide corrente (Pagina 1 o Pagina 2)
 window.renderDetailSlide = function() {
     const detailPanel = document.getElementById('feature-detail-panel');
     if (!detailPanel) return;
@@ -294,7 +289,6 @@ window.renderDetailSlide = function() {
         contentHtml += `</table>`;
     }
 
-    // Creazione dei controlli con freccia sinistra, contatore e freccia destra
     let leftArrowStyle = (slide > 1) ? "cursor:pointer; color:#3498db;" : "cursor:default; color:#ccc;";
     let rightArrowStyle = (slide < totalPages) ? "cursor:pointer; color:#3498db;" : "cursor:default; color:#ccc;";
     
@@ -321,6 +315,7 @@ window.renderDetailSlide = function() {
     detailPanel.innerHTML = detailHtml;
     detailPanel.style.display = 'flex';
 };
+
 window.changeDetailSlide = function(targetSlide) {
     window.currentDetailSlide = targetSlide;
     renderDetailSlide();
