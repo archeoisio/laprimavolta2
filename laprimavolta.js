@@ -28,11 +28,30 @@ customStyleTag.innerHTML = `
 
     /* Modifiche specifiche solo per DESKTOP */
 @media (min-width: 768px) {
-        /* 1. LA LINGUETTA (Desktop): da chiusa sta in basso a sinistra */
+        /* CONTENITORE PRINCIPALE UNICO */
         #custom-bottom-panel {
             position: fixed;
-            bottom: 0px;
+            bottom: 0;
             left: 10px;
+            width: max-content;
+            display: flex;
+            flex-direction: column-reverse; /* Inverte l'ordine: la linguetta sta in basso, il box sale sopra quando aperto */
+            z-index: 2000;
+            background: transparent;
+            box-sizing: border-box;
+            transition: all 0.25s ease-in-out;
+        }
+
+        /* QUANDO APERTO: si allarga alla misura desktop e definisce l'ingombro totale */
+        #custom-bottom-panel.open {
+            width: 1000px !important;
+        }
+
+        /* LA LINGUETTA (Testata del pannello) */
+        #custom-bottom-panel .panel-main-header {
+            position: relative;
+            width: max-content !important;
+            min-width: 180px;
             z-index: 2002;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
@@ -42,53 +61,38 @@ customStyleTag.innerHTML = `
             border: 1px solid rgba(0,0,0,0.1);
             padding: 8px 12px;
             box-sizing: border-box;
-            transition: bottom 0.25s ease-in-out;
         }
-        
-        /* QUANDO APERTA (Desktop): la linguetta sale con bordo inferiore a 176px */
-        #custom-bottom-panel.open {
-            bottom: 176px !important;
+
+        /* QUANDO APERTO: la linguetta si trova in cima al box aperto (grazie a column-reverse) */
+        #custom-bottom-panel.open .panel-main-header {
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         }
 
-        /* 2. IL BOX CENTRO DI CONTROLLO (Desktop): pannello contenuti senza intestazione */
-        #control-center-content-box {
-            position: fixed;
-            bottom: 0;
-            left: 10px;
-            width: 1000px;
-            height: 0px; /* Chiuso di default */
+        /* IL CORPO DEI CONTENUTI (inizialmente chiuso a 0) */
+        #custom-bottom-panel .panel-three-columns {
+            max-height: 0px !important;
+            height: 0px !important;
             overflow: hidden;
-            z-index: 2000;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+            border-top-left-radius: 14px;
             border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
-            border-top: none;
             box-sizing: border-box;
-            transition: height 0.25s ease-in-out;
-            display: flex;
-            flex-direction: column;
+            transition: max-height 0.25s ease-in-out, height 0.25s ease-in-out;
+            display: grid !important;
+            grid-template-columns: 180px 120px 1fr !important;
             padding: 0 12px;
         }
 
-        /* QUANDO APERTO (Desktop): il box si apre a comparsa nello spazio dei 176px */
-        #custom-bottom-panel.open ~ #control-center-content-box {
+        /* QUANDO APERTO: il corpo si espande esattamente a 176px */
+        #custom-bottom-panel.open .panel-three-columns {
             height: 176px !important;
+            max-height: 176px !important;
             padding: 8px 12px;
-        }
-
-        /* GRIGLIA INTERNA DEI CONTENUTI (Desktop) */
-        #control-center-content-box .panel-three-columns {
-            height: 100% !important;
-            max-height: 100% !important;
-            grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
-            display: grid !important;
-            width: 100%;
-            box-sizing: border-box;
         }
 
         #feature-detail-panel {
