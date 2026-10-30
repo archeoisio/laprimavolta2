@@ -55,7 +55,7 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel.open {
             bottom: 0 !important;
             width: 1000px !important;
-            height: 220px !important;
+            height: 176px !important;
             justify-content: space-between !important; /* Distribuisce la linguetta in alto e il corpo in basso */
             padding-top: 10px;
         }
