@@ -15,7 +15,7 @@ customStyleTag.innerHTML = `
 
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
-    #custom-bottom-panel {
+   #custom-bottom-panel {
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
         width: 98%; max-width: 1000px; max-height: 310px;
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
@@ -34,17 +34,23 @@ customStyleTag.innerHTML = `
             width: max-content;
             min-width: 220px;
             padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
         
         #custom-bottom-panel.open {
             width: 1000px !important;
             height: 220px !important;
+            align-items: stretch; /* Quando è aperto si espande sotto la linguetta per tutta la larghezza */
         }
 
-        /* LINGUETTA DESKTOP: resta stretta a misura di testo anche quando aperto */
+        /* LINGUETTA DESKTOP: resta fissa in alto a sinistra a misura di testo */
         #custom-bottom-panel .panel-main-header {
             width: max-content !important;
             min-width: 180px;
+            align-self: flex-start;
+            margin-bottom: 6px;
         }
 
         #feature-detail-panel {
@@ -73,7 +79,6 @@ customStyleTag.innerHTML = `
             gap: 4px;
         }
     }
-
   /* Pannello Dettaglio Feature - MOBILE (altezza fissa 310px, pari al Centro di Controllo) */
     @media (max-width: 767px) {
         #feature-detail-panel {
