@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomDelta: 0.25,
         wheelPxPerZoomLevel: 120, // <-- Aggiungilo qui (regola la velocità/sensibilità dello scroll)
    maxBounds: initialBounds,   // 2. Blocca i confini di navigazione usando la costante
-        maxBoundsViscosity: 1.0     // Rende il blocco rigido ai bordi
+        maxBoundsViscosity: 0.25     // Rende il blocco rigido ai bordi
     }).fitBounds(initialBounds);
     
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
