@@ -556,9 +556,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 columns.push(items.slice(i, i + itemsPerColumn));
             }
 
-            html += `
+           html += `
                 <div id="tab-${cleanKey}" class="sidebar-tab-content ${isActive ? 'active' : ''}">
-                    <div class="cluster-counter-fixed">Elementi mappati: <b>${items.length}</b></div>
+                    <div class="sub-section-title" style="margin-bottom: 6px;">Elementi mappati: ${items.length}</div>
                     <div class="panel-scrollable-grid">
             `;
 
