@@ -209,15 +209,10 @@ document.head.appendChild(customStyleTag);
 
 const tavoloColors = { 
     'ambiente': '#2ecc71', 
-    'cultura': '#e67e22', 
-    'sociale': '#3498db', 
-    'urbanistica': '#9b59b6', 
-    'economia': '#f1c40f', 
-    'mobilità': '#e74c3c', 
-    'spazi pubblici': '#00b894', // Colore per Spazi pubblici
+    'cultura': '#e67e22',  
+    'spazi pubblici': '#8e44ad', // Colore per Spazi pubblici
     'salute': '#d63031',        // Colore per Salute
     'servizi urbani': '#0984e3', // Colore per Servizi urbani
-    'altro': '#1abc9c' 
 };
 function getTavoloColor(tavoloName) {
     if (!tavoloName) return '#3b71e6';
