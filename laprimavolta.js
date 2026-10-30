@@ -74,7 +74,10 @@ customStyleTag.innerHTML = `
             width: 100%;
             box-sizing: border-box;
         }
-
+       #custom-bottom-panel .sidebar-tab-btn {
+        font-size: 13px !important; 
+    }
+}
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 1025px; width: 500px;
             height: 230px;
