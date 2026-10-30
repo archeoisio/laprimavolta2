@@ -48,37 +48,40 @@ customStyleTag.innerHTML = `
             border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
-            transition: all 0.3s ease-in-out;
+            transition: height 0.25s ease-in-out;
         }
         
-        /* QUANDO APERTO: il pannello si espande e gestisce lo spostamento */
+        /* QUANDO APERTO: il blocco raggiunge l'altezza totale esatta di 220px */
         #custom-bottom-panel.open {
             bottom: 0 !important;
             width: 1000px !important;
-            height: 220px !important; /* Altezza totale che accoglie la linguetta sollevata e il corpo sotto */
+            height: 220px !important;
+            justify-content: space-between !important; /* Distribuisce la linguetta in alto e il corpo in basso */
+            padding-top: 10px;
         }
 
-        /* LINGUETTA: quando aperto, si sposta/posiziona in alto all'interno del box dei 220px */
+        /* LINGUETTA: quando aperto, si posiziona perfettamente in cima */
         #custom-bottom-panel.open .panel-main-header {
+            order: 1;
             position: relative;
-            transform: translateY(-176px); /* Sposta la linguetta verso l'alto della quota esatta */
-            transition: transform 0.3s ease-in-out;
+            transform: none !important;
             width: max-content !important;
             min-width: 180px;
-            margin: 0;
+            margin: 0 0 6px 0;
             z-index: 2002;
         }
 
-        /* IL CORPO DEL PANNELLO: si apre nello spazio sottostante (176px) */
+        /* IL CORPO DEL PANNELLO: si sviluppa esattamente nei 176px sottostanti */
         #custom-bottom-panel.open .panel-three-columns {
+            order: 2;
             height: 176px !important;
             max-height: 176px !important;
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
             display: grid !important;
             width: 100%;
+            margin: 0;
             box-sizing: border-box;
-            margin-top: -44px; /* Compensa lo spazio della linguetta sollevata */
         }
 
         #feature-detail-panel {
