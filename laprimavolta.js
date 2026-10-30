@@ -27,7 +27,7 @@ customStyleTag.innerHTML = `
     }
 
     /* Modifiche specifiche solo per DESKTOP */
-   @@media (min-width: 768px) {
+   @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
             bottom: 0;
