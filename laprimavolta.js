@@ -48,6 +48,7 @@ customStyleTag.innerHTML = `
         
         #custom-bottom-panel.open {
             width: 1000px !important;
+            height: 220px !important;
         }
 
         #custom-bottom-panel .panel-three-columns {
