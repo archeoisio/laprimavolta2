@@ -277,7 +277,6 @@ window.renderDetailSlide = function() {
     let contentHtml = '';
 
     if (slide === 1) {
-        // PAGINA 1: Campi principali
         contentHtml = `
             <table class="detail-table">
                 <tr><th>Nome</th><td>${props['Nome'] || 'N/D'}</td></tr>
@@ -288,7 +287,6 @@ window.renderDetailSlide = function() {
             </table>
         `;
     } else {
-        // PAGINA 2: Eventuali campi extra
         contentHtml = `<table class="detail-table">`;
         window.currentDetailExtraFields.forEach(item => {
             contentHtml += `<tr><th>${item.key}</th><td>${item.value}</td></tr>`;
@@ -296,27 +294,25 @@ window.renderDetailSlide = function() {
         contentHtml += `</table>`;
     }
 
-    // Costruiamo i controlli di navigazione (frecce e indicatore es. 1/1 o 1/2)
-    let navControls = '';
-    if (totalPages > 1) {
-        if (slide === 1) {
-            navControls = `<button onclick="window.changeDetailSlide(2)" title="Pagina successiva" style="background:none; border:none; cursor:pointer; font-size:12px; color:#3498db; padding:0; font-weight:bold;">➔</button> <span style="font-size:11px; color:#666;">${slide}/${totalPages}</span>`;
-        } else {
-            navControls = `<button onclick="window.changeDetailSlide(1)" title="Pagina precedente" style="background:none; border:none; cursor:pointer; font-size:12px; color:#3498db; padding:0; font-weight:bold;">⬅</button> <span style="font-size:11px; color:#666;">${slide}/${totalPages}</span>`;
-        }
-    } else {
-        // Anche se c'è una sola pagina, mostriamo l'indicatore fisso predisposto (es. 1/1) e la freccetta disattivata o pronta
-        navControls = `<span style="font-size:11px; color:#aaa; cursor:default;" title="Nessun campo ulteriore">➔</span> <span style="font-size:11px; color:#888;">1/1</span>`;
-    }
+    // Creazione dei controlli con freccia sinistra, contatore e freccia destra
+    let leftArrowStyle = (slide > 1) ? "cursor:pointer; color:#3498db;" : "cursor:default; color:#ccc;";
+    let rightArrowStyle = (slide < totalPages) ? "cursor:pointer; color:#3498db;" : "cursor:default; color:#ccc;";
+    
+    let leftAction = (slide > 1) ? `onclick="window.changeDetailSlide(${slide - 1})"` : "";
+    let rightAction = (slide < totalPages) ? `onclick="window.changeDetailSlide(${slide + 1})"` : "";
+
+    let navControls = `
+        <div style="display:flex; align-items:center; gap:6px; font-weight:bold;">
+            <span ${leftAction} title="Pagina precedente" style="${leftArrowStyle} font-size:12px;">⬅</span>
+            <span style="font-size:11px; color:#666; font-weight:normal;">${slide}/${totalPages}</span>
+            <span ${rightAction} title="Pagina successiva" style="${rightArrowStyle} font-size:12px;">➔</span>
+        </div>
+    `;
 
     let detailHtml = `
         <div class="feature-detail-header">
-            <div style="display:flex; align-items:center; gap:6px;">
-                <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
-                <div style="display:flex; align-items:center; gap:4px; margin-left: 6px;">
-                    ${navControls}
-                </div>
-            </div>
+            <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
+            ${navControls}
             <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
         </div>
         ${contentHtml}
@@ -325,7 +321,6 @@ window.renderDetailSlide = function() {
     detailPanel.innerHTML = detailHtml;
     detailPanel.style.display = 'flex';
 };
-
 window.changeDetailSlide = function(targetSlide) {
     window.currentDetailSlide = targetSlide;
     renderDetailSlide();
