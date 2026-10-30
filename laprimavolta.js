@@ -690,21 +690,37 @@ atlasCategories[tematica].push({ name, layer });
 
                 const layer = targetItem.layer;
                 const geom = layer.feature.geometry;
+                const isDesktop = window.innerWidth >= 768; // Distinguiamo desktop da mobile
 
                 if (geom.type === 'Point') {
-                    // Zoom fisso e ravvicinato per i punti, compensando il pannello inferiore
                     const latlng = [geom.coordinates[1], geom.coordinates[0]];
                     map.setView(latlng, 17.5, { animate: false });
-                    map.panBy([0, 120], { animate: false });
+                    
+                    // Su mobile compensiamo spostando la mappa verso l'alto per non far coprire il punto dal pannello basso
+                    if (isDesktop) {
+                        map.panBy([0, 120], { animate: false });
+                    } else {
+                        map.panBy([0, -100], { animate: false }); 
+                    }
                 } else {
-                    // Zoom proporzionale dinamico per i poligoni basato sui loro confini
                     const bounds = layer.getBounds();
-                    map.fitBounds(bounds, {
-                        paddingTopLeft: [50, 50],
-                        paddingBottomRight: [50, 250], // Lascia lo spazio visivo libero sopra il pannello inferiore
-                        maxZoom: 18,
-                        animate: false
-                    });
+                    
+                    // Padding differenziato tra desktop e mobile per i poligoni
+                    if (isDesktop) {
+                        map.fitBounds(bounds, {
+                            paddingTopLeft: [50, 50],
+                            paddingBottomRight: [50, 250], // Spazio per i pannelli laterali/inferiori desktop
+                            maxZoom: 18,
+                            animate: false
+                        });
+                    } else {
+                        map.fitBounds(bounds, {
+                            paddingTopLeft: [20, 20],
+                            paddingBottomRight: [20, 260], // Spazio maggiore sotto per il pannello mobile alto 240px
+                            maxZoom: 18,
+                            animate: false
+                        });
+                    }
                 }
 
                 highlightFeature({ target: layer });
