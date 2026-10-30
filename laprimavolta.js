@@ -28,7 +28,7 @@ customStyleTag.innerHTML = `
 
     /* Modifiche specifiche solo per DESKTOP */
 @media (min-width: 768px) {
-        /* CONTENITORE PRINCIPALE / BOX CONTENUTI */
+        /* CONTENITORE PRINCIPALE: da chiuso sta in basso a sinistra (visibile) */
         #custom-bottom-panel {
             position: fixed;
             bottom: 0;
@@ -47,45 +47,45 @@ customStyleTag.innerHTML = `
             border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
-            height: 0px; /* Chiuso */
-            overflow: hidden;
-            transition: height 0.25s ease-in-out, width 0.25s ease-in-out;
+            height: auto;
+            transition: all 0.25s ease-in-out;
         }
         
-        /* QUANDO APERTO: il box dei contenuti si apre all'altezza desiderata (es. 176px) */
+        /* QUANDO APERTO: il box si espande in larghezza e altezza totale */
         #custom-bottom-panel.open {
+            bottom: 0 !important;
             width: 1000px !important;
-            height: 176px !important; 
+            height: 220px !important; 
         }
 
-        /* LINGUETTA SEPARATA: gestita in modo indipendente dal box */
+        /* LINGUETTA DA CHIUSA: visibile in basso a sinistra nel flusso normale */
         #custom-bottom-panel .panel-main-header {
-            position: absolute;
-            bottom: 0px; /* Quando chiuso si appoggia in basso */
-            left: 0;
+            position: relative;
             width: max-content !important;
             min-width: 180px;
             z-index: 2002;
-            transition: bottom 0.25s ease-in-out;
+            margin: 0;
+            transition: transform 0.25s ease-in-out;
         }
 
-        /* QUANDO APERTO: la linguetta si sposta in alto in modo indipendente alla quota esatta */
+        /* QUANDO APERTO: la linguetta si sposta in alto portando il suo bordo inferiore esattamente a 176px */
         #custom-bottom-panel.open .panel-main-header {
-            bottom: 176px !important; /* Si posiziona esattamente sopra l'altezza del box aperto! */
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
+            transform: translateY(-176px);
         }
 
-        /* IL CORPO DEL PANNELLO INTERNO */
+        /* IL CORPO DEL PANNELLO INTERNO: si sviluppa nei 176px sottostanti */
         #custom-bottom-panel.open .panel-three-columns {
-            height: 100% !important;
-            max-height: 100% !important;
+            position: absolute;
+            bottom: 0;
+            left: 12px;
+            right: 12px;
+            height: 176px !important;
+            max-height: 176px !important;
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
             display: grid !important;
-            width: 100%;
             box-sizing: border-box;
-            padding-top: 4px;
+            padding-top: 8px;
         }
 
         #feature-detail-panel {
