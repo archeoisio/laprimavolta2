@@ -53,6 +53,12 @@ customStyleTag.innerHTML = `
 #custom-bottom-panel .panel-main-header b {
             font-size: 14px !important; 
         }
+        #custom-bottom-panel .sub-section-title {
+    font-size: 13px !important; /* Modifica qui la dimensione dei titoli di sezione */
+}
+#custom-bottom-panel .sidebar-tab-btn {
+    font-size: 13px !important; /* Modifica qui se vuoi ingrandire o rimpicciolire i pulsanti */
+}
         #custom-bottom-panel .panel-three-columns {
             grid-template-columns: 180px 120px 1fr !important;
             overflow-y: auto;
