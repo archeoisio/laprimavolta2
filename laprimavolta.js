@@ -694,7 +694,7 @@ atlasCategories[tematica].push({ name, layer });
 
                 if (geom.type === 'Point') {
                     const latlng = [geom.coordinates[1], geom.coordinates[0]];
-                    map.setView(latlng, 17.5, { animate: false });
+                    map.setView(latlng, 19, { animate: false });
                     
                     // Su mobile compensiamo spostando la mappa verso l'alto per non far coprire il punto dal pannello basso
                     if (isDesktop) {
