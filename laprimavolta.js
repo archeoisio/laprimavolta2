@@ -420,7 +420,10 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomSnap: 0.25,  
         zoomDelta: 0.25,
         wheelPxPerZoomLevel: 120 // <-- Aggiungilo qui (regola la velocità/sensibilità dello scroll)
-    }).fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]);
+    }).fitBounds([
+       [40.626, 14.771],
+       [40.726, 14.873]
+       ]);
     
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
@@ -762,7 +765,13 @@ atlasCategories[tematica].push({ name, layer });
             return btn;
         };
 
-        createBtn('🌍', "Torna alla vista iniziale", () => { map.fitBounds([[40.656620229112676,14.746602424093645],[40.696732601759756,14.837955878058532]]); }, 'btn-tutorial-home');
+       createBtn('🌍', "Torna alla vista iniziale", () => { 
+    map.fitBounds([
+        [40.626, 14.771],
+        [40.726, 14.873]
+    ], { padding: [20, 20], animate: true }); 
+}, 'btn-tutorial-home');
+       
         createBtn('📍', "Posizione", () => { map.locate({setView: true, maxZoom: 16}); }, 'btn-tutorial-locate');
         return container;
     };
