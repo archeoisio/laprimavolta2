@@ -14,7 +14,25 @@ customStyleTag.innerHTML = `
     }
 
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
-    
+    #custom-bottom-panel {
+        position: fixed;
+        bottom: 0;
+        left: 10px;
+        transform: none;
+        width: max-content;
+        min-width: 220px;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        z-index: 2000;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
+        border: 1px solid rgba(0,0,0,0.1);
+        box-sizing: border-box;
+    }
   @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
