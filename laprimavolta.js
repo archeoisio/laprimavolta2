@@ -419,7 +419,18 @@ const navigationBounds = [
     [40.600, 14.740], // Sud-Ovest esteso
     [40.750, 14.900]  // Nord-Est esteso
 ];
-    
+    document.addEventListener('DOMContentLoaded', () => {
+    map = L.map('map', { 
+        zoomControl: false, 
+        maxZoom: 28, 
+        minZoom: 12.5, 
+        zoomSnap: 0.25,  
+        zoomDelta: 0.25,
+        wheelPxPerZoomLevel: 120,
+        maxBounds: navigationBounds, // Limite esteso per evitare il blocco brusco ai bordi
+        maxBoundsViscosity: 0.8      // Effetto elastico gradevole sui bordi
+    }).fitBounds(initialBounds);
+       
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
