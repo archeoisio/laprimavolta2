@@ -83,7 +83,7 @@ customStyleTag.innerHTML = `
     @media (max-width: 767px) {
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 98%; max-width: 1000px; height: 150px !important;
+            width: 98%; max-width: 1000px; height: 200px !important;
             background: rgba(255, 255, 255, 0.99); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 2100;
             padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
