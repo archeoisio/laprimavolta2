@@ -5,7 +5,7 @@ let allTavoloLayers = [];
 let currentActiveTab = null;
 
 const isMobile = window.innerWidth < 768; 
-const MIN_ZOOM_VISIBLE = isMobile ? 5 : 13; 
+const MIN_ZOOM_VISIBLE = isMobile ? 2 : 13; 
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
-        minZoom: 5, 
+        minZoom: 2, 
         zoomSnap: 1,  
         zoomDelta: 1,
         wheelDebounceTime: 80,
@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
         style: function(feature) {
             return { 
                 color: '##000000',      
-                weight: 4,           
+                weight: 5,           
                 fill: true,            
                 fillColor: '#b2bec3',  
                 fillOpacity: 0.0       
