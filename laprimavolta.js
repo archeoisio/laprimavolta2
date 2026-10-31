@@ -417,10 +417,15 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 4, 
-        zoomSnap: 0.5,  
+        zoomSnap: 1,  
         zoomDelta: 1,
         wheelDebounceTime: 80,
-        wheelPxPerZoomLevel: 120 
+        wheelPxPerZoomLevel: 120, 
+        worldCopyJump: false, // Disattiva il salto automatico tra copie del mondo
+        maxBounds: L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180)), // Blocca i confini del mondo (evita le bande nere e la ripetizione)
+        maxBoundsViscosity: 1.0, // Rigidità al 100% per impedire di uscire dall'area consentita
+       bounceAtZoomLimits: false,
+       attributionControl: false
     });
 
    if (isMobileDevice) {
@@ -438,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('zoomend', checkZoomVisibility);
 
     map.createPane('pane_confini_amministrativi');
-    map.getPane('pane_confini_amministrativi').style.zIndex = 404;
+    map.getPane('pane__amministrativi').style.zIndex = 404;
 
     var layer_confini_amministrativi = L.geoJson(null, {
         interactive: false,
@@ -446,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
         style: function(feature) {
             return { 
                 color: '#000000',      
-                weight: 2.5,           
+                weight: 1.5,           
                 fill: true,            
                 fillColor: '#b2bec3',  
                 fillOpacity: 0.0       
@@ -462,10 +467,12 @@ document.addEventListener('DOMContentLoaded', () => {
        });
 
     map.createPane('pane_GoogleSatellite_3'); map.getPane('pane_GoogleSatellite_3').style.zIndex = 402;
-    var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28, keepBuffer: 6 });
+    var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28,noWrap: true, keepBuffer: 6, updateWhenIdle: false,
+        updateInterval: 100 });
 
     map.createPane('pane_OpenStreetMap_4'); map.getPane('pane_OpenStreetMap_4').style.zIndex = 403;
-    var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28, keepBuffer: 6 });
+    var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28,noWrap: true, keepBuffer: 6, updateWhenIdle: false,
+        updateInterval: 100 });
     map.addLayer(layer_OpenStreetMap_4);
 
     window.atlasCategories = {};
@@ -873,18 +880,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        createBtn('🌍', "Torna alla vista iniziale", () => { 
-            map.fitBounds([
-                [40.626, 14.771],
-                [40.726, 14.873]
-            ], { padding: [20, 20], animate: true }); 
+        // Pulsante Home 🌍
+        createBtn('🌍', "Torna alla vista iniziale", () => {
+            const isMobileDevice = window.innerWidth < 768;
+            if (isMobileDevice) {
+                map.setView([40.658, 14.805], 11.5, { animate: true });
+            } else {
+                map.fitBounds([
+                    [40.626, 14.771],
+                    [40.726, 14.873]
+                ], { padding: [20, 20], animate: true });
+            }
         }, 'btn-tutorial-home');
-       
-        createBtn('📍', "Posizione", () => { map.locate({setView: true, maxZoom: 16}); }, 'btn-tutorial-locate');
-        return container;
-    };
-    btnControl.addTo(map);
-});
 
 function closeModal() {
     const modal = document.getElementById('welcome-modal');
