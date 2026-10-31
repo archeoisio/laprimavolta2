@@ -63,7 +63,7 @@ customStyleTag.innerHTML = `
     #custom-bottom-panel:not(.open) {
         max-height: 44px !important;
         overflow: hidden !important;
-        padding: 6px 10px !important;
+        padding: 10px 12px !important;
     }
 
     #custom-bottom-panel:not(.open) .mobile-content-container {
@@ -204,7 +204,7 @@ customStyleTag.innerHTML = `
     @media (max-width: 767px) {
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 1000px; height: 240px !important;
+            width: 100%; max-width: 1000px; height: 220px !important;
             background: rgba(255, 255, 259, 0.99); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 2100;
             padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
