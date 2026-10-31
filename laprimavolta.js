@@ -581,8 +581,8 @@ document.addEventListener('DOMContentLoaded', () => {
        });
     // Array unificato globale dei layer di contesto per il Centro di Controllo
     const contextLayers = [
-        { name: 'Confini', layer: layer_confini_amministrativi }, 
-        { name: 'Comuni / Provincia', layer: layer_comuniprovincia }
+        { name: 'Confine Comune', layer: layer_confini_amministrativi }, 
+        { name: 'Comuni Provincia', layer: layer_comuniprovincia }
     ];
 
     map.createPane('pane_GoogleSatellite_3'); map.getPane('pane_GoogleSatellite_3').style.zIndex = 402;
@@ -715,14 +715,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentActiveTab = tavoloKeys[0];
         }
 
-      if (checkMobile) {
+   if (checkMobile) {
             // ==================== LAYOUT MOBILE CON RIGA UNICA SUP ====================
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
                 <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
                     
-                    <!-- 1. BASE MAP FISSA: bloccata, non si restringe e non scorre -->
+                    <!-- 1. BASE MAP FISSA -->
                     <div style="display: flex; align-items: center; gap: 5px; flex-shrink: 0; white-space: nowrap;">
                         <span class="sub-section-title" style="margin:0; font-size:11px;">Base Map:</span>
                         <label style="display:inline-flex; align-items:center; gap:2px; cursor:pointer; font-size:11px;">
@@ -736,55 +736,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <!-- Separatore verticale -->
                     <div style="width: 1px; height: 14px; background: #dcdde1; flex-shrink: 0;"></div>
 
-                    <!-- 2. SEZIONE ALTRO SCORREVOLE: min-width: 0 è il trucco CSS cruciale per forzare lo scroll qui -->
-                    <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; flex-grow: 1; min-width: 0; padding-bottom: 2px;">
+                    <!-- 2. SEZIONE ALTRO: Titolo FISSO + Contenitore scrollabile separato -->
+                    <div style="display: flex; align-items: center; gap: 6px; flex-grow: 1; min-width: 0;">
+                        <!-- Titolo fisso che non si sposta -->
                         <span class="sub-section-title" style="margin:0; flex-shrink:0; font-size:11px;">Altro:</span>
+                        
+                        <!-- Contenitore dedicato ESCLUSIVAMENTE allo scroll dei checkbox (senza bounce) -->
+                        <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; flex-grow: 1; min-width: 0; padding-bottom: 2px; -webkit-overflow-scrolling: touch;">
             `;
             
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
                 html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px; flex-shrink:0;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
             });
-            html += `</div></div>`;
-
-            html += `
-                <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; flex-grow: 1; overflow: hidden;">
-                    <div style="display: flex; flex-direction: column; border-right: 1px solid #e1e1e1; padding-right: 4px; overflow-y: auto; gap: 3px;">
-                        <div class="sub-section-title" style="margin-bottom:2px;">Tematiche</div>
-            `;
-            tavoloKeys.forEach(tavolo => {
-                const catColor = getTavoloColor(tavolo);
-                const isActive = (tavolo === currentActiveTab);
-                const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : 'background:#f1f2f6; color:#57606f; border:1px solid #dcdde1;';
-                html += `<button class="sidebar-tab-btn ${isActive ? 'active' : ''}" data-tavolo-name="${tavolo}" data-color="${catColor}" style="font-size:11px; padding:3px 4px; border-radius:4px; font-weight:bold; text-align:left; cursor:pointer; ${activeStyle}">${tavolo.toUpperCase()}</button>`;
-            });
-            html += `</div>`;
-
-            html += `<div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch;">`;
-            
-            tavoloKeys.forEach(tavolo => {
-                const items = atlasCategories[tavolo];
-                const isActive = (tavolo === currentActiveTab);
-                if (!isActive) return;
-
-                html += `
-                    <div class="sub-section-title" style="margin-bottom: 4px; flex-shrink: 0;">Elementi: ${items.length}</div>
-                    <div style="display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; min-height: 0; padding-right: 4px; flex-grow: 1;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 250px; gap: 4px;">
-                `;
-                
-                items.forEach((item, globalIdx) => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px; box-sizing:border-box; height:100%;">
-                            <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; white-space:normal; word-break:break-word; line-height:1.2;" title="${item.name}">${item.name}</span>
-                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
-                        </div>
-                    `;
-                });
-                html += `</div></div>`;
-            });
-         
-            html += `</div></div></div>`;
+            html += `</div></div></div>`; // Chiusura corretta dei vari div
 
         } else {
             // ==================== LAYOUT DESKTOP ====================
