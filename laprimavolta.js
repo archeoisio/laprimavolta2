@@ -652,21 +652,30 @@ document.addEventListener('DOMContentLoaded', () => {
                    <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; overscroll-behavior-y: contain;">
             `;
             tavoloKeys.forEach(tavolo => {
-                const items = atlasCategories[tavolo];
-                const isActive = (tavolo === currentActiveTab);
-                if (!isActive) return;
+        const items = atlasCategories[tavolo];
+        const isActive = (tavolo === currentActiveTab);
+        if (!isActive) return;
 
-                html += `
-                    <div class="sub-section-title" style="margin-bottom: 4px;">Elementi: ${items.length}</div>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 250px; gap: 4px;">                `;
-                items.forEach((item, globalIdx) => {
-    html += `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px; box-sizing:border-box; height:100%;">
-            <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; white-space:normal; word-break:break-word; line-height:1.2;" title="${item.name}">${item.name}</span>
-            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
-        </div>
-    `;
-});
+        html += `
+            <!-- 1. TITOLO FISSO (NON SCORRE) -->
+            <div class="sub-section-title" style="margin-bottom: 4px; flex-shrink: 0;">Elementi: ${items.length}</div>
+            
+            <!-- 2. CONTENITORE SCORRIBILE (SOLO QUESTO SCORRE) -->
+            <div style="display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior-y: contain; padding-right: 4px; flex-grow: 1;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 250px; gap: 4px;">
+        `;
+        
+        items.forEach((item, globalIdx) => {
+            html += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px; box-sizing:border-box; height:100%;">
+                    <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; white-space:normal; word-break:break-word; line-height:1.2;" title="${item.name}">${item.name}</span>
+                    <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
+                </div>
+            `;
+        });
+        
+        html += `</div></div>`;
+    });
                 html += `</div>`;
             });
             html += `</div></div></div>`;
