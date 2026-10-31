@@ -658,7 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 html += `
                     <div class="sub-section-title" style="margin-bottom: 4px;">Elementi: ${items.length}</div>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 100px; gap: 4px;">                `;
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 250px; gap: 4px;">                `;
                 items.forEach((item, globalIdx) => {
     html += `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px; box-sizing:border-box; height:100%;">
