@@ -549,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
    if (isMobileDevice) {
-        map.setView([40.625, 14.805], 11.75);
+        map.setView([40.630, 14.805], 11.75);
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
@@ -1204,7 +1204,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Esegue il reset delle dimensioni della mappa e torna alla vista iniziale
             const isMobileDevice = window.innerWidth < 768;
             if (isMobileDevice) {
-                map.setView([40.620, 14.805], 11.75, { animate: true });
+                map.setView([40.630, 14.805], 11.75, { animate: true });
             } else {
                 map.fitBounds(initialBounds, { padding: [20, 20], animate: true });
                 if (map.getZoom() < 13) {
