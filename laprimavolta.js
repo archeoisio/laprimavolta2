@@ -1,4 +1,4 @@
-let map; 
+let map;
 let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
@@ -26,6 +26,8 @@ customStyleTag.innerHTML = `
     .leaflet-interactive {
         transition: none !important;
     }
+
+    /* ==================== MOBILE STYLES (ORIGINALE) ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
@@ -36,7 +38,8 @@ customStyleTag.innerHTML = `
         border-top-left-radius: 14px; border-top-right-radius: 14px; 
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
     }
-.comune-label {
+
+    .comune-label {
         background: #ffffff;
         border: 1px solid #333333;
         padding: 3px 7px;
@@ -50,35 +53,41 @@ customStyleTag.innerHTML = `
         display: inline-block;
         box-sizing: border-box;
         pointer-events: none;
-        /* Sposta l'etichetta esattamente al centro del punto di ancoraggio */
         transform: translate(-50%, -50%); 
     }
+
+    /* ==================== DESKTOP STYLES (LATO SINISTRO A SCOMPARSA) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
-            bottom: 0;
-            left: 10px;
+            top: 10px;
+            left: -350px; /* Nascosto a sinistra di default */
+            bottom: auto;
             transform: none;
-            width: max-content;
-            min-width: 220px;
-            padding: 8px 12px;
+            width: 350px !important;
+            height: calc(100vh - 260px) !important;
+            max-height: calc(100vh - 260px) !important;
+            padding: 15px 12px;
             display: flex;
             flex-direction: column;
             z-index: 2000;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
-            border-top-left-radius: 14px;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.3);
+            border-top-left-radius: 0;
             border-top-right-radius: 14px;
+            border-bottom-right-radius: 14px;
+            border-bottom-left-radius: 0;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
-            transition: width 0.25s ease-in-out;
+            transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
         }
         
         #custom-bottom-panel.open {
-            width: 1000px !important;
-            height: 230px !important;
-            max-height: 230px !important;
+            left: 0 !important; /* Apre il pannello a sinistra */
+            width: 950px !important;
+            height: calc(100vh - 260px) !important;
+            max-height: calc(100vh - 260px) !important;
         }
 
         #custom-bottom-panel .panel-main-header b {
@@ -109,16 +118,35 @@ customStyleTag.innerHTML = `
             font-size: 13px !important; 
         }
 
+        /* Pannello dettaglio elemento desktop posizionato verticalmente sotto il Centro di Controllo sul lato sinistro */
         #feature-detail-panel {
-            position: fixed; bottom: 0; left: 1025px; width: 500px;
-            height: 230px;
+            position: fixed; 
+            top: auto;
+            bottom: 10px; 
+            left: 10px; 
+            width: 350px;
             max-height: 230px !important;
-            border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
-            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
-            padding: 8px 8px; box-sizing: border-box; font-family: sans-serif;
-            font-size: 13px; color: #333; display: none; flex-direction: column;
+            border-radius: 14px; 
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3); 
+            z-index: 2100;
+            padding: 8px 8px; 
+            box-sizing: border-box; 
+            font-family: sans-serif;
+            font-size: 13px; 
+            color: #333; 
+            display: none; 
+            flex-direction: column;
             border: 1px solid rgba(0,0,0,0.1);
+            transition: width 0.3s ease-in-out, left 0.3s ease-in-out;
+        }
+
+        /* Quando il pannello principale è aperto, anche il pannello dettagli si allarga per allinearsi */
+        #custom-bottom-panel.open ~ #feature-detail-panel,
+        body:has(#custom-bottom-panel.open) #feature-detail-panel {
+            width: 950px !important;
         }
 
         .col-left .base-map-vertical {
@@ -148,10 +176,17 @@ customStyleTag.innerHTML = `
     }
 
     #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
-    #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
+    @media (min-width: 768px) {
+        #custom-bottom-panel:not(.open) { width: 44px !important; height: 44px !important; border-radius: 50% !important; overflow: hidden; padding: 0 !important; display: flex; align-items: center; justify-content: center; }
+        #custom-bottom-panel:not(.open) .panel-main-header { justify-content: center; padding: 0; margin: 0; }
+        #custom-bottom-panel:not(.open) .panel-main-header b { display: none; }
+    }
+    @media (max-width: 767px) {
+        #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
+        #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; width: 100%; }
-    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     .panel-three-columns { display: grid; grid-template-columns: 80px 120px 1fr; gap: 6px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
     
@@ -168,7 +203,6 @@ customStyleTag.innerHTML = `
     .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 3px 4px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
-    .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
     
     .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
@@ -309,7 +343,6 @@ function showFeatureDetailsOnly(layer, tavoloName) {
         }
     }
 
-    const totalPages = extraFields.length > 0 ? 2 : 1;
     window.currentDetailSlide = 1;
     window.currentDetailExtraFields = extraFields;
     window.currentDetailTableData = { props, tavoloName };
@@ -493,28 +526,16 @@ document.addEventListener('DOMContentLoaded', () => {
     map.getPane('pane_comuniprovincia').style.zIndex = 407;
 
     var layer_comuniprovincia = L.layerGroup();
-    // Array interno per tracciare le feature e le etichette dei comuni
-    let comuniprovinciaSubLayers = [];
 
-    // Funzione di utilità per calcolarsi il centro approssimativo di un poligono (bounding box center o pointOnSurface)
-    function getPolygonCenter(feature) {
-        // Se usi Turf.js potresti usare turf.centerOfMass, ma calcoliamolo dai bounds per compatibilità nativa:
-        const tempLayer = L.geoJson(feature);
-        const bounds = tempLayer.getBounds();
-        return bounds.getCenter();
-    }
-
-  // 1. CREAZIONE DEL PANE DEDICATO ALLE ETICHETTE (se non esiste già)
     if (!map.getPane('pane_comuniprovincia_labels')) {
         map.createPane('pane_comuniprovincia_labels');
-        map.getPane('pane_comuniprovincia_labels').style.zIndex = 650; // Più alto dei poligoni
+        map.getPane('pane_comuniprovincia_labels').style.zIndex = 650;
         map.getPane('pane_comuniprovincia_labels').style.pointerEvents = 'none';
     }
 
     let selectedComuneLayer = null; 
     let currentLabelMarker = null;  
 
-    // 2. CARICAMENTO DEL GEOJSON (il codice che già usi)
     fetch('data/comuniprovincia.geojson')
        .then(response => response.json())
        .then(data => {
@@ -563,11 +584,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 iconAnchor: [0, 0]
                             });
 
-                            // 3. IL MARKER USA IL PANE SUPERIORE
                             currentLabelMarker = L.marker(center, { 
                                 icon: labelIcon, 
                                 interactive: false,
-                                pane: 'pane_comuniprovincia_labels' // <--- Ecco dove va
+                                pane: 'pane_comuniprovincia_labels'
                             });
                             
                             layer_comuniprovincia.addLayer(currentLabelMarker);
@@ -579,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
        });
-    // Array unificato globale dei layer di contesto per il Centro di Controllo
+
     const contextLayers = [
         { name: 'Confine Comune', layer: layer_confini_amministrativi }, 
         { name: 'Comuni Provincia', layer: layer_comuniprovincia }
@@ -698,14 +718,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.renderPanelContent = function() {
         const isOpen = bottomPanel.classList.contains('open');
-        const arrowSymbol = isOpen ? '▼' : '▲';
+        const arrowSymbol = isOpen ? '◀' : '▶';
         const checkMobile = window.innerWidth < 768;
 
         let html = `
-            <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent();">
+            <div class="panel-main-header" onclick="
+                const panel = document.getElementById('custom-bottom-panel');
+                const wasOpen = panel.classList.contains('open');
+                panel.classList.toggle('open');
+                renderPanelContent();
+                
+                // Spostamento dinamico della mappa su desktop
+                if (window.innerWidth >= 768) {
+                    if (!wasOpen) {
+                        map.panBy([-475, 0], { animate: true });
+                    } else {
+                        map.setView([40.665, 14.805], map.getZoom(), { animate: true });
+                    }
+                    setTimeout(() => { map.invalidateSize(); }, 300);
+                }
+            ">
                 <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
+                    <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${checkMobile ? (isOpen ? '▼' : '▲') : arrowSymbol}</span>
                 </div>
             </div>
         `;
@@ -715,14 +750,13 @@ document.addEventListener('DOMContentLoaded', () => {
             currentActiveTab = tavoloKeys[0];
         }
 
-   if (checkMobile) {
-            // ==================== LAYOUT MOBILE CON RIGA UNICA SUP ====================
+        if (checkMobile) {
+            // ==================== LAYOUT MOBILE (ORIGINALE) ====================
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
                 <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
                     
-                    <!-- 1. BASE MAP FISSA -->
                     <div style="display: flex; align-items: center; gap: 5px; flex-shrink: 0; white-space: nowrap;">
                         <span class="sub-section-title" style="margin:0; font-size:11px;">Base Map:</span>
                         <label style="display:inline-flex; align-items:center; gap:2px; cursor:pointer; font-size:11px;">
@@ -733,15 +767,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         </label>
                     </div>
 
-                    <!-- Separatore verticale -->
                     <div style="width: 1px; height: 14px; background: #dcdde1; flex-shrink: 0;"></div>
 
-                    <!-- 2. SEZIONE ALTRO: Titolo FISSO + Contenitore scrollabile separato -->
                     <div style="display: flex; align-items: center; gap: 6px; flex-grow: 1; min-width: 0;">
-                        <!-- Titolo fisso che non si sposta -->
                         <span class="sub-section-title" style="margin:0; flex-shrink:0; font-size:11px;">Altro:</span>
                         
-                        <!-- Contenitore dedicato ESCLUSIVAMENTE allo scroll dei checkbox (senza bounce) -->
                         <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; flex-grow: 1; min-width: 0; padding-bottom: 2px; -webkit-overflow-scrolling: touch;">
             `;
             
@@ -749,7 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isChecked = map.hasLayer(ctx.layer);
                 html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px; flex-shrink:0;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
             });
-            html += `</div></div></div>`; // Chiusura corretta dei vari div
+            html += `</div></div></div>`;
 
         } else {
             // ==================== LAYOUT DESKTOP ====================
@@ -964,7 +994,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-        // Pulsante Home 🌍
         createBtn('🌍', "Torna alla vista iniziale", () => {
             const isMobileDevice = window.innerWidth < 768;
             if (isMobileDevice) {
@@ -977,7 +1006,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 'btn-tutorial-home');
 
-        // Pulsante Geolocalizzazione 📍
         createBtn('📍', "Posizione", () => { map.locate({setView: true, maxZoom: 16}); }, 'btn-tutorial-locate');
 
         return container;
