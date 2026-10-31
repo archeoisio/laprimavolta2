@@ -720,7 +720,7 @@ atlasCategories[tematica].push({ name, layer });
                     if (isDesktop) {
                         map.panBy([0, 120], { animate: false });
                     } else {
-                        map.panBy([0, -180], { animate: false }); 
+                        map.panBy([0, 150], { animate: false }); 
                     }
                 } else {
                     const bounds = layer.getBounds();
