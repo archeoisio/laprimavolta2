@@ -240,7 +240,7 @@ function resetFeatureStyle(e) {
   const tematica = prop['Tematica'] || 'Altro';
 const catColor = getTavoloColor(tematica);
     if (layer.feature.geometry.type === 'Point') {
-        layer.setStyle({ : 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
+        layer.setStyle({ radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
     } else {
         layer.setStyle({ opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: catColor });
     }
