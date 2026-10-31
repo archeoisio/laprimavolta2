@@ -453,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
    if (isMobileDevice) {
-        map.setView([40.626, 14.805], 11.75);
+        map.setView([40.600, 14.805], 11.75);
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
@@ -504,19 +504,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return bounds.getCenter();
     }
 
-  fetch('data/comuniprovincia.geojson')
+  let selectedComuneLayer = null; // Variabile per tracciare il comune attivo
+    let currentLabelMarker = null;  // Variabile per tracciare l'etichetta attiva
+
+    fetch('data/comuniprovincia.geojson')
        .then(response => response.json())
        .then(data => {
             const geoJsonLayer = L.geoJson(data, {
-                interactive: true, // Assicurati che sia true per poter cliccare sui poligoni
+                interactive: true,
                 pane: 'pane_comuniprovincia',
                 style: function(feature) {
                     return { 
-                        color: '#000000',      // Colore bordo normale
-                        weight: 1,            // Spessore bordo normale
+                        color: '#000000',      
+                        weight: 1,            
                         fill: true,           
                         fillColor: '#e74c3c',  
-                        fillOpacity: 0.0      // Trasparente finché non cliccato
+                        fillOpacity: 0.0      
                     };
                 },
                 onEachFeature: function(feature, layer) {
@@ -525,28 +528,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     const nomeComune = feature.properties['COMUNE'] || feature.properties['Comune'] || '';
                     
                     if (nomeComune) {
-                        let labelMarker = null;
-
-                        // Gestione del click sul poligono del comune
                         layer.on('click', function(e) {
-                            // 1. Prima di tutto, deselezioniamo/rimuoviamo l'etichetta e resettiamo lo stile degli altri comuni (opzionale ma pulito)
-                            layer_comuniprovincia.eachLayer(function(l) {
-                                if (l instanceof L.Polygon || l instanceof L.MultiPolygon) {
-                                    l.setStyle({ color: '#000000', weight: 1, fillOpacity: 0.0 });
-                                }
-                                if (l._isComuneLabel) {
-                                    layer_comuniprovincia.removeLayer(l);
-                                }
-                            });
+                            // 1. Se c'era già un comune selezionato in precedenza, resettiamo il suo stile
+                            if (selectedComuneLayer) {
+                                selectedComuneLayer.setStyle({ 
+                                    color: '#000000', 
+                                    weight: 1, 
+                                    fillOpacity: 0.0 
+                                });
+                            }
 
-                            // 2. Evidenziamo il poligono cliccato (bordo rosso più spesso e leggero riempimento)
+                            // 2. Se c'era già un'etichetta attiva, la rimuoviamo dalla mappa
+                            if (currentLabelMarker) {
+                                layer_comuniprovincia.removeLayer(currentLabelMarker);
+                            }
+
+                            // 3. Evidenziamo il nuovo poligono cliccato
                             layer.setStyle({
-                                color: '#e74c3c',     // Bordo rosso
-                                weight: 2.5,          // Più spesso
-                                fillOpacity: 0.15     // Leggero velo di colore per evidenziarlo
+                                color: '#e74c3c',     
+                                weight: 2.5,          
+                                fillOpacity: 0.15     
                             });
 
-                            // 3. Creiamo e aggiungiamo l'etichetta al centro del poligono cliccato
+                            // 4. Creiamo e aggiungiamo la nuova etichetta al centro
                             const center = layer.getBounds().getCenter();
                             const labelIcon = L.divIcon({
                                 className: 'comune-label-container',
@@ -555,25 +559,24 @@ document.addEventListener('DOMContentLoaded', () => {
                                 iconAnchor: [0, 0]
                             });
 
-                            labelMarker = L.marker(center, { 
+                            currentLabelMarker = L.marker(center, { 
                                 icon: labelIcon, 
                                 interactive: false,
                                 pane: 'pane_comuniprovincia' 
                             });
                             
-                            // Marcatore di servizio per riconoscerlo e rimuoverlo dopo
-                            labelMarker._isComuneLabel = true;
-                            
-                            layer_comuniprovincia.addLayer(labelMarker);
+                            layer_comuniprovincia.addLayer(currentLabelMarker);
 
-                            // Evita che il click sulla mappa chiuda o faccia altro sotto
+                            // 5. Salviamo i riferimenti correnti
+                            selectedComuneLayer = layer;
+
+                            // Evita propagazioni indesiderate
                             L.DomEvent.stopPropagation(e);
                         });
                     }
                 }
             });
        });
-
     // Array unificato globale dei layer di contesto per il Centro di Controllo
     const contextLayers = [
         { name: 'Confini', layer: layer_confini_amministrativi }, 
