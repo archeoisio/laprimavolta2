@@ -458,15 +458,15 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('zoomend', checkZoomVisibility);
 
     map.createPane('pane_confini_amministrativi');
-    map.getPane('pane_confini_amministrativi').style.zIndex = 5000;
+    map.getPane('pane_confini_amministrativi').style.zIndex = 404;
 
     var layer_confini_amministrativi = L.geoJson(null, {
         interactive: false,
         pane: 'pane_confini_amministrativi',
         style: function(feature) {
             return { 
-                color: '#636e72',      
-                weight: 5,           
+                color: '##000000',      
+                weight: 2.5,           
                 fill: true,            
                 fillColor: '#b2bec3',  
                 fillOpacity: 0.0       
@@ -481,10 +481,10 @@ document.addEventListener('DOMContentLoaded', () => {
            map.addLayer(layer_confini_amministrativi); 
        });
 
-    map.createPane('pane_GoogleSatellite_3'); map.getPane('pane_GoogleSatellite_3').style.zIndex = 403;
+    map.createPane('pane_GoogleSatellite_3'); map.getPane('pane_GoogleSatellite_3').style.zIndex = 402;
     var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28, keepBuffer: 6 });
 
-    map.createPane('pane_OpenStreetMap_4'); map.getPane('pane_OpenStreetMap_4').style.zIndex = 404;
+    map.createPane('pane_OpenStreetMap_4'); map.getPane('pane_OpenStreetMap_4').style.zIndex = 403;
     var layer_OpenStreetMap_4 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OpenStreetMap_4', minZoom: 1, maxZoom: 28, keepBuffer: 6 });
     map.addLayer(layer_OpenStreetMap_4);
 
