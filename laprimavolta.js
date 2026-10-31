@@ -1,4 +1,4 @@
-let map;
+let map; 
 let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
@@ -27,7 +27,7 @@ customStyleTag.innerHTML = `
         transition: none !important;
     }
 
-    /* ==================== STILE BASE MOBILE (UGUALE AL TUO ORIGINALE) ==================== */
+    /* ==================== STILE MOBILE ORIGINALE (DAL TUO FILE FUNZIONANTE) ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
@@ -170,12 +170,7 @@ customStyleTag.innerHTML = `
         }
     }
 
-    /* ==================== MOBILE STYLES (RIPRISTINO PUNTuale) ==================== */
     @media (max-width: 767px) {
-        #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
-        #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
-        #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 1000px; height: 240px !important;
@@ -188,8 +183,12 @@ customStyleTag.innerHTML = `
             overflow-y: auto;
         }
     }
+
+    #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
+    #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; width: 100%; }
+    #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     .panel-three-columns { display: grid; grid-template-columns: 80px 120px 1fr; gap: 6px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
     
@@ -206,6 +205,7 @@ customStyleTag.innerHTML = `
     .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 3px 4px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
+    .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
     
     .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
@@ -346,6 +346,7 @@ function showFeatureDetailsOnly(layer, tavoloName) {
         }
     }
 
+    const totalPages = extraFields.length > 0 ? 2 : 1;
     window.currentDetailSlide = 1;
     window.currentDetailExtraFields = extraFields;
     window.currentDetailTableData = { props, tavoloName };
@@ -529,6 +530,13 @@ document.addEventListener('DOMContentLoaded', () => {
     map.getPane('pane_comuniprovincia').style.zIndex = 407;
 
     var layer_comuniprovincia = L.layerGroup();
+    let comuniprovinciaSubLayers = [];
+
+    function getPolygonCenter(feature) {
+        const tempLayer = L.geoJson(feature);
+        const bounds = tempLayer.getBounds();
+        return bounds.getCenter();
+    }
 
     if (!map.getPane('pane_comuniprovincia_labels')) {
         map.createPane('pane_comuniprovincia_labels');
@@ -725,21 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const checkMobile = window.innerWidth < 768;
 
         let html = `
-            <div class="panel-main-header" onclick="
-                const panel = document.getElementById('custom-bottom-panel');
-                const wasOpen = panel.classList.contains('open');
-                panel.classList.toggle('open');
-                renderPanelContent();
-                
-                if (window.innerWidth >= 768) {
-                    if (!wasOpen) {
-                        map.panBy([-475, 0], { animate: true });
-                    } else {
-                        map.setView([40.665, 14.805], map.getZoom(), { animate: true });
-                    }
-                    setTimeout(() => { map.invalidateSize(); }, 300);
-                }
-            ">
+            <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent();">
                 <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
@@ -753,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (checkMobile) {
-            // ==================== LAYOUT MOBILE ORIGINALE ====================
+            // ==================== LAYOUT MOBILE ORIGINALE (DAL TUO FILE) ====================
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
