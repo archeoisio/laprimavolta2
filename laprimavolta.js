@@ -4,8 +4,8 @@ let selectedLayer = null;
 let allTavoloLayers = [];
 let currentActiveTab = null;
 
-const isMobile = window.innerWidth < 768; // Rilevamento mobile/desktop
-const MIN_ZOOM_VISIBLE = isMobile ? 10 : 13; // Soglia dinamica
+const isMobile = window.innerWidth < 768; 
+const MIN_ZOOM_VISIBLE = isMobile ? 10 : 13; 
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!isMobileDevice) {
         map.on('zoomend', () => {
-            if (!window.innerWidth < 768 && map.getZoom() < 13) {
+            if (window.innerWidth >= 768 && map.getZoom() < 13) {
                 map.setZoom(13);
             }
         });
@@ -880,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const createBtn = (html, title, onClick, className) => {
             const btn = L.DomUtil.create('a', className || '', container);
-            btn.innerHTML = html; btn.title = title; btn.href = '#'; btn.style.width = '44px'; btn.style.height = '44px'; btn.style.lineHeight = '44px'; btn.style.textAlign = 'center'; btn.style.display = 'flex'; btn.style.alignItems: 'center'; btn.style.justifyContent = 'center'; btn.style.fontSize = '18px'; btn.style.backgroundColor = 'white'; btn.style.color = '#333'; btn.style.borderBottom = '1px solid #ccc'; btn.style.textDecoration = 'none';
+            btn.innerHTML = html; btn.title = title; btn.href = '#'; btn.style.width = '44px'; btn.style.height = '44px'; btn.style.lineHeight = '44px'; btn.style.textAlign = 'center'; btn.style.display = 'flex'; btn.style.alignItems = 'center'; btn.style.justifyContent = 'center'; btn.style.fontSize = '18px'; btn.style.backgroundColor = 'white'; btn.style.color = '#333'; btn.style.borderBottom = '1px solid #ccc'; btn.style.textDecoration = 'none';
             L.DomEvent.on(btn, 'click', e => { L.DomEvent.stopPropagation(e); L.DomEvent.preventDefault(e); onClick(); });
             return btn;
         };
