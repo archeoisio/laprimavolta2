@@ -636,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `</div></div>`;
 
             html += `
-                <div style="display: grid; grid-template-columns: 120px 1fr; gap: 6px; flex-grow: 1; overflow: hidden;">
+                <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; flex-grow: 1; overflow: hidden;">
                     <div style="display: flex; flex-direction: column; border-right: 1px solid #e1e1e1; padding-right: 4px; overflow-y: auto; gap: 3px;">
                         <div class="sub-section-title" style="margin-bottom:2px;">Tematiche</div>
             `;
