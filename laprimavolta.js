@@ -9,8 +9,29 @@ const MIN_ZOOM_VISIBLE = isMobile ? 2 : 13;
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
+    /* ==================== RESET PER ELIMINARE BORDI BIANCHI ==================== */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+        background-color: #ffffff;
+    }
+
+    #map {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     * {
         touch-action: manipulation;
+        box-sizing: border-box;
     }
     .leaflet-pane svg path,
     .leaflet-tile-pane .leaflet-layer {
@@ -56,12 +77,12 @@ customStyleTag.innerHTML = `
         transform: translate(-50%, -50%); 
     }
 
-    /* ==================== DESKTOP STYLES (RIDOTTO E ALLINEATO) ==================== */
+    /* ==================== DESKTOP STYLES (ORIZZONTALE, COMPATTO E COLLEGATO) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
             top: 20px;
-            left: -720px; 
+            left: 20px; 
             bottom: auto;
             transform: none;
             width: 720px !important;
@@ -73,44 +94,39 @@ customStyleTag.innerHTML = `
             z-index: 2000;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            box-shadow: 2px 5px 20px rgba(0,0,0,0.25);
-            border-radius: 0 14px 14px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            border-radius: 12px;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
-            transition: left 0.3s ease-in-out;
-        }
-        
-        #custom-bottom-panel.open {
-            left: 0 !important; 
+            transition: all 0.3s ease-in-out;
         }
 
-        /* Linguetta chiusa allineata esattamente in alto (top: 20px) */
+        /* Stato Chiuso: Pulsante orizzontale, stretto e basso in alto a sinistra */
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
             top: 20px !important;
-            left: 0 !important;
+            left: 20px !important;
             bottom: auto !important;
             transform: none !important;
-            width: 38px !important;
-            height: 160px !important;
-            max-height: 160px !important;
-            border-radius: 0 10px 10px 0 !important;
-            padding: 0 !important;
+            width: 170px !important;
+            height: 36px !important;
+            max-height: 36px !important;
+            border-radius: 8px !important;
+            padding: 4px 8px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             background: #ffffff !important;
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15) !important;
             cursor: pointer !important;
             overflow: hidden !important;
         }
 
         #custom-bottom-panel:not(.open) .panel-main-header {
-            writing-mode: vertical-rl !important;
-            text-orientation: mixed !important;
+            writing-mode: horizontal-tb !important;
             display: flex !important;
             align-items: center !important;
-            justify-content: center !important;
+            justify-content: space-between !important;
             height: 100% !important;
             width: 100% !important;
             padding: 0 !important;
@@ -119,15 +135,13 @@ customStyleTag.innerHTML = `
         }
 
         #custom-bottom-panel:not(.open) .panel-main-header b {
-            display: block !important;
-            font-size: 12px !important;
+            font-size: 11px !important;
             color: #2c3e50 !important;
-            letter-spacing: 0.5px;
             white-space: nowrap;
         }
 
         #custom-bottom-panel:not(.open) .panel-main-header div {
-            display: none !important;
+            display: flex !important;
         }
 
         #custom-bottom-panel .desktop-main-container {
@@ -140,20 +154,20 @@ customStyleTag.innerHTML = `
             box-sizing: border-box;
         }
 
+        /* Pannello Dettaglio Elemento posizionato subito sotto il Centro di Controllo sul lato sinistro */
         #feature-detail-panel {
-            position: fixed; 
-            top: auto;
-            bottom: 10px; 
-            left: 10px; 
-            width: 350px;
-            max-height: 230px !important;
-            border-radius: 14px; 
+            position: fixed !important;
+            top: 360px !important; 
+            left: 20px !important; 
+            width: 720px !important;
+            max-height: 220px !important;
+            border-radius: 12px; 
             overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); 
             backdrop-filter: blur(10px);
-            box-shadow: 0 5px 25px rgba(0,0,0,0.3); 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25); 
             z-index: 2100;
-            padding: 8px 8px; 
+            padding: 10px 12px; 
             box-sizing: border-box; 
             font-family: sans-serif;
             font-size: 13px; 
@@ -180,7 +194,7 @@ customStyleTag.innerHTML = `
     }
 
     #custom-bottom-panel:not(.open) .desktop-main-container { display: none !important; }
-    #custom-bottom-panel:not(.open) { max-height: 160px !important; height: 160px !important; }
+    #custom-bottom-panel:not(.open) { max-height: 36px !important; height: 36px !important; }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 4px; cursor: pointer; user-select: none; width: 100%; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -709,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const checkMobile = window.innerWidth < 768;
 
         let html = `
-            <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent();">
+            <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent(); if(window.innerWidth >= 768) { setTimeout(() => { map.invalidateSize({animate: true}); }, 300); }">
                 <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span style="font-size:12px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
@@ -967,8 +981,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const mapEl = document.getElementById('map');
         if (!mapEl || !map) return;
         const runResize = () => {
-            mapEl.style.left = "0px";
-            mapEl.style.top = "0px";
             mapEl.style.width = window.innerWidth + 'px';
             mapEl.style.height = window.innerHeight + 'px';
             map.invalidateSize({ animate: false });
