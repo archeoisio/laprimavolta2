@@ -27,7 +27,7 @@ customStyleTag.innerHTML = `
         transition: none !important;
     }
 
-    /* ==================== STILE MOBILE ORIGINALE ==================== */
+    /* ==================== STILE MOBILE ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
@@ -56,53 +56,51 @@ customStyleTag.innerHTML = `
         transform: translate(-50%, -50%); 
     }
 
-    /* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
+    /* ==================== DESKTOP STYLES (RIDOTTO E ALLINEATO) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
-            top: 0;
-            left: -350px; 
+            top: 20px;
+            left: -720px; 
             bottom: auto;
             transform: none;
-            width: 350px !important;
-            height: 100vh !important;
-            max-height: 100vh !important;
-            padding: 15px 12px;
+            width: 720px !important;
+            height: 330px !important;
+            max-height: 330px !important;
+            padding: 10px 12px;
             display: flex;
             flex-direction: column;
             z-index: 2000;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            box-shadow: 2px 0 15px rgba(0,0,0,0.3);
+            box-shadow: 2px 5px 20px rgba(0,0,0,0.25);
             border-radius: 0 14px 14px 0;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
-            transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+            transition: left 0.3s ease-in-out;
         }
         
         #custom-bottom-panel.open {
             left: 0 !important; 
-            width: 950px !important;
-            height: 100vh !important;
-            max-height: 100vh !important;
         }
 
+        /* Linguetta chiusa allineata esattamente in alto (top: 20px) */
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
-            top: 50% !important;
+            top: 20px !important;
             left: 0 !important;
             bottom: auto !important;
-            transform: translateY(-50%) !important;
+            transform: none !important;
             width: 38px !important;
-            height: 170px !important;
-            max-height: 170px !important;
+            height: 160px !important;
+            max-height: 160px !important;
             border-radius: 0 10px 10px 0 !important;
             padding: 0 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             background: #ffffff !important;
-            box-shadow: 3px 0 10px rgba(0,0,0,0.2) !important;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.15) !important;
             cursor: pointer !important;
             overflow: hidden !important;
         }
@@ -132,11 +130,13 @@ customStyleTag.innerHTML = `
             display: none !important;
         }
 
-        #custom-bottom-panel .panel-three-columns {
-            grid-template-columns: 180px 160px 1fr !important;
-            overflow-y: auto;
-            display: grid !important;
-            width: 100%;
+        #custom-bottom-panel .desktop-main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-grow: 1;
+            height: calc(100% - 30px);
+            overflow: hidden;
             box-sizing: border-box;
         }
 
@@ -161,12 +161,6 @@ customStyleTag.innerHTML = `
             display: none; 
             flex-direction: column;
             border: 1px solid rgba(0,0,0,0.1);
-            transition: width 0.3s ease-in-out, left 0.3s ease-in-out;
-        }
-
-        #custom-bottom-panel.open ~ #feature-detail-panel,
-        body:has(#custom-bottom-panel.open) #feature-detail-panel {
-            width: 950px !important;
         }
     }
 
@@ -185,30 +179,19 @@ customStyleTag.innerHTML = `
         }
     }
 
-    #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
-    #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
+    #custom-bottom-panel:not(.open) .desktop-main-container { display: none !important; }
+    #custom-bottom-panel:not(.open) { max-height: 160px !important; height: 160px !important; }
     
-    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; width: 100%; }
+    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 4px; cursor: pointer; user-select: none; width: 100%; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
-    .panel-three-columns { display: grid; grid-template-columns: 80px 120px 1fr; gap: 6px; flex-grow: 1; overflow: hidden; height: calc(100% - 30px); }
-    
-    .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
-    .col-left .base-map-vertical { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
-    .col-left-scrollable { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex-grow: 1; border-top: 1px solid #e1e1e1; padding-top: 4px; overscroll-behavior: none; }
-    
-    .col-middle { display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow-y: auto; overscroll-behavior: none; }
-    .sidebar-tabs-vertical { display: flex; flex-direction: column; gap: 4px; }
-    
-    .col-right { display: flex; flex-direction: column; overflow: hidden; }
-    
-    .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 3px 4px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
-    .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
+    .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 4px 6px; font-size: 11px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
+    .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; height: 100%; }
     .sidebar-tab-content.active { display: flex; }
     
-    .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; overscroll-behavior: none; }
-    .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
+    .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; overscroll-behavior-x: none; -webkit-overflow-scrolling: touch; }
+    .feature-vertical-column { display: flex; flex-direction: column; gap: 3px; min-width: 140px; flex-shrink: 0; }
     
     .feature-detail-header {
         display: flex;
@@ -531,12 +514,6 @@ document.addEventListener('DOMContentLoaded', () => {
     var layer_comuniprovincia = L.layerGroup();
     let comuniprovinciaSubLayers = [];
 
-    function getPolygonCenter(feature) {
-        const tempLayer = L.geoJson(feature);
-        const bounds = tempLayer.getBounds();
-        return bounds.getCenter();
-    }
-
     if (!map.getPane('pane_comuniprovincia_labels')) {
         map.createPane('pane_comuniprovincia_labels');
         map.getPane('pane_comuniprovincia_labels').style.zIndex = 650;
@@ -733,9 +710,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = `
             <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent();">
-                <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
+                <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
+                    <span style="font-size:12px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
                 </div>
             </div>
         `;
@@ -746,8 +723,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (checkMobile) {
-            // ==================== LAYOUT MOBILE CORRETTO CON SCORRIMENTO ORIZZONTALE E VERTICALE DISTINTI ====================
-            html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 210px;">`;
+            // ==================== LAYOUT MOBILE ====================
+            html += `<div style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 210px;">`;
             
             html += `
                 <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
@@ -766,8 +743,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div style="display: flex; align-items: center; gap: 6px; flex-grow: 1; min-width: 0;">
                         <span class="sub-section-title" style="margin:0; flex-shrink:0; font-size:11px;">Altro:</span>
-                        
-                        <!-- Contenitore orizzontale per Altro con dimensione 0 e no bounce -->
                         <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; flex-grow: 1; min-width: 0; padding-bottom: 2px; -webkit-overflow-scrolling: touch; overscroll-behavior-x: none;">
             `;
             
@@ -777,7 +752,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             html += `</div></div></div>`;
 
-            // Sezione inferiore mobile con altezza 0 e scorrimento verticale controllato (no bounce)
             html += `
                 <div style="display: flex; gap: 6px; flex-grow: 1; min-height: 0; height: 0; overflow: hidden;">
                     <div style="display: flex; flex-direction: column; gap: 3px; width: 110px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid #e1e1e1; padding-right: 4px; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch;">
@@ -813,36 +787,39 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `</div></div></div>`;
 
         } else {
-            // ==================== LAYOUT DESKTOP ====================
-            html += `
-                <div class="panel-three-columns">
-                    <div class="col-left">
-                        <div>
-                            <div class="sub-section-title">Base map</div>
-                            <div class="base-map-vertical">
-                                <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
-                                    <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
-                                </label>
-                                <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
-                                    <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Satellite
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-left-scrollable">
-                            <div class="sub-section-title">Altro</div>
-                            <div class="desktop-grid-altro" style="display:flex; flex-direction:column; gap:2px;">
-            `;
+            // ==================== LAYOUT DESKTOP OTTIMIZZATO (2 RIGHE: 1. BASEMAP+ALTRO, 2. TEMATICHE+ELEMENTI COLONNE MAX 5) ====================
+            html += `<div class="desktop-main-container">`;
             
+            // Riga 1: Base Map e Altro affiancati
+            html += `
+                <div style="display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e1e1e1; padding-bottom: 6px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                        <span class="sub-section-title" style="margin:0;">Base Map:</span>
+                        <label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer;">
+                            <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
+                        </label>
+                        <label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer;">
+                            <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Satellite
+                        </label>
+                    </div>
+
+                    <div style="width: 1px; height: 16px; background: #dcdde1; flex-shrink: 0;"></div>
+
+                    <div style="display: flex; align-items: center; gap: 8px; flex-grow: 1; min-width: 0;">
+                        <span class="sub-section-title" style="margin:0; flex-shrink:0;">Altro:</span>
+                        <div style="display: flex; align-items: center; gap: 12px; overflow-x: auto; white-space: nowrap; flex-grow: 1; min-width: 0; padding-bottom: 2px; overscroll-behavior-x: none;">
+            `;
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
-                html += `<label style="display:flex; align-items:center; gap:4px; margin:2px 0; cursor:pointer;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
+                html += `<label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer; flex-shrink:0;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
             });
             html += `</div></div></div>`;
 
+            // Riga 2: Tematiche (a sinistra) e Elementi Mappati (a destra in colonne da max 5 con scorrimento orizzontale)
             html += `
-                <div class="col-middle">
-                    <div class="sub-section-title">Tematiche</div>
-                    <div class="sidebar-tabs-vertical">
+                <div style="display: flex; gap: 10px; flex-grow: 1; min-height: 0; height: 0; overflow: hidden;">
+                    <div style="display: flex; flex-direction: column; gap: 3px; width: 160px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid #e1e1e1; padding-right: 8px; overscroll-behavior-y: none;">
+                        <div class="sub-section-title">Tematiche</div>
             `;
 
             tavoloKeys.forEach(tavolo => {
@@ -852,9 +829,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : '';
                 html += `<button class="sidebar-tab-btn ${isActive ? 'active' : ''}" data-tab="tab-${cleanKey}" data-tavolo-name="${tavolo}" data-color="${catColor}" style="${activeStyle}">${tavolo.toUpperCase()}</button>`;
             });
-            html += `</div></div>`;
 
-            html += `<div class="col-right">`;
+            html += `</div><div style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0; height: 100%; overflow: hidden;">`;
+
             tavoloKeys.forEach(tavolo => {
                 const cleanKey = tavolo.replace(/\s+/g, '');
                 const items = atlasCategories[tavolo];
@@ -868,7 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 html += `
                     <div id="tab-${cleanKey}" class="sidebar-tab-content ${isActive ? 'active' : ''}">
-                        <div class="sub-section-title" style="margin-bottom: 6px;">Elementi mappati: ${items.length}</div>
+                        <div class="sub-section-title" style="margin-bottom: 4px; flex-shrink:0;">Elementi mappati: ${items.length}</div>
                         <div class="panel-scrollable-grid">
                 `;
 
@@ -877,9 +854,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     colItems.forEach((item) => {
                         const globalIdx = items.indexOf(item);
                         html += `
-                            <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
-                                <span style="font-size:12px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
-                                <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:11px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 5px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
+                                <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
+                                <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
                             </div>
                         `;
                     });
@@ -888,7 +865,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 html += `</div></div>`;
             });
-            html += `</div></div>`;
+
+            html += `</div></div></div>`;
         }
 
         bottomPanel.innerHTML = html;
@@ -940,7 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (checkMobile) {
                         map.panBy([0, 150], { animate: false }); 
                     } else {
-                        map.panBy([0, 120], { animate: false });
+                        map.panBy([0, 80], { animate: false });
                     }
                 } else {
                     const bounds = layer.getBounds();
@@ -955,7 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         map.fitBounds(bounds, {
                             paddingTopLeft: [50, 50],
-                            paddingBottomRight: [50, 250],
+                            paddingBottomRight: [50, 180],
                             maxZoom: 18,
                             animate: false
                         });
