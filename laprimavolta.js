@@ -56,17 +56,17 @@ customStyleTag.innerHTML = `
         transform: translate(-50%, -50%); 
     }
 
-    /* ==================== DESKTOP STYLES (LATO SINISTRO A SCOMPARSA) ==================== */
+ /* ==================== DESKTOP STYLES (LATO SINISTRO A SCOMPARSA) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
-            top: 10px;
+            top: 0;
             left: -350px; /* Nascosto a sinistra di default */
             bottom: auto;
             transform: none;
             width: 350px !important;
-            height: calc(100vh - 260px) !important;
-            max-height: calc(100vh - 260px) !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
             padding: 15px 12px;
             display: flex;
             flex-direction: column;
@@ -86,8 +86,8 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel.open {
             left: 0 !important; /* Apre il pannello a sinistra */
             width: 950px !important;
-            height: calc(100vh - 260px) !important;
-            max-height: calc(100vh - 260px) !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
         }
 
         #custom-bottom-panel .panel-main-header b {
