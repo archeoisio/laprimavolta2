@@ -525,8 +525,8 @@ window.changeDetailSlide = function(targetSlide) {
 };
 
 const initialBounds = [
-    [40.627, 14.771],
-    [40.727, 14.873]
+    [40.6269, 14.771],
+    [40.7269, 14.873]
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -548,7 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
    if (isMobileDevice) {
-        map.setView([40.615, 14.805], 11.75);
+        map.setView([40.625, 14.805], 11.75);
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
