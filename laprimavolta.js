@@ -504,9 +504,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return bounds.getCenter();
     }
 
-  let selectedComuneLayer = null; // Variabile per tracciare il comune attivo
-    let currentLabelMarker = null;  // Variabile per tracciare l'etichetta attiva
+  // 1. CREAZIONE DEL PANE DEDICATO ALLE ETICHETTE (se non esiste già)
+    if (!map.getPane('pane_comuniprovincia_labels')) {
+        map.createPane('pane_comuniprovincia_labels');
+        map.getPane('pane_comuniprovincia_labels').style.zIndex = 650; // Più alto dei poligoni
+        map.getPane('pane_comuniprovincia_labels').style.pointerEvents = 'none';
+    }
 
+    let selectedComuneLayer = null; 
+    let currentLabelMarker = null;  
+
+    // 2. CARICAMENTO DEL GEOJSON (il codice che già usi)
     fetch('data/comuniprovincia.geojson')
        .then(response => response.json())
        .then(data => {
@@ -529,7 +537,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (nomeComune) {
                         layer.on('click', function(e) {
-                            // 1. Se c'era già un comune selezionato in precedenza, resettiamo il suo stile
                             if (selectedComuneLayer) {
                                 selectedComuneLayer.setStyle({ 
                                     color: '#000000', 
@@ -538,19 +545,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 });
                             }
 
-                            // 2. Se c'era già un'etichetta attiva, la rimuoviamo dalla mappa
                             if (currentLabelMarker) {
                                 layer_comuniprovincia.removeLayer(currentLabelMarker);
                             }
 
-                            // 3. Evidenziamo il nuovo poligono cliccato
                             layer.setStyle({
                                 color: '#e74c3c',     
                                 weight: 2.5,          
                                 fillOpacity: 0.15     
                             });
 
-                            // 4. Creiamo e aggiungiamo la nuova etichetta al centro
                             const center = layer.getBounds().getCenter();
                             const labelIcon = L.divIcon({
                                 className: 'comune-label-container',
@@ -559,18 +563,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 iconAnchor: [0, 0]
                             });
 
+                            // 3. IL MARKER USA IL PANE SUPERIORE
                             currentLabelMarker = L.marker(center, { 
                                 icon: labelIcon, 
                                 interactive: false,
-                                pane: 'pane_comuniprovincia' 
+                                pane: 'pane_comuniprovincia_labels' // <--- Ecco dove va
                             });
                             
                             layer_comuniprovincia.addLayer(currentLabelMarker);
-
-                            // 5. Salviamo i riferimenti correnti
                             selectedComuneLayer = layer;
 
-                            // Evita propagazioni indesiderate
                             L.DomEvent.stopPropagation(e);
                         });
                     }
