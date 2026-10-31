@@ -96,7 +96,7 @@ customStyleTag.innerHTML = `
             bottom: auto;
             transform: none;
             width: 600px !important;
-            height: 240px !important;
+            height: 260px !important;
             max-height: 240px !important;
             padding: 10px 12px;
             display: flex;
@@ -175,9 +175,9 @@ customStyleTag.innerHTML = `
 
         #feature-detail-panel {
             position: fixed !important;
-            top: 360px !important; 
+            top: 262px !important; 
             left: 20px !important; 
-            width: 720px !important;
+            width: 500px !important;
             max-height: 220px !important;
             border-radius: 12px; 
             overflow-y: auto;
