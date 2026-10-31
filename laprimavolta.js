@@ -17,7 +17,15 @@ customStyleTag.innerHTML = `
         transition: none !important;
     }
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
-    
+    .leaflet-zoom-animated {
+        transition: none !important;
+    }
+    .leaflet-pane > svg {
+        transition: none !important;
+    }
+    .leaflet-interactive {
+        transition: none !important;
+    }
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
@@ -473,8 +481,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pane: 'pane_comuniprovincia',
         style: function(feature) {
             return { 
-                color: '#e74c3c',      
-                weight: 1.5,           
+                color: '#000000',      
+                weight: 1,           
                 fill: true,            
                 fillColor: '#e74c3c',  
                 fillOpacity: 0.0       
