@@ -427,15 +427,15 @@ map = L.map('map', {
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 13, 
-        zoomSnap: 0.25,  
-        zoomDelta: 0.25,
+        zoomSnap: 1,  
+        zoomDelta: 1,
         wheelPxPerZoomLevel: 120 // <-- La virgola qui ci vuole perché ci sono altre opzioni sotto (o se chiudi le graffe qui è l'ultima)
     }).fitBounds(initialBounds);
 
        const isMobile = window.innerWidth < 768; // Sotto i 768px è considerato smartphone
 if (isMobile) {
     // Riduciamo lo zoom iniziale di 0.75 (puoi aumentare o diminuire questo valore)
-    map.setZoom(map.getZoom() - 2); 
+    map.setZoom(map.getZoom() - 10); 
 }
        const boundsLimit = L.latLngBounds(navigationBounds);
 
