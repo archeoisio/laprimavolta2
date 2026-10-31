@@ -39,15 +39,19 @@ customStyleTag.innerHTML = `
 .comune-label {
         background: #ffffff;
         border: 1px solid #333333;
-        padding: 2px 6px;
+        padding: 3px 7px;
         font-weight: bold;
-        font-size: 11px;
+        font-size: 10px;
         text-transform: uppercase;
         color: #000000;
         white-space: nowrap;
         box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         text-align: center;
-        pointer-events: none; /* Evita che l'etichetta blocchi i click sulla mappa */
+        display: inline-block;
+        box-sizing: border-box;
+        pointer-events: none;
+        /* Sposta l'etichetta esattamente al centro del punto di ancoraggio */
+        transform: translate(-50%, -50%); 
     }
     @media (min-width: 768px) {
         #custom-bottom-panel {
@@ -503,7 +507,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('data/comuniprovincia.geojson')
        .then(response => response.json())
        .then(data => {
-            // Creo il GeoJSON dei poligoni con il loro stile originale
             const geoJsonLayer = L.geoJson(data, {
                 interactive: false,
                 pane: 'pane_comuniprovincia',
@@ -517,17 +520,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                 },
                 onEachFeature: function(feature, layer) {
+                    layer_comuniprovincia.addLayer(layer);
+
                     const nomeComune = feature.properties['COMUNE'] || feature.properties['Comune'] || '';
                     if (nomeComune) {
-                        // Calcola il centro del poligono
-                        const center = getPolygonCenter(feature);
+                        // Calcolo del centro sicuro tramite i bounds del layer
+                        const center = layer.getBounds().getCenter();
 
-                        // Crea un'etichetta fissa con L.divIcon
+                        // Icona HTML con dimensioni azzerate per delegare tutto al CSS
                         const labelIcon = L.divIcon({
                             className: 'comune-label-container',
                             html: `<div class="comune-label">${nomeComune}</div>`,
-                            iconSize: [0, 0], // Si adatta al testo
-                            iconAnchor: [0, 0]
+                            iconSize: [0, 0],
+                            iconAnchor: [0, 0] // Gestito dal transform CSS (-50%, -50%)
                         });
 
                         const labelMarker = L.marker(center, { 
@@ -536,16 +541,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             pane: 'pane_comuniprovincia' 
                         });
 
-                        // Aggiunge sia il poligono che la relativa etichetta al gruppo complessivo
-                        comuniprovinciaSubLayers.push(layer);
-                        comuniprovinciaSubLayers.push(labelMarker);
+                        layer_comuniprovincia.addLayer(labelMarker);
                     }
                 }
             });
-
-            // Aggiunge tutti gli elementi al LayerGroup principale
-            geoJsonLayer.getLayers().forEach(l => layer_comuniprovincia.addLayer(l));
-            comuniprovinciaSubLayers.forEach(l => layer_comuniprovincia.addLayer(l));
        });
 
     // Array unificato globale dei layer di contesto per il Centro di Controllo
