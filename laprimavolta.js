@@ -57,6 +57,7 @@ customStyleTag.innerHTML = `
     }
 
 /* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
+   /* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
@@ -87,14 +88,16 @@ customStyleTag.innerHTML = `
             max-height: 100vh !important;
         }
 
-        /* LINGUETTA DI APERTURA SUL BORDO SINISTRO QUANDO È CHIUSO */
+        /* LINGUETTA DI APERTURA A SINISTRA (SOVRASCRIVE OGNI EFFETTO PALLINO) */
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
             top: 50% !important;
             left: 0 !important;
+            bottom: auto !important;
             transform: translateY(-50%) !important;
             width: 44px !important;
             height: 160px !important;
+            max-height: 160px !important;
             border-radius: 0 10px 10px 0 !important;
             padding: 0 !important;
             display: flex !important;
@@ -106,10 +109,10 @@ customStyleTag.innerHTML = `
             overflow: hidden !important;
         }
 
-        /* Scritta verticale all'interno della linguetta */
+        /* Testo orientato verticalmente dentro la linguetta */
         #custom-bottom-panel:not(.open) .panel-main-header {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
+            writing-mode: vertical-rl !important;
+            text-orientation: mixed !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -128,7 +131,6 @@ customStyleTag.innerHTML = `
             white-space: nowrap;
         }
 
-        /* Nasconde la freccetta superflua nella linguetta chiusa per fare spazio al testo */
         #custom-bottom-panel:not(.open) .panel-main-header div {
             display: none !important;
         }
