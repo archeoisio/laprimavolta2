@@ -51,7 +51,7 @@ customStyleTag.innerHTML = `
     /* ==================== STILE MOBILE ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
-        width: 100%; max-width: 1000px; max-height: 220px; 
+        width: 100%; max-width: 1000px; max-height: 225px; 
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); 
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out; 
         z-index: 2000; padding: 10px 12px; box-sizing: border-box; text-align: left; 
@@ -204,7 +204,7 @@ customStyleTag.innerHTML = `
     @media (max-width: 767px) {
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 1000px; height: 220px !important;
+            width: 100%; max-width: 1000px; height: 225px !important;
             background: rgba(255, 255, 259, 0.99); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 2100;
             padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
