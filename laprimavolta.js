@@ -649,8 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `</div>`;
 
             html += `
-                   <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; overscroll-behavior-y: contain;">
-            `;
+<div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch;">            `;
          tavoloKeys.forEach(tavolo => {
         const items = atlasCategories[tavolo];
         const isActive = (tavolo === currentActiveTab);
