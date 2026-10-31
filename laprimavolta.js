@@ -1184,16 +1184,37 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-       // Pulsante Home 🌍 (Copia esatta della vista iniziale all'avvio)
+       // Pulsante Home 🌍
         createBtn('🌍', "Torna alla vista iniziale", () => {
+            // Chiude il Centro di Controllo (rimuovendo la classe 'open')
+            const bottomPanel = document.getElementById('custom-bottom-panel');
+            if (bottomPanel) bottomPanel.classList.remove('open');
+
+            // Chiude il pannello dei dettagli elemento
+            const detailPanel = document.getElementById('feature-detail-panel');
+            if (detailPanel) detailPanel.style.display = 'none';
+
+            // Deseleziona il layer attivo e ripristina lo stile se c'è una selezione
+            if (selectedLayer) {
+                resetFeatureStyle({ target: selectedLayer });
+                selectedLayer = null;
+            }
+            if (map) map.closePopup();
+
+            // Esegue il reset delle dimensioni della mappa e torna alla vista iniziale
             const isMobileDevice = window.innerWidth < 768;
             if (isMobileDevice) {
                 map.setView([40.620, 14.805], 11.75, { animate: true });
             } else {
-                map.fitBounds(initialBounds, { animate: true });
+                map.fitBounds(initialBounds, { padding: [20, 20], animate: true });
                 if (map.getZoom() < 13) {
-                    map.setZoom(13, { animate: true });
+                    map.setZoom(13);
                 }
+            }
+
+            // Aggiorna lo stato del pannello di controllo se necessario
+            if (typeof renderPanelContent === 'function') {
+                renderPanelContent();
             }
         }, 'btn-tutorial-home');
 
@@ -1219,14 +1240,3 @@ document.addEventListener('DOMContentLoaded', () => {
         L.DomEvent.stopPropagation(e);
     });
 });
-
-function closeModal() {
-    const modal = document.getElementById('welcome-modal');
-    if (modal) modal.style.display = 'none';
-}
-function startTutorial() { closeModal(); }
-function nextTutorialStep() {}
-
-window.closeModal = closeModal;
-window.startTutorial = startTutorial;
-window.nextTutorialStep = nextTutorialStep;
