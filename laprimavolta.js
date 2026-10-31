@@ -175,10 +175,10 @@ customStyleTag.innerHTML = `
 
         #feature-detail-panel {
             position: fixed !important;
-            top: 262px !important; 
+            top: 270px !important; 
             left: 20px !important; 
             width: 500px !important;
-            max-height: 220px !important;
+            max-height: 230px !important;
             border-radius: 12px; 
             overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); 
@@ -946,9 +946,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         setTimeout(() => {
                             map.invalidateSize({animate: true});
                             if (willBeOpen) {
-                                map.panBy([-220, 0], {animate: true});
+                                map.panBy([-280, 0], {animate: true});
                             } else {
-                                map.panBy([220, 0], {animate: true});
+                                map.panBy([280, 0], {animate: true});
                             }
                         }, 50);
                     }
