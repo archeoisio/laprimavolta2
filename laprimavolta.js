@@ -51,7 +51,7 @@ customStyleTag.innerHTML = `
     /* ==================== STILE MOBILE ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
-        width: 100%; max-width: 1000px; max-height: 310px; 
+        width: 100%; max-width: 1000px; max-height: 280px; 
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); 
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out; 
         z-index: 2000; padding: 10px 12px; box-sizing: border-box; text-align: left; 
@@ -61,7 +61,7 @@ customStyleTag.innerHTML = `
     }
 
     #custom-bottom-panel:not(.open) {
-        max-height: 36px !important;
+        max-height: 44px !important;
         overflow: hidden !important;
         padding: 4px 12px !important;
     }
