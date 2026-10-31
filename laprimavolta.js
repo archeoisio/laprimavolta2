@@ -97,7 +97,7 @@ customStyleTag.innerHTML = `
             transform: none;
             width: 600px !important;
             height: 260px !important;
-            max-height: 240px !important;
+            max-height: 260px !important;
             padding: 10px 12px;
             display: flex;
             flex-direction: column;
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
    if (isMobileDevice) {
-        map.setView([40.600, 14.805], 11.75);
+        map.setView([40.620, 14.805], 11.75);
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
@@ -851,9 +851,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => {
                         map.invalidateSize({animate: true});
                         if (willBeOpen) {
-                            map.panBy([-220, 0], {animate: true});
+                            map.panBy([-280, 0], {animate: true});
                         } else {
-                            map.panBy([220, 0], {animate: true});
+                            map.panBy([280, 0], {animate: true});
                         }
                     }, 50);
                 }
