@@ -1065,7 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+      bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 const tavolo = e.target.getAttribute('data-tavolo');
@@ -1085,12 +1085,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (geom.type === 'Point') {
                     const latlng = [geom.coordinates[1], geom.coordinates[0]];
-                    map.setView(latlng, 19, { animate: false });
+                    map.setView(latlng, 18, { animate: true });
                     
                     if (checkMobile) {
-                        map.panBy([0, 150], { animate: false }); 
+                        map.panBy([0, 150], { animate: true }); 
                     } else {
-                        map.panBy([0, 80], { animate: false });
+                        // Sposta l'elemento nella porzione destra dello schermo su desktop
+                        map.panBy([-300, 0], { animate: true });
                     }
                 } else {
                     const bounds = layer.getBounds();
@@ -1100,15 +1101,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             paddingTopLeft: [20, 20],
                             paddingBottomRight: [20, 260],
                             maxZoom: 18,
-                            animate: false
+                            animate: true
                         });
                     } else {
                         map.fitBounds(bounds, {
                             paddingTopLeft: [50, 50],
                             paddingBottomRight: [50, 180],
                             maxZoom: 18,
-                            animate: false
+                            animate: true
                         });
+                        // Centra il poligono nella parte destra dello schermo
+                        map.panBy([-250, 0], { animate: true });
                     }
                 }
 
