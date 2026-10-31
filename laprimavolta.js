@@ -117,7 +117,7 @@ customStyleTag.innerHTML = `
             left: 10px !important;
             bottom: auto !important;
             transform: none !important;
-            width: 170px !important;
+            width: 200px !important;
             height: 36px !important;
             max-height: 36px !important;
             border-radius: 8px !important;
@@ -152,7 +152,9 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel:not(.open) .panel-main-header div {
             display: flex !important;
         }
-
+#custom-bottom-panel .panel-main-header b {
+            font-size: 14px !important;
+        }
         #custom-bottom-panel .desktop-main-container {
             display: flex;
             flex-direction: column;
@@ -161,6 +163,14 @@ customStyleTag.innerHTML = `
             height: calc(100% - 30px);
             overflow: hidden;
             box-sizing: border-box;
+        }
+        /* 3. Grandezza titoletti interni e bottoni tematiche su desktop */
+        #custom-bottom-panel .sub-section-title {
+            font-size: 14px !important; 
+        }
+        
+        #custom-bottom-panel .sidebar-tab-btn {
+            font-size: 14px !important; 
         }
 
         #feature-detail-panel {
