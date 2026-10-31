@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
-        minZoom: 10, 
+        minZoom: 11, 
         zoomSnap: 1,  
         zoomDelta: 1,
         wheelDebounceTime: 80,
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (isMobileDevice) {
-        map.setView([40.676, 14.822], 12); 
+        map.setView([40.665, 14.805], 11.5); 
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
