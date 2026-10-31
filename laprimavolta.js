@@ -48,16 +48,27 @@ customStyleTag.innerHTML = `
         transition: none !important;
     }
 
-    /* ==================== STILE MOBILE ==================== */
+    /* ==================== STILE MOBILE (CORRETTO PER CHIUSURA PERFETTA) ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); 
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out; 
-        z-index: 2000; padding: 4px 5px; box-sizing: border-box; text-align: left; 
+        z-index: 2000; padding: 4px 8px; box-sizing: border-box; text-align: left; 
         font-family: sans-serif; font-size: 12px; color: #333; 
         border-top-left-radius: 14px; border-top-right-radius: 14px; 
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
+    }
+
+    /* Stato Chiuso su Mobile: Nasconde completamente il contenuto e mostra solo la barra */
+    #custom-bottom-panel:not(.open) {
+        max-height: 38px !important;
+        overflow: hidden !important;
+        padding-bottom: 0 !important;
+    }
+
+    #custom-bottom-panel:not(.open) .mobile-content-container {
+        display: none !important;
     }
 
     .comune-label {
@@ -194,7 +205,6 @@ customStyleTag.innerHTML = `
     }
 
     #custom-bottom-panel:not(.open) .desktop-main-container { display: none !important; }
-    #custom-bottom-panel:not(.open) { max-height: 36px !important; height: 36px !important; }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 4px; cursor: pointer; user-select: none; width: 100%; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -723,7 +733,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const checkMobile = window.innerWidth < 768;
 
         let html = `
-            <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent(); if(window.innerWidth >= 768) { setTimeout(() => { map.invalidateSize({animate: true}); }, 300); }">
+            <div class="panel-main-header" onclick="
+                const panel = document.getElementById('custom-bottom-panel');
+                const willBeOpen = !panel.classList.contains('open');
+                panel.classList.toggle('open');
+                renderPanelContent();
+                if(window.innerWidth >= 768) {
+                    setTimeout(() => {
+                        map.invalidateSize({animate: true});
+                        if (willBeOpen) {
+                            map.panBy([-220, 0], {animate: true});
+                        } else {
+                            map.panBy([220, 0], {animate: true});
+                        }
+                    }, 50);
+                }
+            ">
                 <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span style="font-size:12px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
@@ -736,10 +761,11 @@ document.addEventListener('DOMContentLoaded', () => {
             currentActiveTab = tavoloKeys[0];
         }
 
+        // Avvolgiamo il contenuto mobile in un contenitore con classe dedicata per nasconderlo da chiuso
+        html += `<div class="mobile-content-container" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 210px;">`;
+
         if (checkMobile) {
             // ==================== LAYOUT MOBILE ====================
-            html += `<div style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 210px;">`;
-            
             html += `
                 <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
                     
@@ -798,12 +824,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `</div>`;
             }
 
-            html += `</div></div></div>`;
+            html += `</div></div>`;
 
         } else {
-            // ==================== LAYOUT DESKTOP OTTIMIZZATO (2 RIGHE: 1. BASEMAP+ALTRO, 2. TEMATICHE+ELEMENTI COLONNE MAX 5) ====================
-            html += `<div class="desktop-main-container">`;
-            
+            // ==================== LAYOUT DESKTOP OTTIMIZZATO ====================
+            html = `
+                <div class="panel-main-header" onclick="
+                    const panel = document.getElementById('custom-bottom-panel');
+                    const willBeOpen = !panel.classList.contains('open');
+                    panel.classList.toggle('open');
+                    renderPanelContent();
+                    if(window.innerWidth >= 768) {
+                        setTimeout(() => {
+                            map.invalidateSize({animate: true});
+                            if (willBeOpen) {
+                                map.panBy([-220, 0], {animate: true});
+                            } else {
+                                map.panBy([220, 0], {animate: true});
+                            }
+                        }, 50);
+                    }
+                ">
+                    <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:12px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
+                    </div>
+                </div>
+                <div class="desktop-main-container">
+            `;
+
             // Riga 1: Base Map e Altro affiancati
             html += `
                 <div style="display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e1e1e1; padding-bottom: 6px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
@@ -829,7 +878,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             html += `</div></div></div>`;
 
-            // Riga 2: Tematiche (a sinistra) e Elementi Mappati (a destra in colonne da max 5 con scorrimento orizzontale)
+            // Riga 2: Tematiche (a sinistra) e Elementi Mappati (a destra in colonne da max 5)
             html += `
                 <div style="display: flex; gap: 10px; flex-grow: 1; min-height: 0; height: 0; overflow: hidden;">
                     <div style="display: flex; flex-direction: column; gap: 3px; width: 160px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid #e1e1e1; padding-right: 8px; overscroll-behavior-y: none;">
@@ -881,6 +930,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             html += `</div></div></div>`;
+        }
+
+        // Chiusura del div contenitore mobile se ci troviamo su mobile
+        if (checkMobile) {
+            html += `</div>`;
         }
 
         bottomPanel.innerHTML = html;
