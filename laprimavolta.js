@@ -11,7 +11,10 @@ customStyleTag.innerHTML = `
     * {
         touch-action: manipulation;
     }
-
+.leaflet-pane svg path,
+    .leaflet-tile-pane .leaflet-layer {
+        transition: none !important;
+    }
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
     #custom-bottom-panel { 
