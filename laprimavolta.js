@@ -147,11 +147,12 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel:not(.open) .panel-main-header b {
             font-size: 14px !important;
             color: #2c3e50 !important;
+            padding: 0 !important;
             white-space: nowrap;
         }
 /* Dimensione del font quando il pannello è APERTO su desktop */
         #custom-bottom-panel.open .panel-main-header b {
-            font-size: 16px !important;
+            font-size: 14px !important;
             padding: 0 !important;
         }
         #custom-bottom-panel:not(.open) .panel-main-header div {
