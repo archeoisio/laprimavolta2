@@ -5,7 +5,7 @@ let allTavoloLayers = [];
 let currentActiveTab = null;
 
 const isMobile = window.innerWidth < 768; 
-const MIN_ZOOM_VISIBLE = isMobile ? 10 : 13; 
+const MIN_ZOOM_VISIBLE = isMobile ? 5 : 13; 
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
-        minZoom: 11, 
+        minZoom: 5, 
         zoomSnap: 1,  
         zoomDelta: 1,
         wheelDebounceTime: 80,
@@ -443,14 +443,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    const boundsLimit = L.latLngBounds(navigationBounds);
-
-    map.on('moveend', () => {
-        if (!boundsLimit.contains(map.getCenter())) {
-            map.panInsideBounds(boundsLimit, { animate: false });
-        }
-    });
        
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
