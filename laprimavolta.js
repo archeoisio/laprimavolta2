@@ -36,7 +36,19 @@ customStyleTag.innerHTML = `
         border-top-left-radius: 14px; border-top-right-radius: 14px; 
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
     }
-
+.comune-label {
+        background: #ffffff;
+        border: 1px solid #333333;
+        padding: 2px 6px;
+        font-weight: bold;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #000000;
+        white-space: nowrap;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        text-align: center;
+        pointer-events: none; /* Evita che l'etichetta blocchi i click sulla mappa */
+    }
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
@@ -476,24 +488,64 @@ document.addEventListener('DOMContentLoaded', () => {
     map.createPane('pane_comuniprovincia');
     map.getPane('pane_comuniprovincia').style.zIndex = 407;
 
-    var layer_comuniprovincia = L.geoJson(null, {
-        interactive: false,
-        pane: 'pane_comuniprovincia',
-        style: function(feature) {
-            return { 
-                color: '#000000',      
-                weight: 1,           
-                fill: true,            
-                fillColor: '#e74c3c',  
-                fillOpacity: 0.0       
-            };
-        }
-    });
-    
+    var layer_comuniprovincia = L.layerGroup();
+    // Array interno per tracciare le feature e le etichette dei comuni
+    let comuniprovinciaSubLayers = [];
+
+    // Funzione di utilità per calcolarsi il centro approssimativo di un poligono (bounding box center o pointOnSurface)
+    function getPolygonCenter(feature) {
+        // Se usi Turf.js potresti usare turf.centerOfMass, ma calcoliamolo dai bounds per compatibilità nativa:
+        const tempLayer = L.geoJson(feature);
+        const bounds = tempLayer.getBounds();
+        return bounds.getCenter();
+    }
+
     fetch('data/comuniprovincia.geojson')
        .then(response => response.json())
        .then(data => {
-            layer_comuniprovincia.addData(data);
+            // Creo il GeoJSON dei poligoni con il loro stile originale
+            const geoJsonLayer = L.geoJson(data, {
+                interactive: false,
+                pane: 'pane_comuniprovincia',
+                style: function(feature) {
+                    return { 
+                        color: '#000000',      
+                        weight: 1,            
+                        fill: true,           
+                        fillColor: '#e74c3c',  
+                        fillOpacity: 0.0      
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    const nomeComune = feature.properties['COMUNE'] || feature.properties['Comune'] || '';
+                    if (nomeComune) {
+                        // Calcola il centro del poligono
+                        const center = getPolygonCenter(feature);
+
+                        // Crea un'etichetta fissa con L.divIcon
+                        const labelIcon = L.divIcon({
+                            className: 'comune-label-container',
+                            html: `<div class="comune-label">${nomeComune}</div>`,
+                            iconSize: [0, 0], // Si adatta al testo
+                            iconAnchor: [0, 0]
+                        });
+
+                        const labelMarker = L.marker(center, { 
+                            icon: labelIcon, 
+                            interactive: false,
+                            pane: 'pane_comuniprovincia' 
+                        });
+
+                        // Aggiunge sia il poligono che la relativa etichetta al gruppo complessivo
+                        comuniprovinciaSubLayers.push(layer);
+                        comuniprovinciaSubLayers.push(labelMarker);
+                    }
+                }
+            });
+
+            // Aggiunge tutti gli elementi al LayerGroup principale
+            geoJsonLayer.getLayers().forEach(l => layer_comuniprovincia.addLayer(l));
+            comuniprovinciaSubLayers.forEach(l => layer_comuniprovincia.addLayer(l));
        });
 
     // Array unificato globale dei layer di contesto per il Centro di Controllo
@@ -632,13 +684,15 @@ document.addEventListener('DOMContentLoaded', () => {
             currentActiveTab = tavoloKeys[0];
         }
 
-        if (checkMobile) {
+      if (checkMobile) {
             // ==================== LAYOUT MOBILE CON RIGA UNICA SUP ====================
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
-                <div style="display: flex; align-items: center; gap: 25px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; white-space: nowrap; overflow-x: auto;">
-                    <div style="display: flex; align-items: center; gap: 5px;">
+                <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
+                    
+                    <!-- 1. BASE MAP FISSA: bloccata, non si restringe e non scorre -->
+                    <div style="display: flex; align-items: center; gap: 5px; flex-shrink: 0; white-space: nowrap;">
                         <span class="sub-section-title" style="margin:0; font-size:11px;">Base Map:</span>
                         <label style="display:inline-flex; align-items:center; gap:2px; cursor:pointer; font-size:11px;">
                             <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
@@ -647,14 +701,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Sat
                         </label>
                     </div>
+
+                    <!-- Separatore verticale -->
                     <div style="width: 1px; height: 14px; background: #dcdde1; flex-shrink: 0;"></div>
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <span class="sub-section-title" style="margin:0; font-size:11px;">Altro:</span>
+
+                    <!-- 2. SEZIONE ALTRO SCORREVOLE: min-width: 0 è il trucco CSS cruciale per forzare lo scroll qui -->
+                    <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; flex-grow: 1; min-width: 0; padding-bottom: 2px;">
+                        <span class="sub-section-title" style="margin:0; flex-shrink:0; font-size:11px;">Altro:</span>
             `;
             
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
-                html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
+                html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px; flex-shrink:0;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
             });
             html += `</div></div>`;
 
