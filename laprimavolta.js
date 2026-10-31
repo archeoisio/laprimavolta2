@@ -504,44 +504,71 @@ document.addEventListener('DOMContentLoaded', () => {
         return bounds.getCenter();
     }
 
-    fetch('data/comuniprovincia.geojson')
+  fetch('data/comuniprovincia.geojson')
        .then(response => response.json())
        .then(data => {
             const geoJsonLayer = L.geoJson(data, {
-                interactive: false,
+                interactive: true, // Assicurati che sia true per poter cliccare sui poligoni
                 pane: 'pane_comuniprovincia',
                 style: function(feature) {
                     return { 
-                        color: '#000000',      
-                        weight: 1,            
+                        color: '#000000',      // Colore bordo normale
+                        weight: 1,            // Spessore bordo normale
                         fill: true,           
                         fillColor: '#e74c3c',  
-                        fillOpacity: 0.0      
+                        fillOpacity: 0.0      // Trasparente finché non cliccato
                     };
                 },
                 onEachFeature: function(feature, layer) {
                     layer_comuniprovincia.addLayer(layer);
 
                     const nomeComune = feature.properties['COMUNE'] || feature.properties['Comune'] || '';
+                    
                     if (nomeComune) {
-                        // Calcolo del centro sicuro tramite i bounds del layer
-                        const center = layer.getBounds().getCenter();
+                        let labelMarker = null;
 
-                        // Icona HTML con dimensioni azzerate per delegare tutto al CSS
-                        const labelIcon = L.divIcon({
-                            className: 'comune-label-container',
-                            html: `<div class="comune-label">${nomeComune}</div>`,
-                            iconSize: [0, 0],
-                            iconAnchor: [0, 0] // Gestito dal transform CSS (-50%, -50%)
+                        // Gestione del click sul poligono del comune
+                        layer.on('click', function(e) {
+                            // 1. Prima di tutto, deselezioniamo/rimuoviamo l'etichetta e resettiamo lo stile degli altri comuni (opzionale ma pulito)
+                            layer_comuniprovincia.eachLayer(function(l) {
+                                if (l instanceof L.Polygon || l instanceof L.MultiPolygon) {
+                                    l.setStyle({ color: '#000000', weight: 1, fillOpacity: 0.0 });
+                                }
+                                if (l._isComuneLabel) {
+                                    layer_comuniprovincia.removeLayer(l);
+                                }
+                            });
+
+                            // 2. Evidenziamo il poligono cliccato (bordo rosso più spesso e leggero riempimento)
+                            layer.setStyle({
+                                color: '#e74c3c',     // Bordo rosso
+                                weight: 2.5,          // Più spesso
+                                fillOpacity: 0.15     // Leggero velo di colore per evidenziarlo
+                            });
+
+                            // 3. Creiamo e aggiungiamo l'etichetta al centro del poligono cliccato
+                            const center = layer.getBounds().getCenter();
+                            const labelIcon = L.divIcon({
+                                className: 'comune-label-container',
+                                html: `<div class="comune-label">${nomeComune}</div>`,
+                                iconSize: [0, 0],
+                                iconAnchor: [0, 0]
+                            });
+
+                            labelMarker = L.marker(center, { 
+                                icon: labelIcon, 
+                                interactive: false,
+                                pane: 'pane_comuniprovincia' 
+                            });
+                            
+                            // Marcatore di servizio per riconoscerlo e rimuoverlo dopo
+                            labelMarker._isComuneLabel = true;
+                            
+                            layer_comuniprovincia.addLayer(labelMarker);
+
+                            // Evita che il click sulla mappa chiuda o faccia altro sotto
+                            L.DomEvent.stopPropagation(e);
                         });
-
-                        const labelMarker = L.marker(center, { 
-                            icon: labelIcon, 
-                            interactive: false,
-                            pane: 'pane_comuniprovincia' 
-                        });
-
-                        layer_comuniprovincia.addLayer(labelMarker);
                     }
                 }
             });
