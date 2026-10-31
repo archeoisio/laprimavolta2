@@ -3,7 +3,7 @@ let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
 let currentActiveTab = null;
-
+fconf
 const isMobile = window.innerWidth < 768; 
 const MIN_ZOOM_VISIBLE = isMobile ? 2 : 13; 
 
@@ -465,7 +465,30 @@ document.addEventListener('DOMContentLoaded', () => {
            layer_confini_amministrativi.addData(data);
            map.addLayer(layer_confini_amministrativi); 
        });
+    map.createPane('pane_comuniprovincia');
+    map.getPane('pane_comuniprovincia').style.zIndex = 407;
 
+    var layer_comuniprovincia = L.geoJson(null, {
+        interactive: false,
+        pane: 'pane_comuniprovincia',
+        style: function(feature) {
+            return { 
+                color: '#e74c3c',      // Puoi scegliere il colore che preferisci (es. rosso/arancio)
+                weight: 1.5,           
+                fill: true,            
+                fillColor: '#e74c3c',  
+                fillOpacity: 0.0       
+            };
+        }
+    });
+    
+    // Caricamento del file GeoJSON (assicurati che si trovi nella cartella 'data/')
+    fetch('data/comuniprovincia.geojson')
+       .then(response => response.json())
+       .then(data => {
+            layer_comuniprovincia.addData(data);
+            // NOTA: Non lo aggiungiamo alla mappa con .addLayer() così parte spento di default
+       });
     map.createPane('pane_GoogleSatellite_3'); map.getPane('pane_GoogleSatellite_3').style.zIndex = 402;
     var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28,noWrap: true, keepBuffer: 6, updateWhenIdle: false,
         updateInterval: 100 });
@@ -615,7 +638,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <span class="sub-section-title" style="margin:0; font-size:11px;">Altro:</span>
             `;
-            const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }];
+            const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }, { name: 'Comuni / Provincia', layer: layer_comuniprovincia }
+                                  ];
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
                 html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
