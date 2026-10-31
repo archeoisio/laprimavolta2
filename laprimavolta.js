@@ -56,12 +56,12 @@ customStyleTag.innerHTML = `
         transform: translate(-50%, -50%); 
     }
 
-/* ==================== DESKTOP STYLES (LATO SINISTRO A SCOMPARSA) ==================== */
+/* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
             top: 0;
-            left: -350px; /* Nascosto a sinistra di default */
+            left: -350px; 
             bottom: auto;
             transform: none;
             width: 350px !important;
@@ -74,62 +74,65 @@ customStyleTag.innerHTML = `
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             box-shadow: 2px 0 15px rgba(0,0,0,0.3);
-            border-top-left-radius: 0;
-            border-top-right-radius: 14px;
-            border-bottom-right-radius: 14px;
-            border-bottom-left-radius: 0;
+            border-radius: 0 14px 14px 0;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
             transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
         }
         
         #custom-bottom-panel.open {
-            left: 0 !important; /* Apre il pannello a sinistra */
+            left: 0 !important; 
             width: 950px !important;
             height: 100vh !important;
             max-height: 100vh !important;
         }
 
-        /* QUANDO IL PANNELLO È CHIUSO: Linguetta visibile sul bordo sinistro dello schermo */
+        /* LINGUETTA DI APERTURA SUL BORDO SINISTRO QUANDO È CHIUSO */
         #custom-bottom-panel:not(.open) {
-            left: 0 !important;
-            width: 46px !important;
-            height: 140px !important;
+            position: fixed !important;
             top: 50% !important;
+            left: 0 !important;
             transform: translateY(-50%) !important;
-            border-radius: 0 8px 8px 0 !important;
+            width: 44px !important;
+            height: 160px !important;
+            border-radius: 0 10px 10px 0 !important;
             padding: 0 !important;
             display: flex !important;
-            align-items: center;
-            justify-content: center;
-            background: #ffffff;
-            box-shadow: 3px 0 10px rgba(0,0,0,0.2);
-            cursor: pointer;
+            align-items: center !important;
+            justify-content: center !important;
+            background: #ffffff !important;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.2) !important;
+            cursor: pointer !important;
+            overflow: hidden !important;
         }
 
+        /* Scritta verticale all'interno della linguetta */
         #custom-bottom-panel:not(.open) .panel-main-header {
-            writing-mode: vertical-lr;
-            transform: rotate(180deg);
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            margin: 0;
-            border: none;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
         }
 
         #custom-bottom-panel:not(.open) .panel-main-header b {
-            display: inline-block !important;
+            display: block !important;
             font-size: 12px !important;
             color: #2c3e50 !important;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
-        #custom-bottom-panel:not(.open) .panel-main-header span {
-            display: none !important; /* Nasconde la freccia temporaneamente per pulizia verticale */
+        /* Nasconde la freccetta superflua nella linguetta chiusa per fare spazio al testo */
+        #custom-bottom-panel:not(.open) .panel-main-header div {
+            display: none !important;
         }
-        
+
         #custom-bottom-panel .panel-three-columns {
             grid-template-columns: 180px 160px 1fr !important;
             overflow-y: auto;
@@ -168,21 +171,7 @@ customStyleTag.innerHTML = `
             width: 950px !important;
         }
     }
-    @media (max-width: 767px) {
-        #feature-detail-panel {
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 1000px; height: 240px !important;
-            background: rgba(255, 255, 255, 0.99); backdrop-filter: blur(10px);
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 2100;
-            padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
-            font-size: 12px; color: #333; display: none; flex-direction: column;
-            border-top-left-radius: 14px; border-top-right-radius: 14px;
-            border: 1px solid rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-    }
-
-    #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
+    
     @media (min-width: 768px) {
         #custom-bottom-panel:not(.open) { width: 44px !important; height: 44px !important; border-radius: 50% !important; overflow: hidden; padding: 0 !important; display: flex; align-items: center; justify-content: center; }
         #custom-bottom-panel:not(.open) .panel-main-header { justify-content: center; padding: 0; margin: 0; }
