@@ -417,14 +417,14 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 4, 
-        zoomSnap: 1,  
+        zoomSnap: 0.5,  
         zoomDelta: 1,
         wheelDebounceTime: 80,
         wheelPxPerZoomLevel: 120 
     });
 
    if (isMobileDevice) {
-        map.setView([40.658, 14.805], 11); // Vista mobile bilanciata per non coprire i confini col pannello
+        map.setView([40.658, 14.805], 11.5); // Vista mobile bilanciata per non coprire i confini col pannello
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
