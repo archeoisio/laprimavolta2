@@ -443,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('zoomend', checkZoomVisibility);
 
     map.createPane('pane_confini_amministrativi');
-    map.getPane('pane__amministrativi').style.zIndex = 404;
+    map.getPane('pane_confini_amministrativi').style.zIndex = 404;
 
     var layer_confini_amministrativi = L.geoJson(null, {
         interactive: false,
