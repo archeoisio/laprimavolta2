@@ -51,7 +51,7 @@ customStyleTag.innerHTML = `
     /* ==================== STILE MOBILE ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
-        width: 100%; max-width: 1000px; max-height: 280px; 
+        width: 100%; max-width: 1000px; max-height: 220px; 
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); 
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out; 
         z-index: 2000; padding: 10px 12px; box-sizing: border-box; text-align: left; 
@@ -63,7 +63,7 @@ customStyleTag.innerHTML = `
     #custom-bottom-panel:not(.open) {
         max-height: 44px !important;
         overflow: hidden !important;
-        padding: 4px 12px !important;
+        padding: 6px 10px !important;
     }
 
     #custom-bottom-panel:not(.open) .mobile-content-container {
@@ -180,8 +180,9 @@ customStyleTag.innerHTML = `
         #feature-detail-panel {
             position: fixed !important;
             top: 280px !important; 
-            left: 20px !important; 
+            left: 0px !important; 
             width: 500px !important;
+            min-height: 230px !important;
             max-height: 230px !important;
             border-radius: 12px; 
             overflow-y: auto;
@@ -263,7 +264,7 @@ customStyleTag.innerHTML = `
     }
 
     .detail-table tr:last-child {
-        border-bottom: none;
+        border-bottom: 1px solid #e1e1e1;
     }
 
     .detail-table th, .detail-table td {
@@ -508,7 +509,7 @@ window.renderDetailSlide = function() {
 
     detailPanel.innerHTML = `
         <div class="feature-detail-header">
-            <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
+            <b style="font-size:14px; color:#2c3e50;">📋 Dettaglio Elemento</b>
             <button class="close-feature-btn" onclick="closeFeaturePanel()">✕</button>
         </div>
         <div style="flex-grow:1; overflow:hidden;">
@@ -959,7 +960,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ">
                     <b style="font-size:12px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:12px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
+                        <span style="font-size:14px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
                     </div>
                 </div>
                 <div class="desktop-main-container">
@@ -1107,14 +1108,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         map.fitBounds(bounds, {
                             paddingTopLeft: [20, 20],
                             paddingBottomRight: [20, 260],
-                            maxZoom: 18,
+                            maxZoom: 22,
                             animate: false
                         });
                     } else {
                         map.fitBounds(bounds, {
                             paddingTopLeft: [50, 50],
                             paddingBottomRight: [50, 180],
-                            maxZoom: 18,
+                            maxZoom: 22,
                             animate: false
                         });
                         // Centra il poligono nella parte destra dello schermo su desktop
