@@ -1070,15 +1070,18 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-      bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+    bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
-                const tavolo = e.target.getAttribute('data-tavolo');
-                const idx = parseInt(e.target.getAttribute('data-index'));
-                const targetItem = atlasCategories[tavolo][idx];
+                
+                // Usiamo direttamente 'btn' del ciclo: zero rischi di errori sul target interno!
+                const tavolo = btn.getAttribute('data-tavolo');
+                const idx = parseInt(btn.getAttribute('data-index'));
+                const targetItem = atlasCategories[tavolo] ? atlasCategories[tavolo][idx] : null;
                 
                 if (!targetItem || !targetItem.layer) return;
 
+                // Gestione stile layer precedente
                 if (selectedLayer && selectedLayer !== targetItem.layer) {
                     resetFeatureStyle({ target: selectedLayer });
                 }
@@ -1088,6 +1091,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const layer = targetItem.layer;
                 const geom = layer.feature.geometry;
 
+                // Spostamento mappa in base al tipo di geometria
                 if (geom.type === 'Point') {
                     const latlng = [geom.coordinates[1], geom.coordinates[0]];
                     map.setView(latlng, 18, { animate: true });
@@ -1095,7 +1099,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (checkMobile) {
                         map.panBy([0, 150], { animate: true }); 
                     } else {
-                        // Sposta l'elemento nella porzione destra dello schermo su desktop
                         map.panBy([-300, 0], { animate: true });
                     }
                 } else {
@@ -1115,7 +1118,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             maxZoom: 18,
                             animate: true
                         });
-                        // Centra il poligono nella parte destra dello schermo
                         map.panBy([-250, 0], { animate: true });
                     }
                 }
