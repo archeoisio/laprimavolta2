@@ -437,7 +437,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
        
-    map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
     map.on('zoomend', checkZoomVisibility);
