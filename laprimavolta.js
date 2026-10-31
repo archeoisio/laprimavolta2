@@ -92,7 +92,7 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel {
             position: fixed;
             top: 20px;
-            left: 20px; 
+            left: 0px; 
             bottom: auto;
             transform: none;
             width: 600px !important;
@@ -114,7 +114,7 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
             top: 20px !important;
-            left: 20px !important;
+            left: 0px !important;
             bottom: auto !important;
             transform: none !important;
             width: 200px !important;
@@ -1070,18 +1070,17 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
-    bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+  bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
-                
-                // Usiamo direttamente 'btn' del ciclo: zero rischi di errori sul target interno!
-                const tavolo = btn.getAttribute('data-tavolo');
-                const idx = parseInt(btn.getAttribute('data-index'));
+                // Usiamo currentTarget per catturare sempre il bottone ed evitare errori sul target interno (emoji)
+                const targetBtn = e.currentTarget;
+                const tavolo = targetBtn.getAttribute('data-tavolo');
+                const idx = parseInt(targetBtn.getAttribute('data-index'));
                 const targetItem = atlasCategories[tavolo] ? atlasCategories[tavolo][idx] : null;
                 
                 if (!targetItem || !targetItem.layer) return;
 
-                // Gestione stile layer precedente
                 if (selectedLayer && selectedLayer !== targetItem.layer) {
                     resetFeatureStyle({ target: selectedLayer });
                 }
@@ -1091,15 +1090,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const layer = targetItem.layer;
                 const geom = layer.feature.geometry;
 
-                // Spostamento mappa in base al tipo di geometria
                 if (geom.type === 'Point') {
                     const latlng = [geom.coordinates[1], geom.coordinates[0]];
-                    map.setView(latlng, 18, { animate: true });
+                    map.setView(latlng, 18, { animate: false });
                     
                     if (checkMobile) {
-                        map.panBy([0, 150], { animate: true }); 
+                        map.panBy([0, 150], { animate: false }); 
                     } else {
-                        map.panBy([-300, 0], { animate: true });
+                        // Sposta l'elemento nella porzione destra dello schermo su desktop
+                        map.panBy([-300, 0], { animate: false });
                     }
                 } else {
                     const bounds = layer.getBounds();
@@ -1109,16 +1108,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             paddingTopLeft: [20, 20],
                             paddingBottomRight: [20, 260],
                             maxZoom: 18,
-                            animate: true
+                            animate: false
                         });
                     } else {
                         map.fitBounds(bounds, {
                             paddingTopLeft: [50, 50],
                             paddingBottomRight: [50, 180],
                             maxZoom: 18,
-                            animate: true
+                            animate: false
                         });
-                        map.panBy([-250, 0], { animate: true });
+                        // Centra il poligono nella parte destra dello schermo su desktop
+                        map.panBy([-250, 0], { animate: false });
                     }
                 }
 
