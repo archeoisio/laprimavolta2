@@ -429,6 +429,7 @@ map = L.map('map', {
         minZoom: 13, 
         zoomSnap: 1,  
         zoomDelta: 1,
+       wheelDebounceTime: 80,
         wheelPxPerZoomLevel: 120 // <-- La virgola qui ci vuole perché ci sono altre opzioni sotto (o se chiudi le graffe qui è l'ultima)
     }).fitBounds(initialBounds);
 
