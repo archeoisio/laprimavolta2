@@ -24,7 +24,7 @@ customStyleTag.innerHTML = `
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out; 
         z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left; 
         font-family: sans-serif; font-size: 12px; color: #333; 
-        border-top-left-radius: 14px; border-top-right-radius: 14px; 
+        border-top-left-: 14px; border-top-right-: 14px; 
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
     }
 
@@ -43,8 +43,8 @@ customStyleTag.innerHTML = `
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
-            border-top-left-radius: 14px;
-            border-top-right-radius: 14px;
+            border-top-left-: 14px;
+            border-top-right-: 14px;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
             transition: width 0.25s ease-in-out;
@@ -87,7 +87,7 @@ customStyleTag.innerHTML = `
             position: fixed; bottom: 0; left: 1025px; width: 500px;
             height: 230px;
             max-height: 230px !important;
-            border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
+            border-top-left-: 14px; border-top-right-: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
             padding: 8px 8px; box-sizing: border-box; font-family: sans-serif;
@@ -116,7 +116,7 @@ customStyleTag.innerHTML = `
             box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 2100;
             padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
             font-size: 12px; color: #333; display: none; flex-direction: column;
-            border-top-left-radius: 14px; border-top-right-radius: 14px;
+            border-top-left-: 14px; border-top-right-: 14px;
             border: 1px solid rgba(0,0,0,0.1);
             overflow-y: auto;
         }
@@ -140,7 +140,7 @@ customStyleTag.innerHTML = `
     .col-right { display: flex; flex-direction: column; overflow: hidden; }
     
     .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 3px 4px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
+    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-: 4px; padding: 3px 4px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
@@ -161,7 +161,7 @@ customStyleTag.innerHTML = `
         background: #e74c3c;
         color: white;
         border: none;
-        border-radius: 50%;
+        border-: 50%;
         width: 22px;
         height: 22px;
         font-weight: bold;
@@ -240,7 +240,7 @@ function resetFeatureStyle(e) {
   const tematica = prop['Tematica'] || 'Altro';
 const catColor = getTavoloColor(tematica);
     if (layer.feature.geometry.type === 'Point') {
-        layer.setStyle({ radius: 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
+        layer.setStyle({ : 6.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
     } else {
         layer.setStyle({ opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: catColor });
     }
@@ -505,7 +505,7 @@ atlasCategories[tematica].push({ name, layer });
                 });
             },
             pointToLayer: function (feature, latlng) { 
-                return L.circleMarker(latlng, { radius: 9.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
+                return L.circleMarker(latlng, { radius: 8.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
             }
         });
        allTavoloLayers.push(layerPuntiTavolo);
