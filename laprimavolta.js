@@ -95,9 +95,9 @@ customStyleTag.innerHTML = `
             left: 20px; 
             bottom: auto;
             transform: none;
-            width: 720px !important;
-            height: 330px !important;
-            max-height: 330px !important;
+            width: 600px !important;
+            height: 240px !important;
+            max-height: 240px !important;
             padding: 10px 12px;
             display: flex;
             flex-direction: column;
@@ -114,7 +114,7 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
             top: 20px !important;
-            left: 20px !important;
+            left: 10px !important;
             bottom: auto !important;
             transform: none !important;
             width: 170px !important;
@@ -144,7 +144,7 @@ customStyleTag.innerHTML = `
         }
 
         #custom-bottom-panel:not(.open) .panel-main-header b {
-            font-size: 11px !important;
+            font-size: 14px !important;
             color: #2c3e50 !important;
             white-space: nowrap;
         }
@@ -178,7 +178,7 @@ customStyleTag.innerHTML = `
             padding: 10px 12px; 
             box-sizing: border-box; 
             font-family: sans-serif;
-            font-size: 13px; 
+            font-size: 14px; 
             color: #333; 
             display: none; 
             flex-direction: column;
