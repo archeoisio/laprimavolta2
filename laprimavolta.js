@@ -61,7 +61,7 @@ customStyleTag.innerHTML = `
     }
 
     #custom-bottom-panel:not(.open) {
-        max-height: 38px !important;
+        max-height: 42px !important;
         overflow: hidden !important;
         padding-bottom: 0 !important;
     }
