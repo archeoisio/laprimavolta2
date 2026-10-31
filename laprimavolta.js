@@ -48,7 +48,7 @@ customStyleTag.innerHTML = `
         transition: none !important;
     }
 
-    /* ==================== STILE MOBILE (CORRETTO PER CHIUSURA PERFETTA) ==================== */
+    /* ==================== STILE MOBILE ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
@@ -60,7 +60,6 @@ customStyleTag.innerHTML = `
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
     }
 
-    /* Stato Chiuso su Mobile: Nasconde completamente il contenuto e mostra solo la barra */
     #custom-bottom-panel:not(.open) {
         max-height: 38px !important;
         overflow: hidden !important;
@@ -112,7 +111,6 @@ customStyleTag.innerHTML = `
             transition: all 0.3s ease-in-out;
         }
 
-        /* Stato Chiuso: Pulsante orizzontale, stretto e basso in alto a sinistra */
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
             top: 20px !important;
@@ -165,7 +163,6 @@ customStyleTag.innerHTML = `
             box-sizing: border-box;
         }
 
-        /* Pannello Dettaglio Elemento posizionato subito sotto il Centro di Controllo sul lato sinistro */
         #feature-detail-panel {
             position: fixed !important;
             top: 360px !important; 
@@ -272,6 +269,47 @@ customStyleTag.innerHTML = `
     .detail-table td {
         width: 70%;
         color: #2c3e50;
+    }
+
+    /* Stile per il box di ricerca indirizzi */
+    #search-box-container {
+        position: fixed;
+        top: 20px;
+        right: 70px;
+        background: white;
+        padding: 6px 10px;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        z-index: 3000;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        font-family: sans-serif;
+    }
+    #search-input {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px 8px;
+        font-size: 12px;
+        width: 220px;
+        outline: none;
+    }
+    #search-btn-submit {
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 5px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    #search-close {
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        color: #e74c3c;
+        margin-left: 2px;
     }
 `;
 document.head.appendChild(customStyleTag);
@@ -701,6 +739,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkZoomVisibility();
 
+    let searchMarker = null;
+
     map.on('click', () => {
         if (selectedLayer) {
             resetFeatureStyle({ target: selectedLayer });
@@ -709,6 +749,11 @@ document.addEventListener('DOMContentLoaded', () => {
         map.closePopup();
         const detailPanel = document.getElementById('feature-detail-panel');
         if (detailPanel) detailPanel.style.display = 'none';
+
+        if (searchMarker) {
+            map.removeLayer(searchMarker);
+            searchMarker = null;
+        }
     });
 
     const bottomPanel = document.createElement('div');
@@ -718,6 +763,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const featureDetailPanel = document.createElement('div');
     featureDetailPanel.id = 'feature-detail-panel';
     document.body.appendChild(featureDetailPanel);
+
+    const searchBoxContainer = document.createElement('div');
+    searchBoxContainer.id = 'search-box-container';
+    searchBoxContainer.innerHTML = `
+        <input type="text" id="search-input" placeholder="Cerca indirizzo a Salerno..." />
+        <button id="search-btn-submit">Cerca</button>
+        <span id="search-close" title="Chiudi">✕</span>
+    `;
+    document.body.appendChild(searchBoxContainer);
+
+    function executeSearch() {
+        const query = document.getElementById('search-input').value.trim();
+        if (!query) return;
+
+        const fullQuery = query.toLowerCase().includes('salerno') ? query : `${query}, Salerno`;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=1`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    const displayName = data[0].display_name;
+
+                    map.setView([lat, lon], 18, { animate: true });
+
+                    if (searchMarker) {
+                        map.removeLayer(searchMarker);
+                    }
+                    searchMarker = L.marker([lat, lon]).addTo(map)
+                        .bindPopup(`<b>Indirizzo trovato:</b><br>${displayName}`)
+                        .openPopup();
+                } else {
+                    alert("Indirizzo non trovato nel comune di Salerno.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Errore durante la ricerca dell'indirizzo.");
+            });
+    }
+
+    document.getElementById('search-btn-submit').onclick = executeSearch;
+    document.getElementById('search-input').onkeypress = (e) => {
+        if (e.key === 'Enter') executeSearch();
+    };
+    document.getElementById('search-close').onclick = () => {
+        searchBoxContainer.style.display = 'none';
+        if (searchMarker) {
+            map.removeLayer(searchMarker);
+            searchMarker = null;
+        }
+    };
 
     window.closeFeaturePanel = function() {
         featureDetailPanel.style.display = 'none';
@@ -761,7 +860,6 @@ document.addEventListener('DOMContentLoaded', () => {
             currentActiveTab = tavoloKeys[0];
         }
 
-        // Avvolgiamo il contenuto mobile in un contenitore con classe dedicata per nasconderlo da chiuso
         html += `<div class="mobile-content-container" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 210px;">`;
 
         if (checkMobile) {
@@ -853,7 +951,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="desktop-main-container">
             `;
 
-            // Riga 1: Base Map e Altro affiancati
             html += `
                 <div style="display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e1e1e1; padding-bottom: 6px; flex-shrink: 0; width: 100%; box-sizing: border-box;">
                     <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
@@ -878,7 +975,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             html += `</div></div></div>`;
 
-            // Riga 2: Tematiche (a sinistra) e Elementi Mappati (a destra in colonne da max 5)
             html += `
                 <div style="display: flex; gap: 10px; flex-grow: 1; min-height: 0; height: 0; overflow: hidden;">
                     <div style="display: flex; flex-direction: column; gap: 3px; width: 160px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid #e1e1e1; padding-right: 8px; overscroll-behavior-y: none;">
@@ -932,7 +1028,6 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `</div></div></div>`;
         }
 
-        // Chiusura del div contenitore mobile se ci troviamo su mobile
         if (checkMobile) {
             html += `</div>`;
         }
@@ -1082,6 +1177,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 'btn-tutorial-home');
 
         createBtn('📍', "Posizione", () => { map.locate({setView: true, maxZoom: 16}); }, 'btn-tutorial-locate');
+
+        createBtn('🔍', "Cerca indirizzo a Salerno", () => {
+            const box = document.getElementById('search-box-container');
+            if (box.style.display === 'flex') {
+                box.style.display = 'none';
+            } else {
+                box.style.display = 'flex';
+                document.getElementById('search-input').focus();
+            }
+        }, 'btn-tutorial-search');
 
         return container;
     };
