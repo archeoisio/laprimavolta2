@@ -4,7 +4,8 @@ let selectedLayer = null;
 let allTavoloLayers = [];
 let currentActiveTab = null;
 
-const MIN_ZOOM_VISIBLE = 13;
+const isMobile = window.innerWidth < 768; // Rilevamento mobile/desktop
+const MIN_ZOOM_VISIBLE = isMobile ? 10 : 13; // Soglia dinamica
 
 const customStyleTag = document.createElement('style');
 customStyleTag.innerHTML = `
@@ -423,22 +424,36 @@ const navigationBounds = [
     [40.760, 14.920]  // Nord-Est esteso
 ];
     document.addEventListener('DOMContentLoaded', () => {
+const isMobile = window.innerWidth < 768; // Definiamo isMobile prima di creare la mappa
+
 map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
-        minZoom: 13, 
+        minZoom: 10, // Lasciamo margine basso per il mobile
         zoomSnap: 1,  
         zoomDelta: 1,
-       wheelDebounceTime: 80,
-        wheelPxPerZoomLevel: 120 // <-- La virgola qui ci vuole perché ci sono altre opzioni sotto (o se chiudi le graffe qui è l'ultima)
+        wheelDebounceTime: 80,
+        wheelPxPerZoomLevel: 120 
     }).fitBounds(initialBounds);
 
-       const isMobile = window.innerWidth < 768; // Sotto i 768px è considerato smartphone
+// Gestione dello zoom iniziale differenziata
 if (isMobile) {
-    // Riduciamo lo zoom iniziale di 0.75 (puoi aumentare o diminuire questo valore)
-    map.setZoom(map.getZoom() - 10); 
+    // Su mobile allarghiamo dolcemente (es. sottraendo solo 2 livelli invece di 10)
+    const targetZoom = Math.max(10, map.getZoom() - 2); 
+    map.setZoom(targetZoom); 
+} else {
+    // Su desktop blocchiamo rigidamente il limite minimo a 13
+    if (map.getZoom() < 13) {
+        map.setZoom(13);
+    }
+    map.on('zoomend', () => {
+        if (!isMobile && map.getZoom() < 13) {
+            map.setZoom(13);
+        }
+    });
 }
-       const boundsLimit = L.latLngBounds(navigationBounds);
+
+const boundsLimit = L.latLngBounds(navigationBounds);
 
 map.on('moveend', () => {
     if (!boundsLimit.contains(map.getCenter())) {
