@@ -438,15 +438,15 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('zoomend', checkZoomVisibility);
 
     map.createPane('pane_confini_amministrativi');
-    map.getPane('pane_confini_amministrativi').style.zIndex = 5000;
+    map.getPane('pane_confini_amministrativi').style.zIndex = 404;
 
     var layer_confini_amministrativi = L.geoJson(null, {
         interactive: false,
         pane: 'pane_confini_amministrativi',
         style: function(feature) {
             return { 
-                color: '##000000',      
-                weight: 5,           
+                color: '#000000',      
+                weight: 2.5,           
                 fill: true,            
                 fillColor: '#b2bec3',  
                 fillOpacity: 0.0       
