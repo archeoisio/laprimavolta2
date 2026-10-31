@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="sub-section-title" style="margin-bottom: 4px; flex-shrink: 0;">Elementi: ${items.length}</div>
             
             <!-- 2. CONTENITORE SCORRIBILE -->
-            <<div style="display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; min-height: 0; padding-right: 4px; flex-grow: 1;">
+            <div style="display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; min-height: 0; padding-right: 4px; flex-grow: 1;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 250px; gap: 4px;">
         `;
         
