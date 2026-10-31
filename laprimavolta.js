@@ -56,7 +56,7 @@ customStyleTag.innerHTML = `
         transform: translate(-50%, -50%); 
     }
 
- /* ==================== DESKTOP STYLES (LATO SINISTRO A SCOMPARSA) ==================== */
+/* ==================== DESKTOP STYLES (LATO SINISTRO A SCOMPARSA) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
@@ -90,22 +90,46 @@ customStyleTag.innerHTML = `
             max-height: 100vh !important;
         }
 
-        #custom-bottom-panel .panel-main-header b {
-            font-size: 14px !important; 
+        /* QUANDO IL PANNELLO È CHIUSO: Linguetta visibile sul bordo sinistro dello schermo */
+        #custom-bottom-panel:not(.open) {
+            left: 0 !important;
+            width: 46px !important;
+            height: 140px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            border-radius: 0 8px 8px 0 !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.2);
+            cursor: pointer;
         }
 
-        #custom-bottom-panel .sub-section-title {
-            font-size: 14px !important;
+        #custom-bottom-panel:not(.open) .panel-main-header {
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            border: none;
         }
 
-        #custom-bottom-panel .col-left label {
-            font-size: 14px !important;
+        #custom-bottom-panel:not(.open) .panel-main-header b {
+            display: inline-block !important;
+            font-size: 12px !important;
+            color: #2c3e50 !important;
+            letter-spacing: 1px;
         }
 
-        #custom-bottom-panel .col-right span[style*="font-size"] {
-            font-size: 14px !important;
+        #custom-bottom-panel:not(.open) .panel-main-header span {
+            display: none !important; /* Nasconde la freccia temporaneamente per pulizia verticale */
         }
-
+        
         #custom-bottom-panel .panel-three-columns {
             grid-template-columns: 180px 160px 1fr !important;
             overflow-y: auto;
@@ -114,11 +138,7 @@ customStyleTag.innerHTML = `
             box-sizing: border-box;
         }
 
-        #custom-bottom-panel .sidebar-tab-btn {
-            font-size: 13px !important; 
-        }
-
-        /* Pannello dettaglio elemento desktop posizionato verticalmente sotto il Centro di Controllo sul lato sinistro */
+        /* Pannello dettaglio elemento desktop */
         #feature-detail-panel {
             position: fixed; 
             top: auto;
@@ -143,24 +163,11 @@ customStyleTag.innerHTML = `
             transition: width 0.3s ease-in-out, left 0.3s ease-in-out;
         }
 
-        /* Quando il pannello principale è aperto, anche il pannello dettagli si allarga per allinearsi */
         #custom-bottom-panel.open ~ #feature-detail-panel,
         body:has(#custom-bottom-panel.open) #feature-detail-panel {
             width: 950px !important;
         }
-
-        .col-left .base-map-vertical {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-        }
-        .col-left .desktop-grid-altro {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-        }
     }
-
     @media (max-width: 767px) {
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
