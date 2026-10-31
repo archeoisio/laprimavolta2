@@ -520,8 +520,8 @@ window.changeDetailSlide = function(targetSlide) {
 };
 
 const initialBounds = [
-    [40.626, 14.771],
-    [40.726, 14.873]
+    [40.623, 14.771],
+    [40.723, 14.873]
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
