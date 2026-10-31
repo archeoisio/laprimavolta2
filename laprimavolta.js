@@ -14,8 +14,6 @@ customStyleTag.innerHTML = `
 .leaflet-pane svg path,
     .leaflet-tile-pane .leaflet-layer {
         transition: none !important;
-        animation: none !important;
-        will-change: transform;
     }
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
@@ -425,16 +423,22 @@ const navigationBounds = [
     [40.760, 14.920]  // Nord-Est esteso
 ];
     document.addEventListener('DOMContentLoaded', () => {
-    map = L.map('map', { 
+map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 13, 
         zoomSnap: 0.25,  
         zoomDelta: 0.25,
-        wheelPxPerZoomLevel: 120,
-        maxBounds: navigationBounds, // Limite esteso per evitare il blocco brusco ai bordi
-        maxBoundsViscosity: 0.8      // Effetto elastico gradevole sui bordi
+        wheelPxPerZoomLevel: 120 // <-- La virgola qui ci vuole perché ci sono altre opzioni sotto (o se chiudi le graffe qui è l'ultima)
     }).fitBounds(initialBounds);
+
+       const boundsLimit = L.latLngBounds(navigationBounds);
+
+map.on('move', () => {
+    if (!boundsLimit.contains(map.getCenter())) {
+        map.panInsideBounds(boundsLimit, { animate: false });
+    }
+});
        
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
