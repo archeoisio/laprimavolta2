@@ -12,7 +12,7 @@ customStyleTag.innerHTML = `
     * {
         touch-action: manipulation;
     }
-.leaflet-pane svg path,
+    .leaflet-pane svg path,
     .leaflet-tile-pane .leaflet-layer {
         transition: none !important;
     }
@@ -25,7 +25,7 @@ customStyleTag.innerHTML = `
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out; 
         z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left; 
         font-family: sans-serif; font-size: 12px; color: #333; 
-        border-top-left-: 14px; border-top-right-: 14px; 
+        border-top-left-radius: 14px; border-top-right-radius: 14px; 
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
     }
 
@@ -44,8 +44,8 @@ customStyleTag.innerHTML = `
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
-            border-top-left-: 14px;
-            border-top-right-: 14px;
+            border-top-left-radius: 14px;
+            border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
             transition: width 0.25s ease-in-out;
@@ -54,6 +54,7 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel.open {
             width: 1000px !important;
             height: 230px !important;
+            max-height: 230px !important;
         }
 
         #custom-bottom-panel .panel-main-header b {
@@ -88,7 +89,7 @@ customStyleTag.innerHTML = `
             position: fixed; bottom: 0; left: 1025px; width: 500px;
             height: 230px;
             max-height: 230px !important;
-            border-top-left-: 14px; border-top-right-: 14px; overflow-y: auto;
+            border-top-left-radius: 14px; border-top-right-radius: 14px; overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); z-index: 2100;
             padding: 8px 8px; box-sizing: border-box; font-family: sans-serif;
@@ -96,7 +97,6 @@ customStyleTag.innerHTML = `
             border: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* Spostate qui dentro per agire SOLO su desktop */
         .col-left .base-map-vertical {
             display: grid !important;
             grid-template-columns: 1fr 1fr;
@@ -117,7 +117,7 @@ customStyleTag.innerHTML = `
             box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 2100;
             padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
             font-size: 12px; color: #333; display: none; flex-direction: column;
-            border-top-left-: 14px; border-top-right-: 14px;
+            border-top-left-radius: 14px; border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
             overflow-y: auto;
         }
@@ -141,7 +141,7 @@ customStyleTag.innerHTML = `
     .col-right { display: flex; flex-direction: column; overflow: hidden; }
     
     .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-: 4px; padding: 3px 4px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
+    .sidebar-tab-btn { background: #f1f2f6; border: 1px solid #dcdde1; border-radius: 4px; padding: 3px 4px; font-size: 12px; cursor: pointer; font-weight: bold; color: #57606f; text-align: left; transition: all 0.2s ease; touch-action: manipulation; }
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
     .cluster-counter-fixed { flex-shrink: 0; font-size: 12px; color: #666; margin-bottom: 4px; }
@@ -162,7 +162,7 @@ customStyleTag.innerHTML = `
         background: #e74c3c;
         color: white;
         border: none;
-        border-: 50%;
+        border-radius: 50%;
         width: 22px;
         height: 22px;
         font-weight: bold;
@@ -211,9 +211,9 @@ document.head.appendChild(customStyleTag);
 const tavoloColors = { 
     'ambiente': '#2ecc71', 
     'cultura': '#e67e22',  
-    'spazi pubblici': '#8e44ad', // Colore per Spazi pubblici
-    'salute': '#d63031',        // Colore per Salute
-    'servizi urbani': '#0984e3', // Colore per Servizi urbani
+    'spazi pubblici': '#8e44ad',
+    'salute': '#d63031',        
+    'servizi urbani': '#0984e3',
 };
 function getTavoloColor(tavoloName) {
     if (!tavoloName) return '#3b71e6';
@@ -228,7 +228,6 @@ function getTavoloColor(tavoloName) {
 function highlightFeature(e) {
     var layer = e.target;
     if (layer.setStyle) {
-        // Mantiene il riempimento originale e applica solo il bordo rosso
         layer.setStyle({ color: '#ff0000', weight: 2 });
     }
     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge && layer.bringToFront) { layer.bringToFront(); }
@@ -238,8 +237,8 @@ function resetFeatureStyle(e) {
     var layer = e.target;
     if (!layer.feature) return;
     const prop = layer.feature.properties;
-  const tematica = prop['Tematica'] || 'Altro';
-const catColor = getTavoloColor(tematica);
+    const tematica = prop['Tematica'] || 'Altro';
+    const catColor = getTavoloColor(tematica);
     if (layer.feature.geometry.type === 'Point') {
         layer.setStyle({ radius: 8.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor });
     } else {
@@ -276,7 +275,7 @@ function showFeatureDetailsOnly(layer, tavoloName) {
 
     highlightFeature({ target: layer });
 
-   const props = layer.feature.properties;
+    const props = layer.feature.properties;
     const standardKeys = ['Nome', 'Criticità', 'Proposta', 'Stato proposta', 'Tematica'];
     
     const extraFields = [];
@@ -300,19 +299,17 @@ window.renderDetailSlide = function() {
 
     const { props, tavoloName } = window.currentDetailTableData;
 
-    // 1. Raccogliamo TUTTI i campi possibili (inclusi quelli vuoti/non compilati)
     const allFields = [];
     const mainKeys = ['Nome', 'Criticità', 'Proposta', 'Stato proposta'];
     
-    // Inseriamo prima i principali nell'ordine desiderato (mostrandoli anche se vuoti)
     mainKeys.forEach(k => {
         const val = props[k];
         allFields.push({ key: k, value: (val !== null && val !== undefined && val !== '') ? val : 'N/D' });
     });
-const tematicaVal = props['Tematica'] || tavoloName;
+    const tematicaVal = props['Tematica'] || tavoloName;
     allFields.push({ key: 'Tematica', value: (tematicaVal !== null && tematicaVal !== undefined && tematicaVal !== '') ? tematicaVal : 'N/D' });
-    // Aggiungiamo anche tutti gli altri campi presenti nell'oggetto (sia compilati che vuoti, escludendo i duplicati già gestiti)
-   const excludedKeys = [...mainKeys, 'Tematica'];
+    
+    const excludedKeys = [...mainKeys, 'Tematica'];
     for (const [key, value] of Object.entries(props)) {
         if (!excludedKeys.includes(key)) {
             allFields.push({
@@ -324,10 +321,7 @@ const tematicaVal = props['Tematica'] || tavoloName;
 
     if (allFields.length === 0) return;
 
-    // 2. Suddividiamo dinamicamente i campi in slide basandoci sullo spazio disponibile (~145px netti)
     const slides = [];
-    let currentSlideFields = [];
-    
     const testFieldsHeight = (fields) => {
         let testHtml = `<table class="detail-table" style="width:100%;">`;
         fields.forEach(item => {
@@ -345,11 +339,9 @@ const tematicaVal = props['Tematica'] || tavoloName;
         return height;
     };
 
-   let tempFields = [];
+    let tempFields = [];
     for (let i = 0; i < allFields.length; i++) {
         tempFields.push(allFields[i]);
-        
-        // Sfruttiamo tutto lo spazio alzando la soglia a 175px e rimuovendo il limite fisso dei 5 campi
         if (testFieldsHeight(tempFields) > 175) {
             if (tempFields.length > 1) {
                 const lastItem = tempFields.pop();
@@ -372,14 +364,12 @@ const tematicaVal = props['Tematica'] || tavoloName;
     const slide = window.currentDetailSlide;
     const activeSlideFields = slides[slide - 1] || slides[0];
 
-    // 3. Costruiamo la tabella per la slide attiva
     let contentHtml = `<table class="detail-table">`;
     activeSlideFields.forEach(item => {
         contentHtml += `<tr><th>${item.key}</th><td>${item.value}</td></tr>`;
     });
     contentHtml += `</table>`;
 
-    // 4. Configurazione frecce di navigazione
     let leftArrowStyle = (slide > 1) ? "cursor:pointer; opacity:1;" : "cursor:default; opacity:0.3;";
     let rightArrowStyle = (slide < totalPages) ? "cursor:pointer; opacity:1;" : "cursor:default; opacity:0.3;";
     
@@ -397,7 +387,6 @@ const tematicaVal = props['Tematica'] || tavoloName;
         `;
     }
 
-    // 5. Output finale nel pannello
     detailPanel.innerHTML = `
         <div class="feature-detail-header">
             <b style="font-size:13px; color:#2c3e50;">📋 Dettaglio Elemento</b>
@@ -415,18 +404,19 @@ window.changeDetailSlide = function(targetSlide) {
     window.currentDetailSlide = targetSlide;
     renderDetailSlide();
 };
+
 const initialBounds = [
     [40.626, 14.771],
     [40.726, 14.873]
 ];
 const navigationBounds = [
-    [40.580, 14.680], // Sud-Ovest molto più esteso a sinistra
-    [40.760, 14.920]  // Nord-Est esteso
+    [40.580, 14.680], 
+    [40.760, 14.920]  
 ];
-    document.addEventListener('DOMContentLoaded', () => {
-const isMobile = window.innerWidth < 768;
 
-    // 1. Creiamo la mappa SENZA il .fitBounds() immediato
+document.addEventListener('DOMContentLoaded', () => {
+    const isMobileDevice = window.innerWidth < 768;
+
     map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
@@ -437,34 +427,27 @@ const isMobile = window.innerWidth < 768;
         wheelPxPerZoomLevel: 120 
     });
 
-    // 2. Differenziamo la vista iniziale tra mobile e desktop
-    if (isMobile) {
-        // Su mobile impostiamo centro (es. il punto medio di Salerno) e uno zoom più largo (es. 12)
+    if (isMobileDevice) {
         map.setView([40.676, 14.822], 12); 
     } else {
-        // Su desktop manteniamo il fitBounds originale
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
             map.setZoom(13);
         }
     }
 
-    // Blocco desktop per impedire lo zoom sotto il 13
-    if (!isMobile) {
+    if (!isMobileDevice) {
         map.on('zoomend', () => {
-            if (!isMobile && map.getZoom() < 13) {
+            if (!window.innerWidth < 768 && map.getZoom() < 13) {
                 map.setZoom(13);
             }
         });
     }
 
-const boundsLimit = L.latLngBounds(navigationBounds);
+    const boundsLimit = L.latLngBounds(navigationBounds);
 
-    // Controlliamo quando l'utente finisce di spostare la mappa
     map.on('moveend', () => {
-        // Se il centro della mappa esce dai confini consentiti
         if (!boundsLimit.contains(map.getCenter())) {
-            // Riportiamo la mappa dentro i confini senza animazione pesante
             map.panInsideBounds(boundsLimit, { animate: false });
         }
     });
@@ -474,27 +457,28 @@ const boundsLimit = L.latLngBounds(navigationBounds);
 
     map.on('zoomend', checkZoomVisibility);
 
-  map.createPane('pane_confini_amministrativi');
-   map.getPane('pane_confini_amministrativi').style.zIndex = 5000;
+    map.createPane('pane_confini_amministrativi');
+    map.getPane('pane_confini_amministrativi').style.zIndex = 5000;
 
-   var layer_confini_amministrativi = L.geoJson(null, {
-    interactive: false,
-    pane: 'pane_confini_amministrativi',
-    style: function(feature) {
-        return { 
-            color: '#636e72',      // Colore del bordo (grigio scuro definito)
-            weight: 5,           // Spessore del bordo
-            fill: true,            
-            fillColor: '#b2bec3',  
-            fillOpacity: 0.0       // <-- Messo a 0 per renderlo totalmente trasparente dentro!
-        };
-    }
-});
-   fetch('data/confiniamministrativi.geojson')
+    var layer_confini_amministrativi = L.geoJson(null, {
+        interactive: false,
+        pane: 'pane_confini_amministrativi',
+        style: function(feature) {
+            return { 
+                color: '#636e72',      
+                weight: 5,           
+                fill: true,            
+                fillColor: '#b2bec3',  
+                fillOpacity: 0.0       
+            };
+        }
+    });
+    
+    fetch('data/confiniamministrativi.geojson')
        .then(response => response.json())
        .then(data => {
            layer_confini_amministrativi.addData(data);
-           map.addLayer(layer_confini_amministrativi); // <-- Attiva il layer sulla mappa appena i dati sono pronti
+           map.addLayer(layer_confini_amministrativi); 
        });
 
     map.createPane('pane_GoogleSatellite_3'); map.getPane('pane_GoogleSatellite_3').style.zIndex = 403;
@@ -507,15 +491,15 @@ const boundsLimit = L.latLngBounds(navigationBounds);
     window.atlasCategories = {};
     function registerItem(feature, layer) {
         const tematica = feature.properties['Tematica'] || 'Altro';
-const name = feature.properties['Nome'] || 'Elemento';
-if (!atlasCategories[tematica]) { atlasCategories[tematica] = []; }
-atlasCategories[tematica].push({ name, layer });
+        const name = feature.properties['Nome'] || 'Elemento';
+        if (!atlasCategories[tematica]) { atlasCategories[tematica] = []; }
+        atlasCategories[tematica].push({ name, layer });
     }
 
     const puntiPerTavolo = {};
     json_puntiprimavolta_5.features.forEach(f => {
-    const t = f.properties['Tematica'] || 'Altro';
-       if (!puntiPerTavolo[t]) puntiPerTavolo[t] = [];
+        const t = f.properties['Tematica'] || 'Altro';
+        if (!puntiPerTavolo[t]) puntiPerTavolo[t] = [];
         puntiPerTavolo[t].push(f);
     });
 
@@ -543,7 +527,7 @@ atlasCategories[tematica].push({ name, layer });
                 return L.circleMarker(latlng, { radius: 8.0, opacity: 1, color: 'rgba(35,35,35,1.0)', weight: 1, fill: true, fillOpacity: 1, fillColor: catColor }); 
             }
         });
-       allTavoloLayers.push(layerPuntiTavolo);
+        allTavoloLayers.push(layerPuntiTavolo);
     }
 
     const poligoniPerTavolo = {};
@@ -605,271 +589,262 @@ atlasCategories[tematica].push({ name, layer });
             selectedLayer = null;
         }
     };
-window.renderPanelContent = function() {
-    const isOpen = bottomPanel.classList.contains('open');
-    const arrowSymbol = isOpen ? '▼' : '▲';
-    const isMobile = window.innerWidth < 768;
 
-    let html = `
-        <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent();">
-            <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
-            </div>
-        </div>
-    `;
+    window.renderPanelContent = function() {
+        const isOpen = bottomPanel.classList.contains('open');
+        const arrowSymbol = isOpen ? '▼' : '▲';
+        const checkMobile = window.innerWidth < 768;
 
-    const tavoloKeys = Object.keys(atlasCategories);
-    if (!currentActiveTab || !atlasCategories[currentActiveTab]) {
-        currentActiveTab = tavoloKeys[0];
-    }
-
-    if (isMobile) {
-        // ==================== LAYOUT MOBILE SPECIFICO ====================
-        html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
-        
-        // RIGA 1: Base map & Altro (con scorrimento orizzontale)
-        html += `
-            <div style="display: flex; gap: 12px; border-bottom: 1px solid #e1e1e1; padding-bottom: 4px; flex-shrink: 0; align-items: center;">
-                <div>
-                    <div class="sub-section-title" style="margin-bottom:2px;">Base map</div>
-                    <div style="display: flex; gap: 8px;">
-                        <label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;">
-                            <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
-                        </label>
-                        <label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;">
-                            <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Sat
-                        </label>
-                    </div>
+        let html = `
+            <div class="panel-main-header" onclick="document.getElementById('custom-bottom-panel').classList.toggle('open'); renderPanelContent();">
+                <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
                 </div>
-                <div style="flex-grow: 1; overflow-x: auto; white-space: nowrap;">
-                    <div class="sub-section-title" style="margin-bottom:2px;">Altro</div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
+            </div>
         `;
-        const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }];
-        contextLayers.forEach((ctx, idx) => {
-            const isChecked = map.hasLayer(ctx.layer);
-            html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
-        });
-        html += `</div></div></div>`;
 
-        // RIGA 2: Due colonne (Tematiche a sinistra, Elementi mappati a destra in griglia 2 colonne con scroll verticale)
-        html += `
-            <div style="display: grid; grid-template-columns: 120px 1fr; gap: 6px; flex-grow: 1; overflow: hidden;">
-                <!-- Colonna Sinistra: Tematiche (scroll verticale) -->
-                <div style="display: flex; flex-direction: column; border-right: 1px solid #e1e1e1; padding-right: 4px; overflow-y: auto; gap: 3px;">
-                    <div class="sub-section-title" style="margin-bottom:2px;">Tematiche</div>
-        `;
-        tavoloKeys.forEach(tavolo => {
-            const catColor = getTavoloColor(tavolo);
-            const isActive = (tavolo === currentActiveTab);
-            const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : 'background:#f1f2f6; color:#57606f; border:1px solid #dcdde1;';
-            html += `<button class="sidebar-tab-btn ${isActive ? 'active' : ''}" data-tavolo-name="${tavolo}" data-color="${catColor}" style="font-size:11px; padding:3px 4px; border-radius:4px; font-weight:bold; text-align:left; cursor:pointer; ${activeStyle}">${tavolo.toUpperCase()}</button>`;
-        });
-        html += `</div>`;
+        const tavoloKeys = Object.keys(atlasCategories);
+        if (!currentActiveTab || !atlasCategories[currentActiveTab]) {
+            currentActiveTab = tavoloKeys[0];
+        }
 
-        // Colonna Destra: Elementi mappati (Griglia a 2 colonne, scroll verticale)
-        html += `
-                <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px;">
-        `;
-        tavoloKeys.forEach(tavolo => {
-            const items = atlasCategories[tavolo];
-            const isActive = (tavolo === currentActiveTab);
-            if (!isActive) return;
-
+        if (checkMobile) {
+            html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
+            
             html += `
-                <div class="sub-section-title" style="margin-bottom: 4px;">Elementi: ${items.length}</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-            `;
-            items.forEach((item, globalIdx) => {
-                html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px; box-sizing:border-box;">
-                        <span style="font-size:11px; color:#333; flex-grow:1; margin-right:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
-                        <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:1px 3px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
-                    </div>
-                `;
-            });
-            html += `</div>`;
-        });
-        html += `</div></div></div>`;
-
-    } else {
-        // ==================== TUO CODICE DESKTOP ORIGINALE ====================
-        html += `
-            <div class="panel-three-columns">
-                <!-- COLONNA 1: MAPPA BASE + ALTRO SCORRIBILE -->
-                <div class="col-left">
+                <div style="display: flex; gap: 12px; border-bottom: 1px solid #e1e1e1; padding-bottom: 4px; flex-shrink: 0; align-items: center;">
                     <div>
-                        <div class="sub-section-title">Base map</div>
-                        <div class="base-map-vertical">
-                            <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
+                        <div class="sub-section-title" style="margin-bottom:2px;">Base map</div>
+                        <div style="display: flex; gap: 8px;">
+                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;">
                                 <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
                             </label>
-                            <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
-                                <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Satellite
+                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;">
+                                <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Sat
                             </label>
                         </div>
                     </div>
-                    <div class="col-left-scrollable">
-                        <div class="sub-section-title">Altro</div>
-                        <div class="desktop-grid-altro" style="display:flex; flex-direction:column; gap:2px;">
-        `;
-        const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }];
-        contextLayers.forEach((ctx, idx) => {
-            const isChecked = map.hasLayer(ctx.layer);
-            html += `<label style="display:flex; align-items:center; gap:4px; margin:2px 0; cursor:pointer;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
-        });
-        html += `</div></div></div>`;
-
-        // COLONNA 2: CLUSTER TEMATICI
-        html += `
-            <div class="col-middle">
-                <div class="sub-section-title">Tematiche</div>
-                <div class="sidebar-tabs-vertical">
-        `;
-
-        tavoloKeys.forEach(tavolo => {
-            const cleanKey = tavolo.replace(/\s+/g, '');
-            const catColor = getTavoloColor(tavolo);
-            const isActive = (tavolo === currentActiveTab);
-            const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : '';
-            html += `<button class="sidebar-tab-btn ${isActive ? 'active' : ''}" data-tab="tab-${cleanKey}" data-tavolo-name="${tavolo}" data-color="${catColor}" style="${activeStyle}">${tavolo.toUpperCase()}</button>`;
-        });
-        html += `</div></div>`;
-
-        // COLONNA 3: ELENCO PROPOSTE (5 ELEMENTI FISSI PER COLONNA)
-        html += `<div class="col-right">`;
-        tavoloKeys.forEach(tavolo => {
-            const cleanKey = tavolo.replace(/\s+/g, '');
-            const items = atlasCategories[tavolo];
-            const isActive = (tavolo === currentActiveTab);
-            
-            const itemsPerColumn = 5;
-            const columns = [];
-            for (let i = 0; i < items.length; i += itemsPerColumn) {
-                columns.push(items.slice(i, i + itemsPerColumn));
-            }
+                    <div style="flex-grow: 1; overflow-x: auto; white-space: nowrap;">
+                        <div class="sub-section-title" style="margin-bottom:2px;">Altro</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+            `;
+            const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }];
+            contextLayers.forEach((ctx, idx) => {
+                const isChecked = map.hasLayer(ctx.layer);
+                html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
+            });
+            html += `</div></div></div>`;
 
             html += `
-                <div id="tab-${cleanKey}" class="sidebar-tab-content ${isActive ? 'active' : ''}">
-                    <div class="sub-section-title" style="margin-bottom: 6px;">Elementi mappati: ${items.length}</div>
-                    <div class="panel-scrollable-grid">
+                <div style="display: grid; grid-template-columns: 120px 1fr; gap: 6px; flex-grow: 1; overflow: hidden;">
+                    <div style="display: flex; flex-direction: column; border-right: 1px solid #e1e1e1; padding-right: 4px; overflow-y: auto; gap: 3px;">
+                        <div class="sub-section-title" style="margin-bottom:2px;">Tematiche</div>
             `;
+            tavoloKeys.forEach(tavolo => {
+                const catColor = getTavoloColor(tavolo);
+                const isActive = (tavolo === currentActiveTab);
+                const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : 'background:#f1f2f6; color:#57606f; border:1px solid #dcdde1;';
+                html += `<button class="sidebar-tab-btn ${isActive ? 'active' : ''}" data-tavolo-name="${tavolo}" data-color="${catColor}" style="font-size:11px; padding:3px 4px; border-radius:4px; font-weight:bold; text-align:left; cursor:pointer; ${activeStyle}">${tavolo.toUpperCase()}</button>`;
+            });
+            html += `</div>`;
 
-            columns.forEach(colItems => {
-                html += `<div class="feature-vertical-column">`;
-                colItems.forEach((item) => {
-                    const globalIdx = items.indexOf(item);
+            html += `
+                    <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px;">
+            `;
+            tavoloKeys.forEach(tavolo => {
+                const items = atlasCategories[tavolo];
+                const isActive = (tavolo === currentActiveTab);
+                if (!isActive) return;
+
+                html += `
+                    <div class="sub-section-title" style="margin-bottom: 4px;">Elementi: ${items.length}</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                `;
+                items.forEach((item, globalIdx) => {
                     html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
-                            <span style="font-size:12px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
-                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:11px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px; box-sizing:border-box;">
+                            <span style="font-size:11px; color:#333; flex-grow:1; margin-right:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
+                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:1px 3px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
                         </div>
                     `;
                 });
                 html += `</div>`;
             });
+            html += `</div></div></div>`;
 
+        } else {
+            html += `
+                <div class="panel-three-columns">
+                    <div class="col-left">
+                        <div>
+                            <div class="sub-section-title">Base map</div>
+                            <div class="base-map-vertical">
+                                <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
+                                    <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
+                                </label>
+                                <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
+                                    <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Satellite
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-left-scrollable">
+                            <div class="sub-section-title">Altro</div>
+                            <div class="desktop-grid-altro" style="display:flex; flex-direction:column; gap:2px;">
+            `;
+            const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }];
+            contextLayers.forEach((ctx, idx) => {
+                const isChecked = map.hasLayer(ctx.layer);
+                html += `<label style="display:flex; align-items:center; gap:4px; margin:2px 0; cursor:pointer;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
+            });
+            html += `</div></div></div>`;
+
+            html += `
+                <div class="col-middle">
+                    <div class="sub-section-title">Tematiche</div>
+                    <div class="sidebar-tabs-vertical">
+            `;
+
+            tavoloKeys.forEach(tavolo => {
+                const cleanKey = tavolo.replace(/\s+/g, '');
+                const catColor = getTavoloColor(tavolo);
+                const isActive = (tavolo === currentActiveTab);
+                const activeStyle = isActive ? `background:${catColor}; color:${['#f1c40f'].includes(catColor) ? '#333' : 'white'}; border-color:${catColor};` : '';
+                html += `<button class="sidebar-tab-btn ${isActive ? 'active' : ''}" data-tab="tab-${cleanKey}" data-tavolo-name="${tavolo}" data-color="${catColor}" style="${activeStyle}">${tavolo.toUpperCase()}</button>`;
+            });
             html += `</div></div>`;
+
+            html += `<div class="col-right">`;
+            tavoloKeys.forEach(tavolo => {
+                const cleanKey = tavolo.replace(/\s+/g, '');
+                const items = atlasCategories[tavolo];
+                const isActive = (tavolo === currentActiveTab);
+                
+                const itemsPerColumn = 5;
+                const columns = [];
+                for (let i = 0; i < items.length; i += itemsPerColumn) {
+                    columns.push(items.slice(i, i + itemsPerColumn));
+                }
+
+                html += `
+                    <div id="tab-${cleanKey}" class="sidebar-tab-content ${isActive ? 'active' : ''}">
+                        <div class="sub-section-title" style="margin-bottom: 6px;">Elementi mappati: ${items.length}</div>
+                        <div class="panel-scrollable-grid">
+                `;
+
+                columns.forEach(colItems => {
+                    html += `<div class="feature-vertical-column">`;
+                    colItems.forEach((item) => {
+                        const globalIdx = items.indexOf(item);
+                        html += `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 4px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
+                                <span style="font-size:12px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
+                                <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:11px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                });
+
+                html += `</div></div>`;
+            });
+            html += `</div></div>`;
+        }
+
+        bottomPanel.innerHTML = html;
+
+        const tabBtns = bottomPanel.querySelectorAll('.sidebar-tab-btn');
+        const tabContents = bottomPanel.querySelectorAll('.sidebar-tab-content');
+        tabBtns.forEach(btn => {
+            btn.onclick = () => {
+                if (checkMobile) {
+                    currentActiveTab = btn.getAttribute('data-tavolo-name');
+                    renderPanelContent();
+                } else {
+                    tabBtns.forEach(b => { b.classList.remove('active'); b.style.background = '#f1f2f6'; b.style.color = '#57606f'; b.style.borderColor = '#dcdde1'; });
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    currentActiveTab = btn.getAttribute('data-tavolo-name');
+
+                    const catColor = btn.getAttribute('data-color');
+                    const textColor = ['#f1c40f'].includes(catColor) ? '#333' : 'white';
+                    btn.style.background = catColor; btn.style.color = textColor; btn.style.borderColor = catColor;
+                    bottomPanel.querySelector(`#${btn.getAttribute('data-tab')}`).classList.add('active');
+                }
+            };
         });
-        html += `</div></div>`;
-    }
 
-    bottomPanel.innerHTML = html;
-
-    // Gestione click pulsanti Tematiche
-    const tabBtns = bottomPanel.querySelectorAll('.sidebar-tab-btn');
-    const tabContents = bottomPanel.querySelectorAll('.sidebar-tab-content');
-    tabBtns.forEach(btn => {
-        btn.onclick = () => {
-            if (isMobile) {
-                currentActiveTab = btn.getAttribute('data-tavolo-name');
-                renderPanelContent();
-            } else {
-                tabBtns.forEach(b => { b.classList.remove('active'); b.style.background = '#f1f2f6'; b.style.color = '#57606f'; b.style.borderColor = '#dcdde1'; });
-                tabContents.forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
+        bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const tavolo = e.target.getAttribute('data-tavolo');
+                const idx = parseInt(e.target.getAttribute('data-index'));
+                const targetItem = atlasCategories[tavolo][idx];
                 
-                currentActiveTab = btn.getAttribute('data-tavolo-name');
+                if (!targetItem || !targetItem.layer) return;
 
-                const catColor = btn.getAttribute('data-color');
-                const textColor = ['#f1c40f'].includes(catColor) ? '#333' : 'white';
-                btn.style.background = catColor; btn.style.color = textColor; btn.style.borderColor = catColor;
-                bottomPanel.querySelector(`#${btn.getAttribute('data-tab')}`).classList.add('active');
-            }
-        };
-    });
-
-    // Gestione click pulsanti lente d'ingrandimento (vola-btn)
-    bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            const tavolo = e.target.getAttribute('data-tavolo');
-            const idx = parseInt(e.target.getAttribute('data-index'));
-            const targetItem = atlasCategories[tavolo][idx];
-            
-            if (!targetItem || !targetItem.layer) return;
-
-            if (selectedLayer && selectedLayer !== targetItem.layer) {
-                resetFeatureStyle({ target: selectedLayer });
-            }
-            selectedLayer = targetItem.layer;
-            map.closePopup();
-
-            const layer = targetItem.layer;
-            const geom = layer.feature.geometry;
-
-            if (geom.type === 'Point') {
-                const latlng = [geom.coordinates[1], geom.coordinates[0]];
-                map.setView(latlng, 19, { animate: false });
-                
-                if (isMobile) {
-                    map.panBy([0, 150], { animate: false }); 
-                } else {
-                    map.panBy([0, 120], { animate: false });
+                if (selectedLayer && selectedLayer !== targetItem.layer) {
+                    resetFeatureStyle({ target: selectedLayer });
                 }
-            } else {
-                const bounds = layer.getBounds();
-                
-                if (isMobile) {
-                    map.fitBounds(bounds, {
-                        paddingTopLeft: [20, 20],
-                        paddingBottomRight: [20, 260],
-                        maxZoom: 18,
-                        animate: false
-                    });
+                selectedLayer = targetItem.layer;
+                map.closePopup();
+
+                const layer = targetItem.layer;
+                const geom = layer.feature.geometry;
+
+                if (geom.type === 'Point') {
+                    const latlng = [geom.coordinates[1], geom.coordinates[0]];
+                    map.setView(latlng, 19, { animate: false });
+                    
+                    if (checkMobile) {
+                        map.panBy([0, 150], { animate: false }); 
+                    } else {
+                        map.panBy([0, 120], { animate: false });
+                    }
                 } else {
-                    map.fitBounds(bounds, {
-                        paddingTopLeft: [50, 50],
-                        paddingBottomRight: [50, 250],
-                        maxZoom: 18,
-                        animate: false
-                    });
+                    const bounds = layer.getBounds();
+                    
+                    if (checkMobile) {
+                        map.fitBounds(bounds, {
+                            paddingTopLeft: [20, 20],
+                            paddingBottomRight: [20, 260],
+                            maxZoom: 18,
+                            animate: false
+                        });
+                    } else {
+                        map.fitBounds(bounds, {
+                            paddingTopLeft: [50, 50],
+                            paddingBottomRight: [50, 250],
+                            maxZoom: 18,
+                            animate: false
+                        });
+                    }
                 }
-            }
 
-            highlightFeature({ target: layer });
-            showFeatureDetailsOnly(layer, tavolo);
-        };
-    });
+                highlightFeature({ target: layer });
+                showFeatureDetailsOnly(layer, tavolo);
+            };
+        });
 
-    // Gestione cambio mappa base (OSM / Satellite)
-    bottomPanel.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
-        radio.onchange = (e) => {
-            if (e.target.value === 'osm') { map.addLayer(layer_OpenStreetMap_4); map.removeLayer(layer_GoogleSatellite_3); } 
-            else { map.addLayer(layer_GoogleSatellite_3); map.removeLayer(layer_OpenStreetMap_4); }
-        };
-    });
+        bottomPanel.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
+            radio.onchange = (e) => {
+                if (e.target.value === 'osm') { map.addLayer(layer_OpenStreetMap_4); map.removeLayer(layer_GoogleSatellite_3); } 
+                else { map.addLayer(layer_GoogleSatellite_3); map.removeLayer(layer_OpenStreetMap_4); }
+            };
+        });
 
-    // Gestione checkbox Altro / Confini
-    bottomPanel.querySelectorAll('.custom-context-chk').forEach(chk => {
-        chk.onchange = (e) => {
-            const index = parseInt(e.target.getAttribute('data-index'));
-            const targetLayer = [layer_confini_amministrativi][index];
-            if (e.target.checked) { map.addLayer(targetLayer); } else { map.removeLayer(targetLayer); }
-        };
-    });
-};
+        bottomPanel.querySelectorAll('.custom-context-chk').forEach(chk => {
+            chk.onchange = (e) => {
+                const index = parseInt(e.target.getAttribute('data-index'));
+                const targetLayer = [layer_confini_amministrativi][index];
+                if (e.target.checked) { map.addLayer(targetLayer); } else { map.removeLayer(targetLayer); }
+            };
+        });
+    };
+
+    renderPanelContent();
+
     function setVh() {
         const mapEl = document.getElementById('map');
         if (!mapEl || !map) return;
@@ -905,17 +880,17 @@ window.renderPanelContent = function() {
 
         const createBtn = (html, title, onClick, className) => {
             const btn = L.DomUtil.create('a', className || '', container);
-            btn.innerHTML = html; btn.title = title; btn.href = '#'; btn.style.width = '44px'; btn.style.height = '44px'; btn.style.lineHeight = '44px'; btn.style.textAlign = 'center'; btn.style.display = 'flex'; btn.style.alignItems = 'center'; btn.style.justifyContent = 'center'; btn.style.fontSize = '18px'; btn.style.backgroundColor = 'white'; btn.style.color = '#333'; btn.style.borderBottom = '1px solid #ccc'; btn.style.textDecoration = 'none';
+            btn.innerHTML = html; btn.title = title; btn.href = '#'; btn.style.width = '44px'; btn.style.height = '44px'; btn.style.lineHeight = '44px'; btn.style.textAlign = 'center'; btn.style.display = 'flex'; btn.style.alignItems: 'center'; btn.style.justifyContent = 'center'; btn.style.fontSize = '18px'; btn.style.backgroundColor = 'white'; btn.style.color = '#333'; btn.style.borderBottom = '1px solid #ccc'; btn.style.textDecoration = 'none';
             L.DomEvent.on(btn, 'click', e => { L.DomEvent.stopPropagation(e); L.DomEvent.preventDefault(e); onClick(); });
             return btn;
         };
 
-       createBtn('🌍', "Torna alla vista iniziale", () => { 
-    map.fitBounds([
-        [40.626, 14.771],
-        [40.726, 14.873]
-    ], { padding: [20, 20], animate: true }); 
-}, 'btn-tutorial-home');
+        createBtn('🌍', "Torna alla vista iniziale", () => { 
+            map.fitBounds([
+                [40.626, 14.771],
+                [40.726, 14.873]
+            ], { padding: [20, 20], animate: true }); 
+        }, 'btn-tutorial-home');
        
         createBtn('📍', "Posizione", () => { map.locate({setView: true, maxZoom: 16}); }, 'btn-tutorial-locate');
         return container;
