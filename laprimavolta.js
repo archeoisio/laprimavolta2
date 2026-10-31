@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
    if (isMobileDevice) {
-        map.setView([40.658, 14.805], 11.75);
+        map.setView([40.665, 14.805], 11.75);
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
@@ -914,7 +914,7 @@ document.addEventListener('DOMContentLoaded', () => {
         createBtn('🌍', "Torna alla vista iniziale", () => {
             const isMobileDevice = window.innerWidth < 768;
             if (isMobileDevice) {
-                map.setView([40.658, 14.805], 11.5, { animate: true });
+                map.setView([40.665, 14.805], 11.75, { animate: true });
             } else {
                 map.fitBounds([
                     [40.626, 14.771],
