@@ -27,7 +27,7 @@ customStyleTag.innerHTML = `
         transition: none !important;
     }
 
-    /* ==================== MOBILE STYLES (ORIGINALE RIPRISTINATO) ==================== */
+    /* ==================== STILE BASE MOBILE (UGUALE AL TUO ORIGINALE) ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
@@ -170,7 +170,9 @@ customStyleTag.innerHTML = `
         }
     }
 
+    /* ==================== MOBILE STYLES (RIPRISTINO PUNTuale) ==================== */
     @media (max-width: 767px) {
+        #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
         #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
         #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         
@@ -186,8 +188,6 @@ customStyleTag.innerHTML = `
             overflow-y: auto;
         }
     }
-
-    #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; width: 100%; }
 
@@ -742,7 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ">
                 <b style="font-size:13px; color:#2c3e50;">🗂️ Centro di Controllo</b>
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${checkMobile ? (isOpen ? '▼' : '▲') : arrowSymbol}</span>
+                    <span style="font-size:13px; font-weight:bold; color:#3498db; padding:0 4px;">${arrowSymbol}</span>
                 </div>
             </div>
         `;
@@ -753,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (checkMobile) {
-            // ==================== LAYOUT MOBILE ORIGINALE (RIGA SUP UNICA) ====================
+            // ==================== LAYOUT MOBILE ORIGINALE ====================
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
