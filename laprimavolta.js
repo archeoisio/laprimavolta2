@@ -53,17 +53,17 @@ customStyleTag.innerHTML = `
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); 
-        box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out; 
-        z-index: 2000; padding: 4px 8px; box-sizing: border-box; text-align: left; 
+        box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out; 
+        z-index: 2000; padding: 10px 12px; box-sizing: border-box; text-align: left; 
         font-family: sans-serif; font-size: 12px; color: #333; 
         border-top-left-radius: 14px; border-top-right-radius: 14px; 
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
     }
 
     #custom-bottom-panel:not(.open) {
-        max-height: 42px !important;
+        max-height: 36px !important;
         overflow: hidden !important;
-        padding-bottom: 0 !important;
+        padding: 4px 12px !important;
     }
 
     #custom-bottom-panel:not(.open) .mobile-content-container {
@@ -108,20 +108,20 @@ customStyleTag.innerHTML = `
             border-radius: 12px;
             border: 1px solid rgba(0,0,0,0.1);
             box-sizing: border-box;
-            transition: all 0.3s ease-in-out;
+            transition: max-height 0.3s ease-in-out, width 0.3s ease-in-out, padding 0.3s ease-in-out;
         }
 
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
             top: 20px !important;
-            left: 10px !important;
+            left: 20px !important;
             bottom: auto !important;
             transform: none !important;
             width: 200px !important;
             height: 36px !important;
             max-height: 36px !important;
             border-radius: 8px !important;
-            padding: 4px 8px !important;
+            padding: 4px 12px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -141,6 +141,7 @@ customStyleTag.innerHTML = `
             padding: 0 !important;
             margin: 0 !important;
             border: none !important;
+            position: relative !important;
         }
 
         #custom-bottom-panel:not(.open) .panel-main-header b {
@@ -152,9 +153,7 @@ customStyleTag.innerHTML = `
         #custom-bottom-panel:not(.open) .panel-main-header div {
             display: flex !important;
         }
-#custom-bottom-panel .panel-main-header b {
-            font-size: 14px !important;
-        }
+
         #custom-bottom-panel .desktop-main-container {
             display: flex;
             flex-direction: column;
@@ -164,7 +163,7 @@ customStyleTag.innerHTML = `
             overflow: hidden;
             box-sizing: border-box;
         }
-        /* 3. Grandezza titoletti interni e bottoni tematiche su desktop */
+
         #custom-bottom-panel .sub-section-title {
             font-size: 14px !important; 
         }
@@ -175,7 +174,7 @@ customStyleTag.innerHTML = `
 
         #feature-detail-panel {
             position: fixed !important;
-            top: 270px !important; 
+            top: 280px !important; 
             left: 20px !important; 
             width: 500px !important;
             max-height: 230px !important;
@@ -200,7 +199,7 @@ customStyleTag.innerHTML = `
         #feature-detail-panel {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 1000px; height: 240px !important;
-            background: rgba(255, 255, 255, 0.99); backdrop-filter: blur(10px);
+            background: rgba(255, 255, 259, 0.99); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 2100;
             padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
             font-size: 12px; color: #333; display: none; flex-direction: column;
@@ -213,7 +212,7 @@ customStyleTag.innerHTML = `
 
     #custom-bottom-panel:not(.open) .desktop-main-container { display: none !important; }
     
-    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 4px; cursor: pointer; user-select: none; width: 100%; }
+    .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 4px; cursor: pointer; user-select: none; width: 100%; position: relative; z-index: 2005; }
     #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     .sub-section-title { font-weight: bold; color: #555; margin-bottom: 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -851,9 +850,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => {
                         map.invalidateSize({animate: true});
                         if (willBeOpen) {
-                            map.panBy([-280, 0], {animate: true});
+                            map.panBy([-350, 0], {animate: true});
                         } else {
-                            map.panBy([280, 0], {animate: true});
+                            map.panBy([350, 0], {animate: true});
                         }
                     }, 50);
                 }
@@ -946,9 +945,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         setTimeout(() => {
                             map.invalidateSize({animate: true});
                             if (willBeOpen) {
-                                map.panBy([-280, 0], {animate: true});
+                                map.panBy([-350, 0], {animate: true});
                             } else {
-                                map.panBy([280, 0], {animate: true});
+                                map.panBy([350, 0], {animate: true});
                             }
                         }, 50);
                     }
@@ -1174,15 +1173,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
-   // Pulsante Home 🌍
+       // Pulsante Home 🌍 (Copia esatta della vista iniziale all'avvio)
         createBtn('🌍', "Torna alla vista iniziale", () => {
             const isMobileDevice = window.innerWidth < 768;
             if (isMobileDevice) {
                 map.setView([40.620, 14.805], 11.75, { animate: true });
             } else {
-                map.fitBounds(initialBounds, { padding: [20, 20], animate: true });
+                map.fitBounds(initialBounds, { animate: true });
                 if (map.getZoom() < 13) {
-                    map.setZoom(13);
+                    map.setZoom(13, { animate: true });
                 }
             }
         }, 'btn-tutorial-home');
