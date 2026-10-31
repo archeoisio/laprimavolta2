@@ -3,7 +3,7 @@ let highlightLayer;
 let selectedLayer = null;
 let allTavoloLayers = [];
 let currentActiveTab = null;
-fconf
+
 const isMobile = window.innerWidth < 768; 
 const MIN_ZOOM_VISIBLE = isMobile ? 2 : 13; 
 
@@ -421,19 +421,19 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomDelta: 1,
         wheelDebounceTime: 80,
         wheelPxPerZoomLevel: 120, 
-        worldCopyJump: false, // Disattiva il salto automatico tra copie del mondo
-        maxBounds: L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180)), // Blocca i confini del mondo (evita le bande nere e la ripetizione)
-        maxBoundsViscosity: 1.0, // Rigidità al 100% per impedire di uscire dall'area consentita
-       bounceAtZoomLimits: false,
-       attributionControl: false
+        worldCopyJump: false,
+        maxBounds: L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180)),
+        maxBoundsViscosity: 1.0,
+        bounceAtZoomLimits: false,
+        attributionControl: false
     });
 
    if (isMobileDevice) {
-        map.setView([40.658, 14.805], 11.5); // Vista mobile bilanciata per non coprire i confini col pannello
+        map.setView([40.658, 14.805], 11.5);
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
-            map.setZoom(13); // Imposta lo zoom di partenza a 13 su desktop, ma SENZA bloccarlo
+            map.setZoom(13);
         }
     }
        
@@ -465,6 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
            layer_confini_amministrativi.addData(data);
            map.addLayer(layer_confini_amministrativi); 
        });
+
     map.createPane('pane_comuniprovincia');
     map.getPane('pane_comuniprovincia').style.zIndex = 407;
 
@@ -473,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pane: 'pane_comuniprovincia',
         style: function(feature) {
             return { 
-                color: '#e74c3c',      // Puoi scegliere il colore che preferisci (es. rosso/arancio)
+                color: '#e74c3c',      
                 weight: 1.5,           
                 fill: true,            
                 fillColor: '#e74c3c',  
@@ -482,13 +483,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Caricamento del file GeoJSON (assicurati che si trovi nella cartella 'data/')
     fetch('data/comuniprovincia.geojson')
        .then(response => response.json())
        .then(data => {
             layer_comuniprovincia.addData(data);
-            // NOTA: Non lo aggiungiamo alla mappa con .addLayer() così parte spento di default
        });
+
+    // Array unificato globale dei layer di contesto per il Centro di Controllo
+    const contextLayers = [
+        { name: 'Confini', layer: layer_confini_amministrativi }, 
+        { name: 'Comuni / Provincia', layer: layer_comuniprovincia }
+    ];
+
     map.createPane('pane_GoogleSatellite_3'); map.getPane('pane_GoogleSatellite_3').style.zIndex = 402;
     var layer_GoogleSatellite_3 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_3', minZoom: 1, maxZoom: 28,noWrap: true, keepBuffer: 6, updateWhenIdle: false,
         updateInterval: 100 });
@@ -621,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (checkMobile) {
             // ==================== LAYOUT MOBILE CON RIGA UNICA SUP ====================
-           html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
+            html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
                 <div style="display: flex; align-items: center; gap: 25px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; white-space: nowrap; overflow-x: auto;">
@@ -638,11 +644,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <span class="sub-section-title" style="margin:0; font-size:11px;">Altro:</span>
             `;
-            
-            const contextLayers = [
-                { name: 'Confini', layer: layer_confini_amministrativi }, 
-                { name: 'Comuni / Provincia', layer: layer_comuniprovincia }
-            ];
             
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
@@ -690,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `</div></div></div>`;
 
         } else {
-            // ==================== LAYOUT DESKTOP ORIGINALE ====================
+            // ==================== LAYOUT DESKTOP ====================
             html += `
                 <div class="panel-three-columns">
                     <div class="col-left">
@@ -709,7 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="sub-section-title">Altro</div>
                             <div class="desktop-grid-altro" style="display:flex; flex-direction:column; gap:2px;">
             `;
-            const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }];
+            
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
                 html += `<label style="display:flex; align-items:center; gap:4px; margin:2px 0; cursor:pointer;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
@@ -854,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bottomPanel.querySelectorAll('.custom-context-chk').forEach(chk => {
             chk.onchange = (e) => {
                 const index = parseInt(e.target.getAttribute('data-index'));
-                const targetLayer = [layer_confini_amministrativi][index];
+                const targetLayer = contextLayers[index].layer;
                 if (e.target.checked) { map.addLayer(targetLayer); } else { map.removeLayer(targetLayer); }
             };
         });
@@ -914,6 +915,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 ], { padding: [20, 20], animate: true });
             }
         }, 'btn-tutorial-home');
+
+        // Pulsante Geolocalizzazione 📍
+        createBtn('📍', "Posizione", () => { map.locate({setView: true, maxZoom: 16}); }, 'btn-tutorial-locate');
+
+        return container;
+    };
+    btnControl.addTo(map);
+
+    L.DomEvent.disableClickPropagation(bottomPanel);
+    L.DomEvent.disableScrollPropagation(bottomPanel);
+    L.DomEvent.on(bottomPanel, 'mousewheel touchstart pointerdown', (e) => {
+        L.DomEvent.stopPropagation(e);
+    });
+});
 
 function closeModal() {
     const modal = document.getElementById('welcome-modal');
