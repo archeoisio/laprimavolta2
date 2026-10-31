@@ -651,7 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                    <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; overscroll-behavior-y: contain;">
             `;
-            tavoloKeys.forEach(tavolo => {
+         tavoloKeys.forEach(tavolo => {
         const items = atlasCategories[tavolo];
         const isActive = (tavolo === currentActiveTab);
         if (!isActive) return;
@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <!-- 1. TITOLO FISSO (NON SCORRE) -->
             <div class="sub-section-title" style="margin-bottom: 4px; flex-shrink: 0;">Elementi: ${items.length}</div>
             
-            <!-- 2. CONTENITORE SCORRIBILE (SOLO QUESTO SCORRE) -->
+            <!-- 2. CONTENITORE SCORRIBILE -->
             <div style="display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior-y: contain; padding-right: 4px; flex-grow: 1;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 250px; gap: 4px;">
         `;
@@ -674,13 +674,14 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
         
+        // Chiudiamo correttamente la griglia e il contenitore scrollabile
         html += `</div></div>`;
     });
-                html += `</div>`;
-            });
-            html += `</div></div></div>`;
 
-        } else {
+    // Chiusura pulita finale del blocco principale del pannello
+    html += `</div></div></div>`;
+
+} else {
             // ==================== LAYOUT DESKTOP ORIGINALE ====================
             html += `
                 <div class="panel-three-columns">
