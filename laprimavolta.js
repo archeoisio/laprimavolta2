@@ -27,7 +27,7 @@ customStyleTag.innerHTML = `
         transition: none !important;
     }
 
-    /* ==================== MOBILE STYLES (ORIGINALE) ==================== */
+    /* ==================== MOBILE STYLES (ORIGINALE RIPRISTINATO) ==================== */
     #custom-bottom-panel { 
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
         width: 100%; max-width: 1000px; max-height: 310px; 
@@ -56,8 +56,7 @@ customStyleTag.innerHTML = `
         transform: translate(-50%, -50%); 
     }
 
-
- /* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
+    /* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
@@ -88,7 +87,6 @@ customStyleTag.innerHTML = `
             max-height: 100vh !important;
         }
 
-        /* LINGUETTA RETTANGOLARE SUL BORDO SINISTRO (ELIMINATO QUALSIASI PALLINO) */
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
             top: 50% !important;
@@ -109,7 +107,6 @@ customStyleTag.innerHTML = `
             overflow: hidden !important;
         }
 
-        /* Testo orientato verticalmente dentro la linguetta */
         #custom-bottom-panel:not(.open) .panel-main-header {
             writing-mode: vertical-rl !important;
             text-orientation: mixed !important;
@@ -143,7 +140,6 @@ customStyleTag.innerHTML = `
             box-sizing: border-box;
         }
 
-        /* Pannello dettaglio elemento desktop */
         #feature-detail-panel {
             position: fixed; 
             top: auto;
@@ -173,16 +169,25 @@ customStyleTag.innerHTML = `
             width: 950px !important;
         }
     }
-    
-    @media (min-width: 768px) {
-        #custom-bottom-panel:not(.open) { width: 44px !important; height: 44px !important; border-radius: 50% !important; overflow: hidden; padding: 0 !important; display: flex; align-items: center; justify-content: center; }
-        #custom-bottom-panel:not(.open) .panel-main-header { justify-content: center; padding: 0; margin: 0; }
-        #custom-bottom-panel:not(.open) .panel-main-header b { display: none; }
-    }
+
     @media (max-width: 767px) {
         #custom-bottom-panel:not(.open) { max-height: 44px !important; height: 44px !important; }
         #custom-bottom-panel:not(.open) .panel-main-header { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        #feature-detail-panel {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 1000px; height: 240px !important;
+            background: rgba(255, 255, 255, 0.99); backdrop-filter: blur(10px);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.4); z-index: 2100;
+            padding: 10px 14px; box-sizing: border-box; font-family: sans-serif;
+            font-size: 12px; color: #333; display: none; flex-direction: column;
+            border-top-left-radius: 14px; border-top-right-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
     }
+
+    #custom-bottom-panel:not(.open) .panel-three-columns { display: none !important; }
     
     .panel-main-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; border-bottom: 1px solid #e1e1e1; margin-bottom: 6px; cursor: pointer; user-select: none; width: 100%; }
 
@@ -716,7 +721,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.renderPanelContent = function() {
         const isOpen = bottomPanel.classList.contains('open');
-        const arrowSymbol = isOpen ? '◀' : '▶';
+        const arrowSymbol = isOpen ? '▼' : '▲';
         const checkMobile = window.innerWidth < 768;
 
         let html = `
@@ -726,7 +731,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 panel.classList.toggle('open');
                 renderPanelContent();
                 
-                // Spostamento dinamico della mappa su desktop
                 if (window.innerWidth >= 768) {
                     if (!wasOpen) {
                         map.panBy([-475, 0], { animate: true });
@@ -749,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (checkMobile) {
-            // ==================== LAYOUT MOBILE (ORIGINALE) ====================
+            // ==================== LAYOUT MOBILE ORIGINALE (RIGA SUP UNICA) ====================
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
