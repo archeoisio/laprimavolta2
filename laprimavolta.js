@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomControl: false, 
         maxZoom: 28, 
         minZoom: 4, 
-        zoomSnap: 1,  
+        zoomSnap: 0.25,  
         zoomDelta: 1,
         wheelDebounceTime: 80,
         wheelPxPerZoomLevel: 120, 
