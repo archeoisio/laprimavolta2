@@ -649,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `</div>`;
 
             html += `
-                    <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px;">
+                   <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; overscroll-behavior-y: contain;">
             `;
             tavoloKeys.forEach(tavolo => {
                 const items = atlasCategories[tavolo];
