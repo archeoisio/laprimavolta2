@@ -424,34 +424,39 @@ const navigationBounds = [
     [40.760, 14.920]  // Nord-Est esteso
 ];
     document.addEventListener('DOMContentLoaded', () => {
-const isMobile = window.innerWidth < 768; // Definiamo isMobile prima di creare la mappa
+const isMobile = window.innerWidth < 768;
 
-map = L.map('map', { 
+    // 1. Creiamo la mappa SENZA il .fitBounds() immediato
+    map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
-        minZoom: 10, // Lasciamo margine basso per il mobile
+        minZoom: 10, 
         zoomSnap: 1,  
         zoomDelta: 1,
         wheelDebounceTime: 80,
         wheelPxPerZoomLevel: 120 
-    }).fitBounds(initialBounds);
+    });
 
-// Gestione dello zoom iniziale differenziata
-if (isMobile) {
-    // Su mobile allarghiamo dolcemente (es. sottraendo solo 2 livelli invece di 10)
-    const targetZoom = Math.max(10, map.getZoom() - 2); 
-    map.setZoom(targetZoom); 
-} else {
-    // Su desktop blocchiamo rigidamente il limite minimo a 13
-    if (map.getZoom() < 13) {
-        map.setZoom(13);
-    }
-    map.on('zoomend', () => {
-        if (!isMobile && map.getZoom() < 13) {
+    // 2. Differenziamo la vista iniziale tra mobile e desktop
+    if (isMobile) {
+        // Su mobile impostiamo centro (es. il punto medio di Salerno) e uno zoom più largo (es. 12)
+        map.setView([40.676, 14.822], 12); 
+    } else {
+        // Su desktop manteniamo il fitBounds originale
+        map.fitBounds(initialBounds);
+        if (map.getZoom() < 13) {
             map.setZoom(13);
         }
-    });
-}
+    }
+
+    // Blocco desktop per impedire lo zoom sotto il 13
+    if (!isMobile) {
+        map.on('zoomend', () => {
+            if (!isMobile && map.getZoom() < 13) {
+                map.setZoom(13);
+            }
+        });
+    }
 
 const boundsLimit = L.latLngBounds(navigationBounds);
 
