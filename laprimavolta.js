@@ -614,7 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
-                <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; white-space: nowrap; overflow-x: auto;">
+                <div style="display: flex; align-items: center; gap: 25px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; white-space: nowrap; overflow-x: auto;">
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <span class="sub-section-title" style="margin:0; font-size:11px;">Base Map:</span>
                         <label style="display:inline-flex; align-items:center; gap:2px; cursor:pointer; font-size:11px;">
