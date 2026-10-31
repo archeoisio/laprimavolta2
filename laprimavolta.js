@@ -188,7 +188,7 @@ customStyleTag.innerHTML = `
             overflow-y: auto;
             background: rgba(255, 255, 255, 0.98); 
             backdrop-filter: blur(10px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.25); 
+            box-shadow: none !important; 
             z-index: 2100;
             padding: 10px 12px; 
             box-sizing: border-box; 
