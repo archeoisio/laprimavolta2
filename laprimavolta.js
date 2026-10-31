@@ -149,7 +149,11 @@ customStyleTag.innerHTML = `
             color: #2c3e50 !important;
             white-space: nowrap;
         }
-
+/* Dimensione del font quando il pannello è APERTO su desktop */
+        #custom-bottom-panel.open .panel-main-header b {
+            font-size: 16px !important;
+            padding: 0 !important;
+        }
         #custom-bottom-panel:not(.open) .panel-main-header div {
             display: flex !important;
         }
@@ -520,8 +524,8 @@ window.changeDetailSlide = function(targetSlide) {
 };
 
 const initialBounds = [
-    [40.623, 14.771],
-    [40.723, 14.873]
+    [40.627, 14.771],
+    [40.727, 14.873]
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
