@@ -621,7 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (checkMobile) {
             // ==================== LAYOUT MOBILE CON RIGA UNICA SUP ====================
-            html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
+           html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
             html += `
                 <div style="display: flex; align-items: center; gap: 25px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; white-space: nowrap; overflow-x: auto;">
@@ -638,8 +638,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <span class="sub-section-title" style="margin:0; font-size:11px;">Altro:</span>
             `;
-            const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }, { name: 'Comuni / Provincia', layer: layer_comuniprovincia }
-                                  ];
+            
+            const contextLayers = [
+                { name: 'Confini', layer: layer_confini_amministrativi }, 
+                { name: 'Comuni / Provincia', layer: layer_comuniprovincia }
+            ];
+            
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
                 html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
@@ -659,39 +663,33 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             html += `</div>`;
 
-            html += `
-<div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch;">            `;
-         tavoloKeys.forEach(tavolo => {
-        const items = atlasCategories[tavolo];
-        const isActive = (tavolo === currentActiveTab);
-        if (!isActive) return;
-
-        html += `
-            <!-- 1. TITOLO FISSO (NON SCORRE) -->
-            <div class="sub-section-title" style="margin-bottom: 4px; flex-shrink: 0;">Elementi: ${items.length}</div>
+            html += `<div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch;">`;
             
-            <!-- 2. CONTENITORE SCORRIBILE -->
-            <div style="display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; min-height: 0; padding-right: 4px; flex-grow: 1;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 250px; gap: 4px;">
-        `;
-        
-        items.forEach((item, globalIdx) => {
-            html += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px; box-sizing:border-box; height:100%;">
-                    <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; white-space:normal; word-break:break-word; line-height:1.2;" title="${item.name}">${item.name}</span>
-                    <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
-                </div>
-            `;
-        });
-        
-        // Chiudiamo correttamente la griglia e il contenitore scrollabile
-        html += `</div></div>`;
-    });
+            tavoloKeys.forEach(tavolo => {
+                const items = atlasCategories[tavolo];
+                const isActive = (tavolo === currentActiveTab);
+                if (!isActive) return;
 
-    // Chiusura pulita finale del blocco principale del pannello
-    html += `</div></div></div>`;
+                html += `
+                    <div class="sub-section-title" style="margin-bottom: 4px; flex-shrink: 0;">Elementi: ${items.length}</div>
+                    <div style="display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; min-height: 0; padding-right: 4px; flex-grow: 1;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; max-width: 250px; gap: 4px;">
+                `;
+                
+                items.forEach((item, globalIdx) => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px; box-sizing:border-box; height:100%;">
+                            <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; white-space:normal; word-break:break-word; line-height:1.2;" title="${item.name}">${item.name}</span>
+                            <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+            });
+         
+            html += `</div></div></div>`;
 
-} else {
+        } else {
             // ==================== LAYOUT DESKTOP ORIGINALE ====================
             html += `
                 <div class="panel-three-columns">
