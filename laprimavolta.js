@@ -23,7 +23,7 @@ customStyleTag.innerHTML = `
         width: 100%; max-width: 1000px; max-height: 310px; 
         background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); 
         box-shadow: 0 -5px 25px rgba(0,0,0,0.3); transition: all 0.3s ease-in-out; 
-        z-index: 2000; padding: 8px 10px; box-sizing: border-box; text-align: left; 
+        z-index: 2000; padding: 4px 5px; box-sizing: border-box; text-align: left; 
         font-family: sans-serif; font-size: 12px; color: #333; 
         border-top-left-radius: 14px; border-top-right-radius: 14px; 
         border: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; 
