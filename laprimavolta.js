@@ -432,6 +432,11 @@ map = L.map('map', {
         wheelPxPerZoomLevel: 120 // <-- La virgola qui ci vuole perché ci sono altre opzioni sotto (o se chiudi le graffe qui è l'ultima)
     }).fitBounds(initialBounds);
 
+       const isMobile = window.innerWidth < 768; // Sotto i 768px è considerato smartphone
+if (isMobile) {
+    // Riduciamo lo zoom iniziale di 0.75 (puoi aumentare o diminuire questo valore)
+    map.setZoom(map.getZoom() - 2); 
+}
        const boundsLimit = L.latLngBounds(navigationBounds);
 
 map.on('move', () => {
