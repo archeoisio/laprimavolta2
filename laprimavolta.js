@@ -14,6 +14,8 @@ customStyleTag.innerHTML = `
 .leaflet-pane svg path,
     .leaflet-tile-pane .leaflet-layer {
         transition: none !important;
+        animation: none !important;
+        will-change: transform;
     }
     .leaflet-control-layers-toggle { width: 44px !important; height: 44px !important; }
     
