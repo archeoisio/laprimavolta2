@@ -416,28 +416,20 @@ document.addEventListener('DOMContentLoaded', () => {
     map = L.map('map', { 
         zoomControl: false, 
         maxZoom: 28, 
-        minZoom: 2, 
+        minZoom: 4, 
         zoomSnap: 1,  
         zoomDelta: 1,
         wheelDebounceTime: 80,
         wheelPxPerZoomLevel: 120 
     });
 
-    if (isMobileDevice) {
-        map.setView([40.658, 14.805], 11); 
+   if (isMobileDevice) {
+        map.setView([40.658, 14.805], 11); // Vista mobile bilanciata per non coprire i confini col pannello
     } else {
         map.fitBounds(initialBounds);
         if (map.getZoom() < 13) {
-            map.setZoom(13);
+            map.setZoom(13); // Imposta lo zoom di partenza a 13 su desktop, ma SENZA bloccarlo
         }
-    }
-
-    if (!isMobileDevice) {
-        map.on('zoomend', () => {
-            if (window.innerWidth >= 768 && map.getZoom() < 13) {
-                map.setZoom(13);
-            }
-        });
     }
        
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
@@ -446,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('zoomend', checkZoomVisibility);
 
     map.createPane('pane_confini_amministrativi');
-    map.getPane('pane_confini_amministrativi').style.zIndex = 404;
+    map.getPane('pane_confini_amministrativi').style.zIndex = 5000;
 
     var layer_confini_amministrativi = L.geoJson(null, {
         interactive: false,
