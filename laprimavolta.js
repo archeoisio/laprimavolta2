@@ -590,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.renderPanelContent = function() {
+   window.renderPanelContent = function() {
         const isOpen = bottomPanel.classList.contains('open');
         const arrowSymbol = isOpen ? '▼' : '▲';
         const checkMobile = window.innerWidth < 768;
@@ -610,34 +610,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (checkMobile) {
+            // ==================== LAYOUT MOBILE SPECIFICO ====================
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 180px;">`;
             
+            // RIGA UNICA SUPERIORE: Base Map (OSM/Sat) | Altro (Confini) con linea divisoria sotto
             html += `
-                <div style="display: flex; gap: 12px; border-bottom: 1px solid #e1e1e1; padding-bottom: 4px; flex-shrink: 0; align-items: center;">
-                    <div>
-                        <div class="sub-section-title" style="margin-bottom:2px;">Base map</div>
-                        <div style="display: flex; gap: 8px;">
-                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;">
-                                <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
-                            </label>
-                            <label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;">
-                                <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Sat
-                            </label>
-                        </div>
+                <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; margin-bottom: 2px; flex-shrink: 0; white-space: nowrap; overflow-x: auto;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="sub-section-title" style="margin:0; font-size:11px;">Base Map:</span>
+                        <label style="display:inline-flex; align-items:center; gap:2px; cursor:pointer; font-size:11px;">
+                            <input type="radio" name="baseMapChoice" value="osm" ${map.hasLayer(layer_OpenStreetMap_4) ? 'checked' : ''}> OSM
+                        </label>
+                        <label style="display:inline-flex; align-items:center; gap:2px; cursor:pointer; font-size:11px;">
+                            <input type="radio" name="baseMapChoice" value="Satellite" ${map.hasLayer(layer_GoogleSatellite_3) ? 'checked' : ''}> Sat
+                        </label>
                     </div>
-                    <div style="flex-grow: 1; overflow-x: auto; white-space: nowrap;">
-                        <div class="sub-section-title" style="margin-bottom:2px;">Altro</div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
+                    <div style="width: 1px; height: 14px; background: #dcdde1; flex-shrink: 0;"></div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="sub-section-title" style="margin:0; font-size:11px;">Altro:</span>
             `;
             const contextLayers = [{ name: 'Confini', layer: layer_confini_amministrativi }];
             contextLayers.forEach((ctx, idx) => {
                 const isChecked = map.hasLayer(ctx.layer);
                 html += `<label style="display:inline-flex; align-items:center; gap:3px; cursor:pointer; font-size:11px;"><input type="checkbox" class="custom-context-chk" data-index="${idx}" ${isChecked ? 'checked' : ''}> ${ctx.name}</label>`;
             });
-            html += `</div></div></div>`;
+            html += `</div></div>`;
 
+            // RIGA INFERIORE: Due colonne (Tematiche a sinistra, Elementi mappati a destra in griglia 2 colonne con scroll verticale)
             html += `
                 <div style="display: grid; grid-template-columns: 120px 1fr; gap: 6px; flex-grow: 1; overflow: hidden;">
+                    <!-- Colonna Sinistra: Tematiche (scroll verticale) -->
                     <div style="display: flex; flex-direction: column; border-right: 1px solid #e1e1e1; padding-right: 4px; overflow-y: auto; gap: 3px;">
                         <div class="sub-section-title" style="margin-bottom:2px;">Tematiche</div>
             `;
@@ -649,6 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             html += `</div>`;
 
+            // Colonna Destra: Elementi mappati (Griglia a 2 colonne, scroll verticale)
             html += `
                     <div style="display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px;">
             `;
@@ -674,6 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `</div></div></div>`;
 
         } else {
+            // ==================== LAYOUT DESKTOP ORIGINALE ====================
             html += `
                 <div class="panel-three-columns">
                     <div class="col-left">
@@ -753,6 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         bottomPanel.innerHTML = html;
 
+        // Gestione click pulsanti Tematiche
         const tabBtns = bottomPanel.querySelectorAll('.sidebar-tab-btn');
         const tabContents = bottomPanel.querySelectorAll('.sidebar-tab-content');
         tabBtns.forEach(btn => {
@@ -775,6 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
+        // Gestione click pulsanti lente d'ingrandimento (vola-btn)
         bottomPanel.querySelectorAll('.vola-btn').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
@@ -827,6 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
+        // Gestione cambio mappa base (OSM / Satellite)
         bottomPanel.querySelectorAll('input[name="baseMapChoice"]').forEach(radio => {
             radio.onchange = (e) => {
                 if (e.target.value === 'osm') { map.addLayer(layer_OpenStreetMap_4); map.removeLayer(layer_GoogleSatellite_3); } 
@@ -834,6 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
+        // Gestione checkbox Altro / Confini
         bottomPanel.querySelectorAll('.custom-context-chk').forEach(chk => {
             chk.onchange = (e) => {
                 const index = parseInt(e.target.getAttribute('data-index'));
@@ -842,8 +850,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
     };
-
-    renderPanelContent();
 
     function setVh() {
         const mapEl = document.getElementById('map');
