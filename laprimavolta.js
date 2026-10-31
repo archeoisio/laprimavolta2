@@ -409,10 +409,6 @@ const initialBounds = [
     [40.626, 14.771],
     [40.726, 14.873]
 ];
-const navigationBounds = [
-    [40.580, 14.680], 
-    [40.760, 14.920]  
-];
 
 document.addEventListener('DOMContentLoaded', () => {
     const isMobileDevice = window.innerWidth < 768;
