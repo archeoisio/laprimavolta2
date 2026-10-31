@@ -1174,15 +1174,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return btn;
         };
 
+   // Pulsante Home 🌍
         createBtn('🌍', "Torna alla vista iniziale", () => {
             const isMobileDevice = window.innerWidth < 768;
             if (isMobileDevice) {
-                map.setView([40.500, 14.805], 11.75, { animate: true });
+                map.setView([40.620, 14.805], 11.75, { animate: true });
             } else {
-                map.fitBounds([
-                    [40.626, 14.771],
-                    [40.726, 14.873]
-                ], { padding: [20, 20], animate: true });
+                map.fitBounds(initialBounds, { padding: [20, 20], animate: true });
+                if (map.getZoom() < 13) {
+                    map.setZoom(13);
+                }
             }
         }, 'btn-tutorial-home');
 
