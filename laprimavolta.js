@@ -181,6 +181,7 @@ customStyleTag.innerHTML = `
             border-top-left-radius: 14px; border-top-right-radius: 14px;
             border: 1px solid rgba(0,0,0,0.1);
             overflow-y: auto;
+            overscroll-behavior: none;
         }
     }
 
@@ -194,9 +195,9 @@ customStyleTag.innerHTML = `
     
     .col-left { display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow: hidden; }
     .col-left .base-map-vertical { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
-    .col-left-scrollable { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex-grow: 1; border-top: 1px solid #e1e1e1; padding-top: 4px; }
+    .col-left-scrollable { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex-grow: 1; border-top: 1px solid #e1e1e1; padding-top: 4px; overscroll-behavior: none; }
     
-    .col-middle { display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow-y: auto; }
+    .col-middle { display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #e1e1e1; padding-right: 6px; overflow-y: auto; overscroll-behavior: none; }
     .sidebar-tabs-vertical { display: flex; flex-direction: column; gap: 4px; }
     
     .col-right { display: flex; flex-direction: column; overflow: hidden; }
@@ -206,7 +207,7 @@ customStyleTag.innerHTML = `
     .sidebar-tab-content { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .sidebar-tab-content.active { display: flex; }
     
-    .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; }
+    .panel-scrollable-grid { flex-grow: 1; overflow-x: auto; overflow-y: hidden; display: flex; gap: 8px; padding-bottom: 4px; align-items: flex-start; overscroll-behavior: none; }
     .feature-vertical-column { display: flex; flex-direction: column; gap: 4px; min-width: 100px; flex-shrink: 0; }
     
     .feature-detail-header {
@@ -745,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (checkMobile) {
-            // ==================== LAYOUT MOBILE ORIGINALE CON CONTENUTI ====================
+            // ==================== LAYOUT MOBILE CORRETTO CON SCORRIMENTO ORIZZONTALE E VERTICALE DISTINTI ====================
             html += `<div class="panel-three-columns" style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow: hidden; height: 210px;">`;
             
             html += `
@@ -766,7 +767,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="display: flex; align-items: center; gap: 6px; flex-grow: 1; min-width: 0;">
                         <span class="sub-section-title" style="margin:0; flex-shrink:0; font-size:11px;">Altro:</span>
                         
-                        <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; flex-grow: 1; min-width: 0; padding-bottom: 2px; -webkit-overflow-scrolling: touch;">
+                        <!-- Contenitore orizzontale per Altro con dimensione 0 e no bounce -->
+                        <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; flex-grow: 1; min-width: 0; padding-bottom: 2px; -webkit-overflow-scrolling: touch; overscroll-behavior-x: none;">
             `;
             
             contextLayers.forEach((ctx, idx) => {
@@ -775,10 +777,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             html += `</div></div></div>`;
 
-            // Sezione tab tematiche ed elementi per mobile
+            // Sezione inferiore mobile con altezza 0 e scorrimento verticale controllato (no bounce)
             html += `
-                <div style="display: flex; gap: 6px; flex-grow: 1; overflow: hidden; min-height: 0;">
-                    <div style="display: flex; flex-direction: column; gap: 3px; width: 110px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid #e1e1e1; padding-right: 4px;">
+                <div style="display: flex; gap: 6px; flex-grow: 1; min-height: 0; height: 0; overflow: hidden;">
+                    <div style="display: flex; flex-direction: column; gap: 3px; width: 110px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid #e1e1e1; padding-right: 4px; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch;">
+                        <div class="sub-section-title" style="font-size:11px; margin-bottom:2px;">Tematiche</div>
             `;
 
             tavoloKeys.forEach(tavolo => {
@@ -788,13 +791,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<button class="sidebar-tab-btn" data-tavolo-name="${tavolo}" style="font-size:10px; padding:3px 4px; border-radius:4px; border:1px solid #dcdde1; text-align:left; cursor:pointer; font-weight:bold; ${activeStyle}">${tavolo.toUpperCase()}</button>`;
             });
 
-            html += `</div><div style="display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; min-width: 0;">`;
+            html += `</div><div style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0; height: 100%; overflow: hidden;">`;
 
             if (currentActiveTab && atlasCategories[currentActiveTab]) {
                 const items = atlasCategories[currentActiveTab];
                 html += `
-                    <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:4px;">Elementi (${items.length}):</div>
-                    <div style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding-right: 2px;">
+                    <div class="sub-section-title" style="font-size:11px; margin-bottom:4px; flex-shrink:0;">Elementi mappati: ${items.length}</div>
+                    <div style="flex-grow: 1; min-height: 0; height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding-right: 2px; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch;">
                 `;
                 items.forEach((item, globalIdx) => {
                     html += `
