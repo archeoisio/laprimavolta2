@@ -439,7 +439,7 @@ if (isMobile) {
 }
        const boundsLimit = L.latLngBounds(navigationBounds);
 
-map.on('move', () => {
+map.on('moveend', () => {
     if (!boundsLimit.contains(map.getCenter())) {
         map.panInsideBounds(boundsLimit, { animate: false });
     }
