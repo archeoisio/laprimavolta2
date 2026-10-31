@@ -56,8 +56,8 @@ customStyleTag.innerHTML = `
         transform: translate(-50%, -50%); 
     }
 
-/* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
-   /* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
+
+ /* ==================== DESKTOP STYLES (LINGUETTA LATO SINISTRO) ==================== */
     @media (min-width: 768px) {
         #custom-bottom-panel {
             position: fixed;
@@ -88,16 +88,16 @@ customStyleTag.innerHTML = `
             max-height: 100vh !important;
         }
 
-        /* LINGUETTA DI APERTURA A SINISTRA (SOVRASCRIVE OGNI EFFETTO PALLINO) */
+        /* LINGUETTA RETTANGOLARE SUL BORDO SINISTRO (ELIMINATO QUALSIASI PALLINO) */
         #custom-bottom-panel:not(.open) {
             position: fixed !important;
             top: 50% !important;
             left: 0 !important;
             bottom: auto !important;
             transform: translateY(-50%) !important;
-            width: 44px !important;
-            height: 160px !important;
-            max-height: 160px !important;
+            width: 38px !important;
+            height: 170px !important;
+            max-height: 170px !important;
             border-radius: 0 10px 10px 0 !important;
             padding: 0 !important;
             display: flex !important;
