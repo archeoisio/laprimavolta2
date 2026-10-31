@@ -455,11 +455,14 @@ if (isMobile) {
 
 const boundsLimit = L.latLngBounds(navigationBounds);
 
-map.on('moveend', () => {
-    if (!boundsLimit.contains(map.getCenter())) {
-        map.panInsideBounds(boundsLimit, { animate: false });
-    }
-});
+    // Controlliamo quando l'utente finisce di spostare la mappa
+    map.on('moveend', () => {
+        // Se il centro della mappa esce dai confini consentiti
+        if (!boundsLimit.contains(map.getCenter())) {
+            // Riportiamo la mappa dentro i confini senza animazione pesante
+            map.panInsideBounds(boundsLimit, { animate: false });
+        }
+    });
        
     map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
