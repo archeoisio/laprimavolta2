@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <script data-goatcounter="https://muroma.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+        async src="//gc.zgo.at/count.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>La Prima Volta, mappiamo Salerno per decidere insieme</title>
@@ -18,68 +18,53 @@
 <link rel="stylesheet" href="css/leaflet.photon.css">
 
 <style>
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    overflow: hidden !important;
-    background-color: #0b0b0b;
-  }
-  #map {
-    position: fixed !important;
-    top: 0; left: 0; right: 0; bottom: 0;
-    width: 100% !important;
-    height: 100dvh !important;
-    z-index: 1;
-    background: #0b0b0b !important;
-  }
-  .leaflet-control-geocoder { z-index: 2000 !important; margin-bottom: 0; }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    background-color: #0b0b0b;
+  }
+  #map {
+    position: fixed !important;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100% !important;
+    height: 100dvh !important;
+    z-index: 1;
+    background: #0b0b0b !important;
+  }
+  .leaflet-control-geocoder { z-index: 2000 !important; margin-bottom: 0; }
 </style>
 </head>
 <body>
-  <div id="map"></div>
+  <div id="map"></div>
 
-  <!-- Modale di Benvenuto -->
-  <div id="welcome-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 9999;">
-    <div style="background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 400px; font-family: sans-serif;">
-      <h2 style="margin-top: 0;">LA PRIMA VOLTA 🗺️</h2>
-      <p>Vuoi visualizzare il tutorial rapido <br> per scoprire i comandi?</p>
-      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-        <button onclick="startTutorial()" style="padding: 10px 20px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold;">Si</button>
-        <button onclick="closeModal()" style="padding: 10px 20px; cursor: pointer; background: #7f8c8d; color: white; border: none; border-radius: 5px;">No, apri mappa</button>
-      </div>
-    </div>
-  </div>
+  <!-- 1. CORE Leaflet JS (DEVE ESSERE IL PRIMO IN ASSOLUTO) -->
+  <script src="js/leaflet.js"></script>
 
-  <!-- 1. CORE LEAFlet JS (DEVE ESSERE IL PRIMO IN ABSOLUTO) -->
-  <script src="js/leaflet.js"></script>
+  <!-- 2. Tutti i plugin e le librerie di QGIS / Leaflet -->
+  <script src="js/qgis2web_expressions.js"></script>
+  <script src="js/L.Control.Layers.Tree.min.js"></script>
+  <script src="js/L.Control.Locate.min.js"></script>
+  <script src="js/multi-style-layer.js"></script>
+  <script src="js/leaflet.rotatedMarker.js"></script>
+  <script src="js/leaflet.pattern.js"></script>
+  <script src="js/leaflet-hash.js"></script>
+  <script src="js/Autolinker.min.js"></script>
+  <script src="js/rbush.min.js"></script>
+  <script src="js/labelgun.min.js"></script>
+  <script src="js/labels.js"></script>
+  <script src="js/leaflet.photon.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-  <!-- 2. Tutti i plugin e le librerie di QGIS / Leaflet -->
-  <script src="js/qgis2web_expressions.js"></script>
-  <script src="js/L.Control.Layers.Tree.min.js"></script>
-  <script src="js/L.Control.Locate.min.js"></script>
-  <script src="js/multi-style-layer.js"></script>
-  <script src="js/leaflet.rotatedMarker.js"></script>
-  <script src="js/leaflet.pattern.js"></script>
-  <script src="js/leaflet-hash.js"></script>
-  <script src="js/Autolinker.min.js"></script>
-  <script src="js/rbush.min.js"></script>
-  <script src="js/labelgun.min.js"></script>
-  <script src="js/labels.js"></script>
-  <script src="js/leaflet.photon.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <!-- 3. Dati GeoJSON dei Layer QGIS -->
+  <script src="data/puntiprimavolta_5.js"></script>
+  <script src="data/poligoniprimavolta_6.js"></script>
 
-  <!-- 3. Dati GeoJSON dei Layer QGIS -->
-
-
-
-  <script src="data/puntiprimavolta_5.js"></script>
-  <script src="data/poligoniprimavolta_6.js"></script>
-
-  <!-- 4. Il tuo file di script personalizzato (es. laprimavolta.js) -->
-  <script src="laprimavolta.js"></script>
+  <!-- 4. Il tuo file di script personalizzato (es. laprimavolta.js) -->
+  <script src="laprimavolta.js"></script>
 </body>
 </html>
