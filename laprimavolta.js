@@ -1029,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const globalIdx = items.indexOf(item);
                         html += `
                             <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 5px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:4px;">
-                                <span style="font-size:11px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
+                                <span style="font-size:13px; color:#333; flex-grow:1; margin-right:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</span>
                                 <button class="vola-btn" data-tavolo="${tavolo}" data-index="${globalIdx}" style="font-size:10px; padding:2px 4px; cursor:pointer; background:white; border:1px solid #333; border-radius:3px; flex-shrink:0;">🔍</button>
                             </div>
                         `;
